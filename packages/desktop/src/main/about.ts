@@ -72,14 +72,17 @@ const ABOUT_MESSAGES: Record<
     okButtonLabel: string;
     optimizedForAppleSilicon: string;
     copyright: (year: number, applicationName: string) => string;
+    /** Apache-2.0 归属（docs/plan/01 §2.5）：About 窗口列明上游基础。 */
+    basedOn: string;
   }
 > = {
-  "zh-CN": {
-    aboutTitle: (applicationName) => `关于 ${applicationName}`,
-    buildLabel: "构建",
-    okButtonLabel: "确定",
-    optimizedForAppleSilicon: "已针对 Apple Silicon 优化。",
-    copyright: (year, applicationName) => `版权所有 © ${year} ${applicationName}。`,
+  ar: {
+    aboutTitle: (applicationName) => `حول ${applicationName}`,
+    buildLabel: "البناء",
+    okButtonLabel: "حسناً",
+    optimizedForAppleSilicon: "مُحسَّن لشرائح Apple Silicon.",
+    copyright: (year, applicationName) => `جميع الحقوق محفوظة © ${year} ${applicationName}.`,
+    basedOn: "مبني على ZCodium (Apache-2.0)",
   },
   "en-US": {
     aboutTitle: (applicationName) => `About ${applicationName}`,
@@ -87,6 +90,7 @@ const ABOUT_MESSAGES: Record<
     okButtonLabel: "OK",
     optimizedForAppleSilicon: "Optimized for Apple Silicon.",
     copyright: (year, applicationName) => `Copyright © ${year} ${applicationName}.`,
+    basedOn: "Based on ZCodium (Apache-2.0)",
   },
 };
 
@@ -304,6 +308,7 @@ export async function showAboutDialog(
         copyright: formatAboutCopyright(applicationName, undefined, locale),
         optimizationLine: formatAboutOptimizationLine(snapshot, locale),
         okButtonLabel: aboutMessages.okButtonLabel,
+        basedOn: aboutMessages.basedOn,
       }),
     )}`,
   );

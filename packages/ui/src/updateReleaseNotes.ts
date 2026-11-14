@@ -20,9 +20,9 @@ export function getLocalizedUpdateReleaseNotes(
 
   return (
     payload.releaseNotesByLocale?.[locale] ??
-    (locale === "zh-CN"
+    (locale === "ar"
       ? defaultReleaseNotes
-      : (payload.releaseNotesByLocale?.["zh-CN"] ?? defaultReleaseNotes))
+      : (payload.releaseNotesByLocale?.["ar"] ?? defaultReleaseNotes))
   );
 }
 

@@ -22,7 +22,7 @@ function formatWeekday(
   locale: Locale,
   formatMessage: IntlInstance["formatMessage"],
 ): string {
-  if (locale === "zh-CN") {
+  if (locale === "ar") {
     return formatMessage(
       { id: "settings.memory.viewer.updated.weekdayZh" },
       { weekday: "日一二三四五六"[new Date(timestamp).getDay()] ?? "" },
@@ -38,7 +38,7 @@ function formatDate(
   formatMessage: IntlInstance["formatMessage"],
 ): string {
   const date = new Date(timestamp);
-  if (locale === "zh-CN") {
+  if (locale === "ar") {
     return formatMessage(
       {
         id: includeYear

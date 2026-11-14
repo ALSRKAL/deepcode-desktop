@@ -715,7 +715,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
         setLocalePreference("system");
         return;
       }
-      if (value === "zh-CN" || value === "en-US") {
+      if (value === "ar" || value === "en-US") {
         setLocalePreference(value as Locale);
       }
     },

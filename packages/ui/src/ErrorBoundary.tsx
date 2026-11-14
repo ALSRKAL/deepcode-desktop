@@ -3,7 +3,7 @@ import type { ErrorInfo, ReactNode } from "react";
 import type { Locale } from "@zcode/shared";
 import { DEFAULT_LOCALE } from "@zcode/shared";
 import { DesktopWindowFrame } from "@/DesktopWindowFrame.js";
-import zhCN from "@/i18n/locales/zh-CN.js";
+import ar from "@/i18n/locales/ar.js";
 import enUS from "@/i18n/locales/en-US.js";
 import { logger } from "@/logger.js";
 import { recordUiDiagnostic } from "@/lib/diagnostics/recorder.js";
@@ -59,7 +59,7 @@ function resolveBoundaryLocale(): Locale {
   if (typeof localStorage !== "undefined" && typeof localStorage.getItem === "function") {
     try {
       const storedPreference = localStorage.getItem(LOCALE_PREFERENCE_KEY);
-      if (storedPreference === "zh-CN" || storedPreference === "en-US") {
+      if (storedPreference === "ar" || storedPreference === "en-US") {
         return storedPreference;
       }
     } catch {
@@ -69,8 +69,9 @@ function resolveBoundaryLocale(): Locale {
     }
   }
 
+  // 阿拉伯语是默认语言（docs/plan/01 §5.2）：系统语言以 ar 开头 → ar，否则英语。
   if (typeof navigator !== "undefined") {
-    return navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US";
+    return navigator.language.toLowerCase().startsWith("ar") ? "ar" : "en-US";
   }
 
   return DEFAULT_LOCALE;
@@ -78,7 +79,7 @@ function resolveBoundaryLocale(): Locale {
 
 function formatBoundaryMessage(id: string): string {
   const locale = resolveBoundaryLocale();
-  const messages = locale === "en-US" ? enUS : zhCN;
+  const messages = locale === "en-US" ? enUS : ar;
   return messages[id] ?? id;
 }
 

@@ -43,9 +43,9 @@ const COPY: Readonly<Record<Locale, LandingCopy>> = {
     "conversationShare.landing.accessMode.public_importable": "Public · importable",
     "conversationShare.landing.accessMode.private": "Private link",
     "conversationShare.landing.expires": "Expires",
-    "conversationShare.landing.brand": "Shared with ZCode",
+    "conversationShare.landing.brand": "Shared with DeepCode Studio",
   },
-  "zh-CN": {
+  ar: {
     "conversationShare.landing.loading": "正在加载分享内容…",
     "conversationShare.landing.error": "无法加载该分享",
     "conversationShare.landing.retry": "重试",
@@ -53,7 +53,7 @@ const COPY: Readonly<Record<Locale, LandingCopy>> = {
     "conversationShare.landing.invalidCode": "分享链接不完整或格式不正确。",
     "conversationShare.landing.notFound": "该分享不存在或已失效。",
     "conversationShare.landing.expired": "该分享已过期。",
-    "conversationShare.landing.upgrade": "该分享由更新版本的 ZCode 创建，请升级后重新打开。",
+    "conversationShare.landing.upgrade": "该分享由更新版本的 DeepCode Studio 创建，请升级后重新打开。",
     "conversationShare.landing.tooLarge": "该分享内容超出本页可读取的范围。",
     "conversationShare.landing.network": "网络请求失败，请检查网络后重试。",
     "conversationShare.landing.rateLimited": "请求过于频繁，请稍后重试。",

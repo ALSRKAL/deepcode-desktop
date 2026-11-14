@@ -37,7 +37,7 @@ export async function verifyDesktopCliAssets({ glmDir, platformKey }) {
   await Promise.all(
     [
       "zcode.cjs",
-      "provider/zcode-builtin.json",
+      "provider/deepcode-builtin.json",
       "THIRD-PARTY-NOTICES.md",
       ...manifest.files.map(({ path }) => {
         if (!path?.startsWith("node_modules/") || path.split(/[\\/]/).includes("..")) {

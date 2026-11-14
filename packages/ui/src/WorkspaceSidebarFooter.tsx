@@ -158,9 +158,9 @@ export const WorkspaceSidebarFooter = memo(function WorkspaceSidebarFooterCompon
                       id: "sidebar.settings.locale.en-US",
                     })}
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="zh-CN">
+                  <DropdownMenuRadioItem value="ar">
                     {intl.formatMessage({
-                      id: "sidebar.settings.locale.zh-CN",
+                      id: "sidebar.settings.locale.ar",
                     })}
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>

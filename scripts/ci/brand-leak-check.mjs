@@ -21,7 +21,7 @@ const checkDist = process.argv.includes("--dist");
 // 裸 ZCode / ZCodium（不匹配 ZCodeXxx 内部类型名）+ z.ai 域名 + bigmodel + 智谱。
 const PATTERN = "zcodium|z\\.ai|bigmodel|智谱|ZCode[^A-Za-z0-9_-]|ZCode$";
 const ALLOW_LINE =
-  /@zcode\/|zcode-protocol|window\.zcode|window\.__zcode|ZCODE_[A-Z_]+|zcode\.cjs|TID_ZCODE|zcode:\/\/|deepcode|experimental\["zcode\/|ZCodeStartupLogoBadge|trayOpenZCode|toggleZCodeStdioTap|zcode-resource/i;
+  /@zcode\/|zcode-protocol|window\.zcode|window\.__zcode|ZCODE_[A-Z_]+|zcode\.cjs|TID_ZCODE|zcode:\/\/|deepcode|experimental\["zcode\/|ZCodeStartupLogoBadge|trayOpenZCode|toggleZCodeStdioTap|zcode-resource|defineProperty\(window, "zcode"|CustomEvent\("zcode:|"zcode\.error\.|"zcode\.unavailable|"zcode\.initFailed|"zcode-browser|"zcodePluginSandbox|"zcode:set_globals"|globalThis\.zcode|runtime\.zcode|\bzcode: ZcodeAliasApi\b|const zcode = lazy/i;
 const ALLOW_PATHS = [
   /node_modules/,
   /(^|\/)dist(\/|$)/,
@@ -39,6 +39,14 @@ const ALLOW_PATHS = [
   /(^|\/)tests?\//,
   // zh-CN 是上游合并锚点，不进发行包（docs/plan/01 §5.2）。
   /locales\/zh-CN\.ts$/,
+  // 上游 Built-in Config 是生成器的输入（deepcode-builtin.json 才是发行面），
+  // 保留 z.ai/bigmodel 模板事实用于上游合并。
+  /config\/provider\/zcode-builtin\.json$/,
+  // NOTICE 中「Based on ZCodium (Apache-2.0)」与 About 窗口的同句归属是义务声明，
+  // 不是品牌泄漏（docs/plan/01 §2.5）。
+  /main\/about\.ts$/,
+  // plugin-sandbox 别名桥：window.zcode 内部协议面（§2.4 有意保留）。
+  /plugin-sandbox\/aliasRuntime\.ts$/,
   // 内部命名空间文件（有意保留的标识符集中地）。
   /openrouter-attribution\.ts$/,
 ];

@@ -77,7 +77,7 @@ export function parseConversationShareRoute(pathname: string): string | null {
 export function resolveConversationShareRouteLocale(pathname: string): Locale {
   const parsed = parseConversationSharePathname(pathname);
   if (parsed) return parsed.locale;
-  return /^zh(?:-|$)/iu.test(navigator.language) ? "zh-CN" : "en-US";
+  return /^ar(?:-|$)/iu.test(navigator.language) ? "ar" : "en-US";
 }
 
 /** 只判断「是否归分享页处理」；形状不合法的留给 code 解析报 invalid_contract。 */

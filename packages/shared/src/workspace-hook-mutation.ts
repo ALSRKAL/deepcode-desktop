@@ -6,6 +6,7 @@ import {
   workspaceHooksConfigSchema,
   type WorkspaceHookDefinition,
 } from "./workspace-hook-config.js";
+import { ZCODE_WORKSPACE_CONFIG_DIR_NAME } from "./appDirNames.js";
 
 export interface AtomicWorkspaceHookConfigWriteOptions {
   beforeRename?: () => void | Promise<void>;
@@ -72,7 +73,7 @@ export async function writeWorkspaceHookConfiguredToggle(input: {
     !entry ||
     !entry.editable ||
     !source?.editable ||
-    source.configFileKind !== ".zcodium/config.json" ||
+    source.configFileKind !== `${ZCODE_WORKSPACE_CONFIG_DIR_NAME}/config.json` ||
     resolve(source.canonicalPath) !== configPath
   ) {
     throw mismatch("Workspace Hook toggle target is not the current editable project config");

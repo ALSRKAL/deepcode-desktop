@@ -17,7 +17,7 @@
  */
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
-import { DEEPCODE_DEEP_LINK_SCHEME, DeepCodeExchangeResponseSchema, type DeepCodeExchangeResponse } from "./contracts.js";
+import { DEEPCODE_DEEP_LINK_SCHEME, DeepCodeExchangeResponseSchema, type DeepCodeExchangeResponse } from "../contracts.js";
 
 export const DEEPCODE_DEVICE_CREDENTIAL_KEY = "deepcode.deviceKey";
 

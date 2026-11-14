@@ -7,7 +7,7 @@ import { OPENAI_SET_GLOBALS_EVENT } from "./openaiAlias.js";
  * 官方 `App` 上的薄封装：只与父窗口（受信 relay shell，origin 为 shell-<id>）通信；懒连接，
  * 自建官方 `App` 的页面不会因为别名多一次 ui/initialize。
  */
-// 不在这里 `declare global` 扩 Window：别名脚本与宿主 renderer 共用 tsconfig，`zcode?: unknown` 会覆盖宿主对
+// 不在这里 `declare global` 扩 Window：别名脚本与宿主 renderer 共用 tsconfig，别名键会覆盖宿主对
 // `window.zcode`（preload 桥）的类型。这里只用 defineProperty / `in` 检查，不需要类型声明。
 
 const app = new App(

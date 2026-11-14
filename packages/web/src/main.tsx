@@ -144,7 +144,7 @@ function createWebPlatform(): IPlatformService {
       window.open(feedbackUrl, "_blank", "noopener,noreferrer");
     },
     openCommunity: async () => {
-      const locale = document.documentElement.lang === "en-US" ? "en-US" : "zh-CN";
+      const locale = document.documentElement.lang === "en" ? "en-US" : "ar";
       const communityUrl = await resolveWebCommunityUrl(locale);
       if (!communityUrl) {
         return;

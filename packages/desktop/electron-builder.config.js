@@ -629,7 +629,7 @@ export default {
       // Provider Registry 的 ZCode Built-in Config 是静态 Provider/Model 事实的唯一内置来源。
       // 显式随包发布，避免正式 Host 回退到旧 Catalog/Preset hardcode。
       from: builtinProviderConfig.sourcePath,
-      to: "config/provider/zcode-builtin.json",
+      to: "config/provider/deepcode-builtin.json",
     },
     {
       // 应用图标：打包后放入 resources 目录，主进程通过 process.resourcesPath 加载

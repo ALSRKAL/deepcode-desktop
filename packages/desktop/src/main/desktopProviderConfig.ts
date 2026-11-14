@@ -16,17 +16,17 @@ export function resolveZCodeBuiltinProviderConfigFilePath(options?: {
   if (options?.isPackaged ?? app.isPackaged) {
     return join(
       options?.resourcesPath ?? process.resourcesPath,
-      "config/provider/zcode-builtin.json",
+      "config/provider/deepcode-builtin.json",
     );
   }
   // 开发态与打包共用唯一线上配置源。
-  const filename = "zcode-builtin.json";
+  const filename = "deepcode-builtin.json";
   return join(options?.appPath ?? app.getAppPath(), "../../config/provider", filename);
 }
 
 /**
  * 查询运行时真正生效的 Provider 配置：Host/Services 启动时会把随包配置物化到
- * `<appConfigDir>/runtime/provider/bundled/zcode-builtin.json`，之后由
+ * `<appConfigDir>/runtime/provider/bundled/deepcode-builtin.json`，之后由
  * NodeZCodeBuiltinProviderConfigSource 只读监听该副本。
  *
  * 打开源配置（resources 内或 env 指定的那份）对用户没有意义：macOS 打包态位于只读

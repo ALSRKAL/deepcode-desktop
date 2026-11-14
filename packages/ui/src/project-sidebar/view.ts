@@ -1,4 +1,4 @@
-import type { ZCodeTaskMeta } from "@zcode/shared";
+import type { Locale, ZCodeTaskMeta } from "@zcode/shared";
 import type {
   ProjectTask,
   ProjectTree,
@@ -277,7 +277,7 @@ function calendarDay(timestamp: number): number {
 export function timelineDateHeadings(
   timestamps: readonly number[],
   now: number,
-  locale: "en-US" | "zh-CN",
+  locale: Locale,
 ): Array<ProjectTimelineDateHeading | null> {
   const today = calendarDay(now);
   const date = new Date(now);

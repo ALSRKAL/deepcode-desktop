@@ -13,6 +13,12 @@ interface DeepLinkWorkspaceGateOptions {
   onWorkspaceOpenBlocked?: (workspacePath: string) => void;
   /** 业务窗口解析器；必须排除 CUA indicator 等 Main 辅助窗口。 */
   resolveApplicationWindow?: () => BrowserWindow | null;
+  /**
+   * DeepCode 登录回调（deepcodestudio://auth?token&state，docs/plan/01 §6）。
+   * 返回 true 表示本条 deep link 已被消化（含失败：失败也算处理过，避免继续
+   * 落到 workspace 分支）。认证状态校验在 packages/deepcode 的 auth service 内。
+   */
+  onAuthCallback?: (url: URL) => boolean;
 }
 
 export interface ExternalWorkspaceOpenDialogCopy {
@@ -180,6 +186,19 @@ export function handleDeepLink(
     // 外部链接可能携带旧登录凭据；解析失败只记录原因，不回显原始 URL。
     logger.warn("[deep-link] 无法解析 URL，已忽略");
     return false;
+  }
+
+  if (parsedUrl.protocol === "deepcodestudio:" && (parsedUrl.host === "auth" || parsedUrl.hostname === "auth")) {
+    // 登录回调：交由 DeepCode auth service（state 校验 + PKCE 兑换在 service 内）。
+    if (options.onAuthCallback) {
+      const handled = options.onAuthCallback(parsedUrl);
+      if (!handled) {
+        logger.warn("[deep-link] 登录回调未被接受（state 不匹配或无待处理登录）");
+      }
+      return true;
+    }
+    logger.warn("[deep-link] 登录回调到达但 auth service 未注册，已忽略");
+    return true;
   }
 
   if (isWorkspaceOpenUrl(parsedUrl)) {

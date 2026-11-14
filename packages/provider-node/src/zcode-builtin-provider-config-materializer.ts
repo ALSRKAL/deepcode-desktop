@@ -20,7 +20,7 @@ export const ZCODE_BUILTIN_PROVIDER_CONFIG_RELATIVE_PATH = [
   "runtime",
   "provider",
   "bundled",
-  "zcode-builtin.json",
+  "deepcode-builtin.json",
 ] as const;
 
 export function resolveZCodeBuiltinProviderConfigFilePath(environmentConfigRoot: string): string {

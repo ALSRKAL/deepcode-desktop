@@ -538,19 +538,19 @@ describe("conversation share preview wire contract", () => {
   });
 
   it("parses canonical share routes and localizes known links only", () => {
-    expect(parseConversationSharePathname("/cn/share/abc")).toEqual({
+    expect(parseConversationSharePathname("/ar/share/abc")).toEqual({
       rawCode: "abc",
-      locale: "zh-CN",
+      locale: "ar",
     });
     expect(parseConversationSharePathname("/share/abc/")).toEqual({
       rawCode: "abc",
       locale: "en-US",
     });
-    expect(parseConversationSharePathname("/cn/other/abc")).toBeNull();
-    expect(localizeConversationShareUrl("https://zcode.z.ai/share/a%2Fb", "zh-CN")).toBe(
-      "https://zcode.z.ai/cn/share/a%2Fb",
+    expect(parseConversationSharePathname("/ar/other/abc")).toBeNull();
+    expect(localizeConversationShareUrl("https://example.com/share/a%2Fb", "ar")).toBe(
+      "https://example.com/ar/share/a%2Fb",
     );
-    expect(localizeConversationShareUrl("https://example.com/whatever/1", "zh-CN")).toBe(
+    expect(localizeConversationShareUrl("https://example.com/whatever/1", "ar")).toBe(
       "https://example.com/whatever/1",
     );
   });

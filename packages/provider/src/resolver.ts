@@ -9,6 +9,7 @@ import type {
 import type { ConfigValidationIssue } from "./config-overlay.js";
 import {
   type ApiKeyAccessConfig,
+  type DeepcodeAccountAccessConfig,
   ModelConfig,
   ModelConfigRules,
   type ZhipuAccountAccessConfig,
@@ -27,7 +28,8 @@ export type RegistryZhipuAccountAccessConfig = ZhipuAccountAccessConfig &
 
 export type RegistryProviderAccessConfig =
   | (ApiKeyAccessConfig & z.infer<typeof completeApiKeyAccessDataSchema>)
-  | RegistryZhipuAccountAccessConfig;
+  | RegistryZhipuAccountAccessConfig
+  | DeepcodeAccountAccessConfig;
 
 export type RegistryProviderConfig = ProviderConfig &
   z.infer<typeof completeProviderConfigDataSchema> & {

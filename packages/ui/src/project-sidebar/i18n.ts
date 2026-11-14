@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 
 const MESSAGES = {
-  "zh-CN": {
+  ar: {
     "projectSidebar.newProject": "新建项目",
     "projectSidebar.restoreProjects": "恢复已删除项目",
     "projectSidebar.restoreEmpty": "没有可恢复的项目",

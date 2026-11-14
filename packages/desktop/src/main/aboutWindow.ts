@@ -5,6 +5,8 @@ interface CustomAboutDialogHtmlInput {
   copyright: string;
   optimizationLine: string;
   okButtonLabel: string;
+  /** Apache-2.0 上游归属（docs/plan/01 §2.5）。 */
+  basedOn?: string;
 }
 
 function escapeHtml(value: string): string {
@@ -187,6 +189,7 @@ export function createCustomAboutDialogHtml(input: CustomAboutDialogHtmlInput): 
           <div class="meta">
             ${input.optimizationLine ? `<div>${escapeHtml(input.optimizationLine)}</div>` : ""}
             <div>${escapeHtml(input.copyright)}</div>
+            ${input.basedOn ? `<div class="based-on">${escapeHtml(input.basedOn)}</div>` : ""}
           </div>
         </div>
         <div class="spacer"></div>

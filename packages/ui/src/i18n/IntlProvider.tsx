@@ -52,10 +52,10 @@ export function createLocaleDateTimeFormatter(locale: Locale): Intl.DateTimeForm
 }
 
 /** 复数选择：阿拉伯语有 six categories，ICU 由 Intl.PluralRules 处理。 */
-export function selectPluralCategory(locale: Locale, count: number): Intl.PluralRuleCategory {
-  return new Intl.PluralRules(locale === "ar" ? "ar" : "en-US", { numberingSystem: "latn" }).select(
-    count,
-  );
+export function selectPluralCategory(locale: Locale, count: number): Intl.LDMLPluralRule {
+  // 西数（latn）通过 locale 扩展注入，兼容不接受 numberingSystem 选项的 TS lib。
+  const tag = locale === "ar" ? "ar-u-nu-latn" : "en-u-nu-latn";
+  return new Intl.PluralRules(tag).select(count);
 }
 
 /** 简易 intl 工具：根据 id 查找翻译，支持 {key} 占位符替换 */

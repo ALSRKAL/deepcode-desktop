@@ -1091,7 +1091,7 @@ function ReadonlyTurn({
 export function ConversationShareReadonlyTimeline({
   rows,
   contentBlocks,
-  locale = "zh-CN",
+  locale = "ar",
   theme = "system",
   codePreviewSettings = DEFAULT_CODE_PREVIEW_SETTINGS,
   artifactUrls = EMPTY_ARTIFACT_URLS,
@@ -1153,7 +1153,7 @@ export function ConversationShareReadonlyTimeline({
     }
   }, []);
   const labels: ReadonlyLabels =
-    locale === "zh-CN"
+    locale === "ar"
       ? {
           history: "思考过程",
           computerUse: "电脑操作",

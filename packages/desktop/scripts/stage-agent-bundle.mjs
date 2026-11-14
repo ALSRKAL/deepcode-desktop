@@ -35,7 +35,7 @@ export async function stageAgentBundle({ repoRoot, platformKey, log = console.lo
   });
   try {
     await access(cliBundlePath);
-    await access(resolve(dirname(cliBundlePath), "provider/zcode-builtin.json"));
+    await access(resolve(dirname(cliBundlePath), "provider/deepcode-builtin.json"));
     await access(resolve(dirname(cliBundlePath), "THIRD-PARTY-NOTICES.md"));
   } catch {
     throw new Error(`[stage:agent-bundle] agent bundle 源产物不存在：${cliBundlePath}`);

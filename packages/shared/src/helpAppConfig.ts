@@ -10,7 +10,7 @@ const helpUrlSchema = z
 const helpConfigSchema = z.object({
   community_urls: z
     .object({
-      "zh-CN": helpUrlSchema,
+      ar: helpUrlSchema,
       "en-US": helpUrlSchema,
     })
     .optional()
@@ -25,7 +25,7 @@ export function resolveHelpAppConfig(local: unknown): HelpAppConfig {
   const config = helpConfigSchema.safeParse(local).data;
   return {
     community_urls: {
-      "zh-CN": config?.community_urls?.["zh-CN"],
+      ar: config?.community_urls?.ar,
       "en-US": config?.community_urls?.["en-US"],
     },
     feedback_url: config?.feedback_url,

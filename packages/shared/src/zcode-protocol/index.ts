@@ -350,7 +350,30 @@ export const zcodeProtocolNotifications = {
   toolExecResource: "process/toolExecResource",
   pluginOperationProgress: "plugins/operationProgress",
   processResourceSample: "process/resourceSample",
+  /** DeepCode 订阅 HUD：agent runtime 在每个流结束后推送（docs/plan/01 §7.1）。 */
+  deepcodeUsageUpdated: "deepcode/usage-updated",
 } as const;
+
+/** `: deepcode-usage {json}` SSE 尾注释的镜像（gateway 契约见根仓库 @deepcode/shared）。 */
+export const deepcodeUsageUpdatedSchema = z
+  .object({
+    requestId: z.string(),
+    model: z.string(),
+    tokens: z
+      .object({
+        input: z.number().int().nonnegative(),
+        output: z.number().int().nonnegative(),
+        cachedInput: z.number().int().nonnegative(),
+        reasoning: z.number().int().nonnegative(),
+      })
+      .strict(),
+    creditsCharged: z.number().int().nonnegative(),
+    creditsRemaining: z.number().int(),
+    percentUsed: z.number().min(0).max(1000),
+    estimated: z.boolean(),
+  })
+  .strict();
+export type DeepCodeUsageUpdated = z.infer<typeof deepcodeUsageUpdatedSchema>;
 
 /** 启动控制面独立于 task stream；数据库身份不可携带路径/凭据。 */
 export const zcodeStorageStartupStateSchema = z

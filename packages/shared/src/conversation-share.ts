@@ -8,26 +8,26 @@ import {
 import type { Locale } from "./protocol.js";
 
 /**
- * 分享站按语言分路径：中文站带 /cn 前缀，英文站是裸 /share。
+ * 分享站按语言分路径：阿拉伯站带 /ar 前缀，英文站是裸 /share。
  * web 路由、发布回链改写、导入回链共用这一份定义，避免三处各写一遍前缀。
  */
 const CONVERSATION_SHARE_LOCALE_PATH_PREFIX: Readonly<Record<Locale, string>> = {
-  "zh-CN": "/cn",
+  ar: "/ar",
   "en-US": "",
 };
 
-const CONVERSATION_SHARE_PATHNAME_RE = /^\/(cn\/)?share\/([^/]+)\/?$/u;
+const CONVERSATION_SHARE_PATHNAME_RE = /^\/(ar\/)?share\/([^/]+)\/?$/u;
 
 /**
  * 解析分享页 pathname，返回未解码的 code 段与该路径对应的语言。
- * 只认 `/share/<code>` 与 `/cn/share/<code>` 两种形状；调用方负责 code 的解码与安全校验。
+ * 只认 `/share/<code>` 与 `/ar/share/<code>` 两种形状；调用方负责 code 的解码与安全校验。
  */
 export function parseConversationSharePathname(
   pathname: string,
 ): { rawCode: string; locale: Locale } | null {
   const match = CONVERSATION_SHARE_PATHNAME_RE.exec(pathname);
   if (!match) return null;
-  return { rawCode: match[2]!, locale: match[1] ? "zh-CN" : "en-US" };
+  return { rawCode: match[2]!, locale: match[1] ? "ar" : "en-US" };
 }
 
 /**

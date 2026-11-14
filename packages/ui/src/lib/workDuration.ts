@@ -43,5 +43,5 @@ export function workDurationParts(
 
 /** 中文时长单位与数字之间留空格以保持可读；英文缩写单位紧贴数字。 */
 export function workDurationUnitSeparator(locale: string): string {
-  return locale === "zh-CN" ? " " : "";
+  return "";
 }

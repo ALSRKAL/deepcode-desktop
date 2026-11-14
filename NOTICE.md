@@ -1,5 +1,16 @@
 # ZCode 相关功能说明与第三方组件声明
 
+> **DeepCode Studio modifications（docs/plan/01 §2.5）**
+>
+> 本仓库是 DeepCode Studio 的源码：一个基于 ZCodium（Apache-2.0）的商业发行版。
+> 相对上游 ZCodium（基线 `e5346de`，v3.16.2）的主要修改：产品身份与数据目录更名
+> （`.deepcode`）、界面语言改为阿拉伯语（默认，RTL）与英语、上游 Z.ai/BigModel/
+> ZCode 服务耦合移除（OAuth 账号、Coding Plan 网关重写、MCP 上报、会话分享、机器人、
+> CDN 回源、区域镜像）、新增 DeepCode 订阅 Provider 与登录/同步集成
+> （packages/deepcode）。上游 LICENSE 保持原样；上游的 ZCode/Z.ai 名称与 Logo 不用于
+> 本产品的品牌展示，本文件保留以履行 Apache-2.0 的声明义务。修改文件的完整清单见
+> `docs/plan/01-ZCODE-REBRAND-AND-IDE-FEATURES.md` §10。
+
 本声明适用于本仓库公开的源码及其构建产物。各运行形态的功能、权限、存储位置和网络行为不同，不能将其中一种形态的默认设置理解为整个项目的统一设置。
 
 ## 一、AI 输出、执行权限与自动化风险
