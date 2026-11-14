@@ -207,7 +207,7 @@ export function ProjectGroupedView({
               data-project-grouped-drop="group-empty"
               data-project-grouped-group-id={row.groupId}
               className={cn(
-                "relative pl-6 pr-2 py-1 text-ui-sm text-foreground-subtlest",
+                "relative ps-6 pe-2 py-1 text-ui-sm text-foreground-subtlest",
                 emptyDropActive && "rounded-md bg-primary/10 text-foreground",
               )}
             >
@@ -276,7 +276,7 @@ export function ProjectGroupedView({
                 <button
                   type="button"
                   data-project-grouped-drag-allowed=""
-                  className="min-w-0 flex-1 truncate text-left text-ui-base text-foreground"
+                  className="min-w-0 flex-1 truncate text-start text-ui-base text-foreground"
                   onClick={() => onToggleCollapsed(group.id)}
                 >
                   {group.title}

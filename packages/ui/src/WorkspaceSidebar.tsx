@@ -978,7 +978,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   // 这里把 render prop 稳定在真正影响工具栏展示的状态上，避免消息流更新污染侧栏任务区。
   const workspaceTaskToolbar = useCallback(
     () => (
-      <div className="pl-2.5 pr-3">
+      <div className="ps-2.5 pe-3">
         <div className="flex min-w-0 items-center justify-between gap-2">
           <div className="flex min-w-0 shrink-0 items-center gap-1">
             <Tabs
@@ -996,7 +996,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
               >
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-y-0.5 left-0 rounded-full bg-background transition-[opacity,transform,width] duration-200 ease-out"
+                  className="pointer-events-none absolute inset-y-0.5 start-0 rounded-full bg-background transition-[opacity,transform,width] duration-200 ease-out"
                   style={primaryTaskIndicatorStyle}
                 />
                 <TabsTrigger
@@ -1004,7 +1004,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
                     primaryTaskTabTriggerRefs.current.grouped = node;
                   }}
                   value="grouped"
-                  className="relative z-10 h-6 flex-none gap-1 rounded-full border-transparent bg-transparent py-0 pl-1.5 pr-2 text-ui-sm font-medium text-foreground-subtle transition-colors data-active:border-transparent data-active:bg-transparent data-active:text-foreground data-active:shadow-none dark:data-active:border-transparent dark:data-active:bg-transparent"
+                  className="relative z-10 h-6 flex-none gap-1 rounded-full border-transparent bg-transparent py-0 ps-1.5 pe-2 text-ui-sm font-medium text-foreground-subtle transition-colors data-active:border-transparent data-active:bg-transparent data-active:text-foreground data-active:shadow-none dark:data-active:border-transparent dark:data-active:bg-transparent"
                 >
                   <Hash aria-hidden="true" className="size-3 shrink-0" />
                   <span>
@@ -1018,7 +1018,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
                     primaryTaskTabTriggerRefs.current.workspace = node;
                   }}
                   value="workspace"
-                  className="relative z-10 h-6 flex-none gap-1 rounded-full border-transparent bg-transparent py-0 pl-1.5 pr-2 text-ui-sm font-medium text-foreground-subtle transition-colors data-active:border-transparent data-active:bg-transparent data-active:text-foreground data-active:shadow-none dark:data-active:border-transparent dark:data-active:bg-transparent"
+                  className="relative z-10 h-6 flex-none gap-1 rounded-full border-transparent bg-transparent py-0 ps-1.5 pe-2 text-ui-sm font-medium text-foreground-subtle transition-colors data-active:border-transparent data-active:bg-transparent data-active:text-foreground data-active:shadow-none dark:data-active:border-transparent dark:data-active:bg-transparent"
                 >
                   <Folder aria-hidden="true" className="size-3 shrink-0" />
                   <span>
@@ -1252,10 +1252,10 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
               className="w-full justify-start gap-2 text-foreground hover:bg-surface-hover hover:text-foreground"
             >
               <Search className="size-4" />
-              <span className="min-w-0 flex-1 truncate text-left">
+              <span className="min-w-0 flex-1 truncate text-start">
                 {intl.formatMessage({ id: "commandCenter.open" })}
               </span>
-              <span className="ml-auto shrink-0 text-ui-xs font-normal text-foreground-subtlest">
+              <span className="ms-auto shrink-0 text-ui-xs font-normal text-foreground-subtlest">
                 {commandCenterShortcutLabel}
               </span>
             </Button>
@@ -1616,7 +1616,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
           </div>
 
           <WorkspaceSidebarFooter
-            className="pr-3"
+            className="pe-3"
             theme={theme}
             localeMenuValue={localeMenuValue}
             onLocaleChange={handleLocaleChange}

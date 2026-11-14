@@ -105,7 +105,7 @@ export function GenUiCard({
       className={
         preview
           ? "flex shrink-0 items-center justify-end gap-1 p-2"
-          : "absolute right-0 bottom-0 z-20 flex gap-1 rounded-lg bg-popover p-1 shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 data-[visible=true]:opacity-100 [@media(hover:none)]:opacity-100"
+          : "absolute end-0 bottom-0 z-20 flex gap-1 rounded-lg bg-popover p-1 shadow-sm opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 data-[visible=true]:opacity-100 [@media(hover:none)]:opacity-100"
       }
       data-visible={snapshot.hovered || tweaks}
       data-testid="gen-ui-actions"

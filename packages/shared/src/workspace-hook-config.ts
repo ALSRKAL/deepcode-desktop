@@ -246,8 +246,8 @@ export function createWorkspaceHookSourceInput(input: {
     discoveryOrder: input.discoveryOrder,
     configFileKind: explicitProjectConfig
       ? "explicit"
-      : basename(canonicalPath) === "zcodium.json"
-        ? "zcodium.json"
+      : basename(canonicalPath) === ZCODE_WORKSPACE_CONFIG_FILE_NAME
+        ? ZCODE_WORKSPACE_CONFIG_FILE_NAME
         : `${ZCODE_WORKSPACE_CONFIG_DIR_NAME}/config.json`,
     explicitProjectConfig,
     editable:

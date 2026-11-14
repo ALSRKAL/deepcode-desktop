@@ -17,7 +17,6 @@ import {
   ICuaPermissionService,
   IConversationShareService,
   IProjectService,
-  IBotsService,
   IFileWatcherService,
   IModelSelectionService,
   IProviderSettingsService,
@@ -72,7 +71,6 @@ export class RemoteServiceAccess implements IServiceAccessor {
   readonly conversationShareService: IConversationShareService;
   /** 只有 Host 握手声明 virtualProjects 才创建；旧 Host 缺省，UI 走显式只读 legacy。 */
   readonly projectService?: IProjectService;
-  readonly botsService: IBotsService;
   readonly fileWatcherService: IFileWatcherService;
   readonly providerSettingsService: IProviderSettingsService;
   readonly modelSelectionService: IModelSelectionService;
@@ -156,9 +154,6 @@ export class RemoteServiceAccess implements IServiceAccessor {
     );
     this.conversationShareService = ProxyChannel.toService<IConversationShareService>(
       channelClient.getChannel(IConversationShareService.channelName),
-    );
-    this.botsService = ProxyChannel.toService<IBotsService>(
-      channelClient.getChannel(IBotsService.channelName),
     );
     this.fileWatcherService = ProxyChannel.toService<IFileWatcherService>(
       channelClient.getChannel(IFileWatcherService.channelName),

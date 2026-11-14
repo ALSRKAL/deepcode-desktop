@@ -519,7 +519,7 @@ function PluginList({
           >
             <button
               type="button"
-              className="flex min-w-0 flex-1 items-center gap-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+              className="flex min-w-0 flex-1 items-center gap-3 text-start outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
               onClick={() => actions.onOpenDetail(plugin.id)}
             >
               <PluginStoreAvatar

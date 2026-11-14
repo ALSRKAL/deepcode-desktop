@@ -78,7 +78,7 @@ export function ModelProviderSectionLayout({
         >
           {hasNavigation ? (
             <div
-              className="min-w-0 border-r border-border"
+              className="min-w-0 border-e border-border"
               data-model-provider-navigation-scroll="true"
             >
               <ModelProviderSectionNavigation

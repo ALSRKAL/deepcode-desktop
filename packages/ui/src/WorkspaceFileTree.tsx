@@ -141,7 +141,7 @@ export function FileManagerPane({
           ) : null}
         </div>
         {canNavigate ? (
-          <div className="flex shrink-0 items-center border-l border-border px-1.5">
+          <div className="flex shrink-0 items-center border-s border-border px-1.5">
             <Button
               type="button"
               variant="ghost"

@@ -100,7 +100,7 @@ function RunRail({ rail, intl }: { rail: WorkflowRunRail; intl: TaskWorkflowRunL
         </span>
       ))}
       {rail.hidden > 0 ? (
-        <span className="ml-1 text-ui-xs leading-none text-foreground-subtlest">
+        <span className="ms-1 text-ui-xs leading-none text-foreground-subtlest">
           {intl.formatMessage(
             { id: "taskList.workflowRun.moreStations" },
             { count: String(rail.hidden) },

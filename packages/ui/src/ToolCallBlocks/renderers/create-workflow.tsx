@@ -298,7 +298,7 @@ export function CreateWorkflowToolCallBlock(context: ToolCallBlockRenderContext)
   const resume =
     workflowRun?.resumable === true && onResumeWorkflowRun !== undefined ? (
       <Button
-        className="ml-auto"
+        className="ms-auto"
         data-testid="workflow-card-resume"
         onClick={handleResume}
         size="sm"

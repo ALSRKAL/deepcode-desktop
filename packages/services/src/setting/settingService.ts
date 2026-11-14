@@ -17,13 +17,6 @@ import { maybeThrowInjectedFsFault } from "../fs/fsFaultInjection.js";
 import { atomicWriteText } from "../fs/atomicFileUtils.js";
 import { withFileLock } from "@zcode/shared/node";
 import { withSettingsWriteQueueTimeout } from "./settingsWriteQueue.js";
-import {
-  migrateLegacyAccountConnectionSettings,
-  needsLegacyAccountConnectionMigration,
-  readLegacyAccountConnectionSettingsFile,
-  readIncompleteLegacyTeamConnections,
-  retainLegacyAccountConnectionFields,
-} from "#src/setting/legacyAccountConnectionSettings.js";
 const MAX_RECENT_PROJECTS = 10;
 const DEFAULT_PROJECT_NAME = "ZCodeProject";
 const SETTINGS_PARSE_RETRY_DELAY_MS = 300;
@@ -98,8 +91,6 @@ function shouldPersistSettingsMigrations(rawValue: unknown): boolean {
   if (!rawValue || typeof rawValue !== "object" || Array.isArray(rawValue)) return false;
   const raw = rawValue as Record<string, unknown>;
   return (
-    (needsLegacyAccountConnectionMigration(rawValue) &&
-      readIncompleteLegacyTeamConnections(rawValue).length === 0) ||
     raw.closeToTrayOnWindowsMigrationInitialized !== true ||
     raw.messageStreamShowReasoningMigrationInitialized !== true ||
     // 自动归档重置迁移：首读在内存里关掉旧开关后必须落盘，否则用户重新开启后
@@ -144,7 +135,7 @@ async function readSettingsWithMeta(): Promise<ReadSettingsResult> {
         };
       }
     }
-    const result = appSettingsSchema.safeParse(migrateLegacyAccountConnectionSettings(rawValue));
+    const result = appSettingsSchema.safeParse(rawValue);
     if (!result.success) {
       log(
         "read failed schema validation, returning defaults. error:",
@@ -192,7 +183,6 @@ async function writeSettings(
   shouldCommit: () => boolean = () => true,
   runExclusiveCommit: (commit: () => Promise<void>) => Promise<void> = (commit) => commit(),
   enterCommitPhase: () => void = () => undefined,
-  commitAccountSelection = false,
 ): Promise<void> {
   const settingsDir = getSettingsDir();
   const settingsFile = getSettingsFile();
@@ -203,15 +193,7 @@ async function writeSettings(
   await mkdir(settingsDir, { recursive: true });
   if (!shouldCommit()) return;
   maybeThrowInjectedFsFault({ operation: "writeFile", path: settingsFile });
-  const raw = await readLegacyAccountConnectionSettingsFile(settingsFile);
-  const rollbackFields = retainLegacyAccountConnectionFields(raw);
-  const persisted = { ...rollbackFields, ...settings };
-  // 旧 Team 缺少组织信息，schema 的默认 {} 不是用户的新选择。
-  // 联网补全已移除；普通偏好保存仍保留原字段，不伪造或覆盖历史连接。
-  if (!commitAccountSelection && readIncompleteLegacyTeamConnections(raw).length > 0) {
-    delete persisted.providerFamilyConnectionSelections;
-  }
-  await atomicWriteText(settingsFile, JSON.stringify(persisted, null, 2), {
+  await atomicWriteText(settingsFile, JSON.stringify(settings, null, 2), {
     // 调用方 withFileLock 已持有 setting.json 的跨进程锁，这里再加锁会自我等待到超时。
     useFileLock: false,
     beforeRename: () => {
@@ -294,21 +276,10 @@ export function createSettingService(): ISettingService {
       return readSettings();
     },
 
-    async update(patch: Partial<AppSettings>, expectedAccountSettings): Promise<void> {
+    async update(patch: Partial<AppSettings>): Promise<void> {
       const runUpdate = async (shouldCommit: () => boolean, enterCommitPhase: () => void) => {
         const validatedPatch = appSettingsPatchSchema.parse(normalizeSettingsPatch(patch));
         const current = await readSettings();
-        if (expectedAccountSettings) {
-          // 账号查询期间用户可能已手动切换。必须在同一写队列内校验，不能靠调用方先读再写。
-          const expected = appSettingsPatchSchema.parse(expectedAccountSettings);
-          if (
-            current.providerFamilyDomain !== expected.providerFamilyDomain ||
-            JSON.stringify(current.providerFamilyConnectionSelections ?? {}) !==
-              JSON.stringify(expected.providerFamilyConnectionSelections ?? {})
-          ) {
-            throw new Error("Account connection settings changed");
-          }
-        }
         const merged = appSettingsSchema.parse({
           ...current,
           ...validatedPatch,
@@ -322,13 +293,7 @@ export function createSettingService(): ISettingService {
           merged.recentProjects = [...new Set(merged.recentProjects)].slice(0, MAX_RECENT_PROJECTS);
         }
 
-        await writeSettings(
-          merged,
-          shouldCommit,
-          runSettingsCommit,
-          enterCommitPhase,
-          Object.hasOwn(patch, "providerFamilyConnectionSelections"),
-        );
+        await writeSettings(merged, shouldCommit, runSettingsCommit, enterCommitPhase);
       };
 
       await enqueueSettingsWrite(runUpdate);

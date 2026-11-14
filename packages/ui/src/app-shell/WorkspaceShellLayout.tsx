@@ -145,9 +145,9 @@ function resolveFullViewTabBarLeadingInsetClass({
 }): string | undefined {
   if (isSidebarVisible) return undefined;
   if (isMacDesktop) {
-    return isMacFullscreen ? "pl-48" : "pl-66";
+    return isMacFullscreen ? "ps-48" : "ps-66";
   }
-  return hasUpdateReady ? "pl-44" : "pl-38";
+  return hasUpdateReady ? "ps-44" : "ps-38";
 }
 
 type WorkspaceSidebarResizeSession = {
@@ -1762,7 +1762,7 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
           id="content"
           className={cn(
             "flex min-w-[320px] flex-1 flex-col",
-            hasDesktopPanelInset ? "p-1 pl-0 pt-0" : "p-0",
+            hasDesktopPanelInset ? "p-1 ps-0 pt-0" : "p-0",
           )}
         >
           {

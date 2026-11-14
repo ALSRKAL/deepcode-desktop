@@ -1,5 +1,7 @@
-const DEEP_LINK_SCHEME = "zcode";
-const DEEP_LINK_RE = /\bzcode:(?:\/\/|\/)?[^\s"'<>]+/i;
+// DeepCode Studio 的 deep link 协议（docs/plan/01 §6）：deepcodestudio://auth 与
+// deepcodestudio://workspace/open。
+const DEEP_LINK_SCHEME = "deepcodestudio";
+const DEEP_LINK_RE = /\bdeepcodestudio:(?:\/\/|\/)?[^\s"'<>]+/i;
 const WORKSPACE_OPEN_HOST = "workspace";
 const DEEP_LINK_ADDITIONAL_DATA_KEY = "deepLinkUrl";
 const OPEN_WORKSPACE_ADDITIONAL_DATA_KEY = "openWorkspacePath";

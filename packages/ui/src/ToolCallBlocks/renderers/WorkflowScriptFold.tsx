@@ -16,7 +16,7 @@ export function WorkflowScriptFold({ script }: { script: string }) {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger
-        className="flex min-w-0 items-center gap-1 rounded-md py-0.5 text-left text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle"
+        className="flex min-w-0 items-center gap-1 rounded-md py-0.5 text-start text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle"
         data-testid="workflow-card-script-toggle"
       >
         <ChevronRightIcon

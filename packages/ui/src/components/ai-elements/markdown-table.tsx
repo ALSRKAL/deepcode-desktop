@@ -1298,7 +1298,7 @@ export function MarkdownTable({ className, children, node: _node, ...props }: Ma
       </div>
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="flex max-h-[calc(100vh-2rem)] w-max max-w-[calc(100vw-2rem)] flex-col gap-3 overflow-hidden rounded-2xl p-4 sm:max-h-[calc(100vh-8rem)] sm:max-w-[calc(100vw-8rem)] md:min-w-[640px] lg:min-w-[720px]">
-          <DialogHeader className="pr-8">
+          <DialogHeader className="pe-8">
             <DialogTitle>{previewTitle}</DialogTitle>
             <DialogDescription>{previewDescription}</DialogDescription>
           </DialogHeader>
@@ -1338,8 +1338,8 @@ function MarkdownTableEdgeShadow({
       className={cn(
         "pointer-events-none absolute inset-y-0 z-10 w-6",
         side === "left"
-          ? "left-0 rounded-l-xl shadow-[inset_12px_0_12px_-12px_color-mix(in_srgb,black_15%,transparent)]"
-          : "right-0 rounded-r-xl shadow-[inset_-12px_0_12px_-12px_color-mix(in_srgb,black_15%,transparent)]",
+          ? "start-0 rounded-s-xl shadow-[inset_12px_0_12px_-12px_color-mix(in_srgb,black_15%,transparent)]"
+          : "end-0 rounded-e-xl shadow-[inset_-12px_0_12px_-12px_color-mix(in_srgb,black_15%,transparent)]",
       )}
       data-markdown-table-edge-shadow={side}
     />
@@ -1397,7 +1397,7 @@ export function MarkdownTableHead({ className, node: _node, ...props }: Markdown
   return (
     <th
       className={cn(
-        "border-border border-b px-3 py-2 text-left font-normal text-foreground-subtlest min-w-16 max-w-md whitespace-normal break-words",
+        "border-border border-b px-3 py-2 text-start font-normal text-foreground-subtlest min-w-16 max-w-md whitespace-normal break-words",
         className,
       )}
       {...props}

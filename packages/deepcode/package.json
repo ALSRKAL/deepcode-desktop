@@ -1,0 +1,21 @@
+{
+  "name": "@zcode/deepcode",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "@deepcode/source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@zcode/services": "workspace:*",
+    "@zcode/shared": "workspace:*",
+    "zod": "4.6.5"
+  }
+}

@@ -6,7 +6,6 @@ import type {
   ModelId,
   ModelProviderId,
 } from "@zcode/contracts";
-import { BUILTIN_MODEL_PROVIDER_IDS } from "@zcode/shared";
 import { getStatusCode, unwrapRetryError } from "./failure-inspection.js";
 
 const EMPTY_ASSISTANT_CONTENT_FALLBACK = "(no content)";
@@ -16,15 +15,16 @@ const REJECTED_REASONING_FALLBACK = "[Thinking removed]";
 // 也会使用不同 ID。只在 reasoning 回放时识别同服务的这些明确身份，不改变选型或鉴权。
 // 不能复用套餐展示分组：Start/Off-Peak/API 接入不在这份签名兼容范围内。
 const REASONING_PROVIDER_GROUPS: readonly (readonly string[])[] = [
+  // 历史身份字面量：账号套餐 provider 已下线，但旧会话回放仍需识别这些 id。
   [
     "builtin:zai-coding-plan",
-    BUILTIN_MODEL_PROVIDER_IDS.zaiIndividualCodingPlan,
-    BUILTIN_MODEL_PROVIDER_IDS.zaiTeamCodingPlan,
+    "account:zai-individual-coding-plan",
+    "account:zai-team-coding-plan",
   ],
   [
     "builtin:bigmodel-coding-plan",
-    BUILTIN_MODEL_PROVIDER_IDS.bigmodelIndividualCodingPlan,
-    BUILTIN_MODEL_PROVIDER_IDS.bigmodelTeamCodingPlan,
+    "account:bigmodel-individual-coding-plan",
+    "account:bigmodel-team-coding-plan",
   ],
 ];
 

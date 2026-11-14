@@ -38,7 +38,7 @@ export function NewTaskButtonGroup({
       >
         <MessageCirclePlus className="size-4 shrink-0" />
         <span className="truncate">{intl.formatMessage({ id: "taskList.newThread" })}</span>
-        <span className="ml-auto shrink-0 text-ui-xs text-foreground-subtlest">
+        <span className="ms-auto shrink-0 text-ui-xs text-foreground-subtlest">
           {newTaskShortcutLabel}
         </span>
       </button>

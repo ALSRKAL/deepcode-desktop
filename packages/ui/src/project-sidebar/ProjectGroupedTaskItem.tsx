@@ -39,7 +39,7 @@ export function ProjectGroupedTaskItem({
       data-project-group-id={row.groupId ?? undefined}
       data-project-grouped-task-row={row.key}
       data-project-grouped-drop="task"
-      className={cn("group relative flex min-w-0 items-start", row.groupId && "pl-4")}
+      className={cn("group relative flex min-w-0 items-start", row.groupId && "ps-4")}
     >
       {dropSide ? (
         <div

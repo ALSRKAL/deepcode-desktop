@@ -39,8 +39,8 @@ describe("floating anchors", () => {
     expect(FLOATING_ANCHORS).toEqual([
       "top-left",
       "top-right",
-      "left-center",
-      "right-center",
+      "start-center",
+      "end-center",
       "bottom-left",
       "bottom-center",
       "bottom-right",
@@ -58,11 +58,11 @@ describe("floating anchors", () => {
       left: slot.left + slot.width - m - size.width,
       top: slot.top + m,
     });
-    expect(resolveFloatingPosition("left-center", slot, size)).toEqual({
+    expect(resolveFloatingPosition("start-center", slot, size)).toEqual({
       left: slot.left + m,
       top: slot.top + (slot.height - size.height) / 2,
     });
-    expect(resolveFloatingPosition("right-center", slot, size)).toEqual({
+    expect(resolveFloatingPosition("end-center", slot, size)).toEqual({
       left: slot.left + slot.width - m - size.width,
       top: slot.top + (slot.height - size.height) / 2,
     });
@@ -90,13 +90,13 @@ describe("floating anchors", () => {
   it("snaps a dropped position to the nearest resting anchor", () => {
     expect(resolveNearestFloatingAnchor({ left: 690, top: 590 }, slot, size)).toBe("bottom-right");
     expect(resolveNearestFloatingAnchor({ left: 16, top: 16 }, slot, size)).toBe("top-left");
-    expect(resolveNearestFloatingAnchor({ left: 420, top: 300 }, slot, size)).toBe("left-center");
+    expect(resolveNearestFloatingAnchor({ left: 420, top: 300 }, slot, size)).toBe("start-center");
     expect(resolveNearestFloatingAnchor({ left: 450, top: 700 }, slot, size)).toBe("bottom-center");
   });
 
   it("scales minimized transitions from the anchor corner", () => {
     expect(resolveFloatingTransformOrigin("top-left")).toBe("left top");
-    expect(resolveFloatingTransformOrigin("right-center")).toBe("right center");
+    expect(resolveFloatingTransformOrigin("end-center")).toBe("right center");
     expect(resolveFloatingTransformOrigin("bottom-right")).toBe("right bottom");
   });
 

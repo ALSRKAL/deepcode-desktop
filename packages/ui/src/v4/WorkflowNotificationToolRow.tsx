@@ -302,7 +302,7 @@ function WorkflowNotificationBaseRow({
             contentClassName="max-h-80 overflow-auto"
             wrapLongLines
           >
-            <CodeBlockHeader className="pl-3 pr-2 pt-2" language="json" />
+            <CodeBlockHeader className="ps-3 pe-2 pt-2" language="json" />
           </CodeBlock>
         ) : (
           <p className="max-h-80 overflow-auto whitespace-pre-wrap break-words text-ui-base leading-relaxed text-foreground">

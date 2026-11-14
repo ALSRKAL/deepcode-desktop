@@ -22,19 +22,19 @@ export const ZCODE_PREVIEW_IDENTITY_ENV = "ZCODE_PREVIEW_IDENTITY";
 
 const PRODUCTION_IDENTITY = Object.freeze({
   flavor: "production",
-  appId: "dev.zcodium.app.exp",
-  productName: "ZCodium Exp",
-  linuxExecutableName: "zcodium-exp",
-  linuxPackageName: "zcodium-exp",
+  appId: "com.deepcodestudio.ide",
+  productName: "DeepCode Studio",
+  linuxExecutableName: "deepcode-studio",
+  linuxPackageName: "deepcode-studio",
   cuaHelperInstallVariant: null,
 });
 
 const PREVIEW_IDENTITY = Object.freeze({
   flavor: "preview",
-  appId: "dev.zcodium.app.preview",
-  productName: "ZCodium Rust",
-  linuxExecutableName: "zcodium-rust",
-  linuxPackageName: "zcodium-rust",
+  appId: "com.deepcodestudio.ide.preview",
+  productName: "DeepCode Studio Preview",
+  linuxExecutableName: "deepcode-studio-preview",
+  linuxPackageName: "deepcode-studio-preview",
   cuaHelperInstallVariant: "preview",
 });
 
@@ -99,7 +99,7 @@ export function resolveDesktopArtifactSuffix(env = process.env) {
  */
 export function resolveWindowsAppUserModelIdForFlavor(flavor, runtime = { isPackaged: true }) {
   if (runtime.isPackaged === false) {
-    return "cn.aminer.zcode";
+    return "com.deepcodestudio.ide.dev";
   }
   return desktopProductIdentities[flavor === "preview" ? "preview" : "production"].appId;
 }

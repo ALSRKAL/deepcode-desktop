@@ -4,6 +4,7 @@ import type { z } from "zod";
 import {
   completeApiKeyAccessDataSchema,
   completeZhipuAccountAccessDataSchema,
+  completeDeepcodeAccountAccessDataSchema,
   completeProviderApiDataSchema,
   completeProviderConfigDataSchema,
   type providerApiTypeDataSchema,
@@ -13,6 +14,7 @@ import {
   type providerLogoDataSchema,
   type apiKeyAccessDataSchema,
   type zhipuAccountAccessDataSchema,
+  type deepcodeAccountAccessDataSchema,
   type providerAccessDataSchema,
   type providerApiDataSchema,
   type providerConfigDataSchema,
@@ -111,7 +113,35 @@ export class ZhipuAccountAccessConfig extends ConfigOverlay<ZhipuAccountAccessCo
   }
 }
 
-export type ProviderAccessConfig = ApiKeyAccessConfig | ZhipuAccountAccessConfig;
+export type DeepcodeAccountAccessConfigInput = Omit<DeepcodeAccountAccessConfigObject, "type">;
+
+export type DeepcodeAccountAccessConfigObject = Readonly<
+  z.infer<typeof deepcodeAccountAccessDataSchema>
+>;
+
+/** DeepCode 订阅账号：无字段；资格由登录会话（account-provider-resolution）决定。 */
+export class DeepcodeAccountAccessConfig extends ConfigOverlay<DeepcodeAccountAccessConfig> {
+  readonly type = "deepcode-account" as const;
+
+  constructor(_input: DeepcodeAccountAccessConfigInput = {}) {
+    super();
+    Object.freeze(this);
+  }
+
+  overlay(_next: DeepcodeAccountAccessConfig): DeepcodeAccountAccessConfig {
+    return new DeepcodeAccountAccessConfig();
+  }
+
+  validateComplete(path: readonly string[] = []): readonly ConfigValidationIssue[] {
+    return validateConfigSchema(completeDeepcodeAccountAccessDataSchema, this.toJSON(), path);
+  }
+
+  toJSON(): DeepcodeAccountAccessConfigObject {
+    return { type: this.type };
+  }
+}
+
+export type ProviderAccessConfig = ApiKeyAccessConfig | ZhipuAccountAccessConfig | DeepcodeAccountAccessConfig;
 
 export type ProviderAccessConfigObject = Readonly<z.infer<typeof providerAccessDataSchema>>;
 
@@ -505,6 +535,9 @@ function overlayProviderAccess(
       return current.overlay(next as ApiKeyAccessConfig);
     case "zhipu-account":
       return current.overlay(next as ZhipuAccountAccessConfig);
+    case "deepcode-account":
+      // 单例 access：无字段可 overlay，直接取新值。
+      return next;
   }
 }
 

@@ -137,7 +137,7 @@ export const ProjectRow = memo(function ProjectRow({
           onClick={onToggleExpanded}
           aria-expanded={expanded}
           title={project.roots.map((root) => root.rootPath).join("\n") || project.name}
-          className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30"
         >
           <ProjectFolderIcon project={project} expanded={expanded} />
           <span
@@ -251,7 +251,7 @@ export const ProjectRow = memo(function ProjectRow({
       </div>
 
       {expanded ? (
-        <div className="pl-6 pr-1">
+        <div className="ps-6 pe-1">
           {visibleTasks.length === 0 ? (
             <p className="px-2 py-1 text-ui-sm text-foreground-subtlest">
               {intl.formatMessage({ id: "projectSidebar.emptyProjectTasks" })}
@@ -272,7 +272,7 @@ export const ProjectRow = memo(function ProjectRow({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="ml-2 h-auto justify-start p-0 text-ui-sm text-foreground-subtlest hover:bg-transparent"
+                  className="ms-2 h-auto justify-start p-0 text-ui-sm text-foreground-subtlest hover:bg-transparent"
                   onClick={() => setLimit((current) => current + PROJECT_TASK_PAGE_SIZE)}
                 >
                   {intl.formatMessage({ id: "projectSidebar.showMore" })}

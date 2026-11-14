@@ -122,7 +122,7 @@ export function PluginUiLauncherItems(props: PluginUiLauncherItemsProps) {
             ) : (
               <PuzzleIcon className="size-4 text-foreground-subtle" />
             )}
-            <span className="side-pane-open-tab-button-label min-w-0 flex-1 truncate text-left">
+            <span className="side-pane-open-tab-button-label min-w-0 flex-1 truncate text-start">
               {title}
             </span>
             <span className="truncate text-ui-sm text-foreground-subtlest">{actionLabel}</span>

@@ -1,6 +1,4 @@
 import type { RemoteResourcePackageSelection } from "./remoteResourcePackages.js";
-import type { ProviderFamilyDomain } from "./model-provider-family.js";
-import type { ProviderFamilyConnectionSelectionSettings } from "./provider-family-connection-selection.js";
 import type { WorkspacePurpose } from "./workspacePurpose.js";
 import type { DynamicWorkflowMode } from "./dynamic-workflow-feature.js";
 import type { EmbeddedBrowserViewportPreference } from "./browser-use/command-metadata.js";
@@ -71,8 +69,14 @@ export interface SystemInfo {
   platform: string;
 }
 
-/** 支持的语言 */
-export type Locale = "zh-CN" | "en-US";
+/**
+ * 支持的语言（docs/plan/01 §5.2）：阿拉伯语（默认，RTL）与英语。
+ * zh-CN 保留在源码树里作为上游合并锚点，但从切换器与发行包中移除。
+ */
+export type Locale = "ar" | "en-US";
+
+/** 默认语言：阿拉伯语是产品默认界面语言（docs/plan/04 Phase 2a/3）。 */
+export const DEFAULT_LOCALE: Locale = "ar";
 
 /** 界面语言偏好；system 表示跟随当前运行端系统语言。 */
 export type LocalePreference = "system" | Locale;
@@ -106,8 +110,7 @@ export interface IntegratedTerminalShellOption {
   source: "system" | "path";
 }
 
-/** 默认语言 */
-export const DEFAULT_LOCALE: Locale = "zh-CN";
+// 默认语言（DEFAULT_LOCALE）见上方 Locale 定义处。
 
 // ── Workspace / Tab ──
 
@@ -322,15 +325,6 @@ export interface AppSettings {
   zcodeInteractionBehavior?: ZCodeInteractionBehavior;
   /** Agent 提问五分钟无人回答时是否允许自动继续；缺失按开启兼容旧配置。 */
   askUserQuestionAutoResolutionEnabled?: boolean;
-  /** 是否完整保留 Model I/O；开启后不轮转、不限额重置、不压缩或裁剪，鉴权信息仍会脱敏。 */
-  /** 设置页中每个 Provider Family 当前唯一的结构化连接选择。 */
-  providerFamilyConnectionSelections?: ProviderFamilyConnectionSelectionSettings;
-  /** ZAI / BigModel 账号 provider family 运行域。 */
-  providerFamilyDomain?: ProviderFamilyDomain;
-  /** 最近一次设置或清空 providerFamilyDomain 的时间。 */
-  providerFamilyDomainUpdatedAt?: number;
-  /** 旧 oauth/provider 状态是否已经尝试迁移到 providerFamilyDomain。 */
-  providerFamilyDomainMigrated?: boolean;
   /** 新建或冷恢复 Session 是否为 Bash 注入 bfs/ugrep 增强；默认启用。 */
   nativeSearchEnhancementsEnabled?: boolean;
   /** 新建或冷恢复 Session 的工具搜索模式；缺省 Off，热 resume 保持原值。 */

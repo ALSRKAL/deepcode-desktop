@@ -15,7 +15,6 @@ import type { IZCodeTaskService } from "./session/zcodeTaskService.js";
 import type { IZCodeAgentService } from "./zcode-agent/zcodeAgent.js";
 import type { IZCodeSessionService } from "./zcode-session/zcodeSession.js";
 import type { ICuaPermissionService } from "./cua-permission-broker/cuaPermissionService.js";
-import type { IBotsService } from "./bots/bots.js";
 import type { IFileWatcherService } from "./fileWatcher/fileWatcher.js";
 import type {
   IModelSelectionService,
@@ -66,7 +65,6 @@ export interface IServiceAccessor {
   readonly conversationShareService: IConversationShareService;
   /** Host 项目组织态；旧 Host/测试 double 可不提供，UI 据此隐藏项目入口而不是伪造行。 */
   readonly projectService?: IProjectService;
-  readonly botsService: IBotsService;
   readonly fileWatcherService: IFileWatcherService;
   /** 当前 Environment 的 Provider 配置与设置视图。 */
   readonly providerSettingsService: IProviderSettingsService;

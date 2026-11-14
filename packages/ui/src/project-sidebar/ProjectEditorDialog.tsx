@@ -342,7 +342,7 @@ export function ProjectEditorDialog({
                 type="button"
                 variant="ghost"
                 data-testid="project-editor-delete"
-                className="mr-auto text-destructive"
+                className="me-auto text-destructive"
                 disabled={busy}
                 onClick={() => setDeletePending(true)}
               >

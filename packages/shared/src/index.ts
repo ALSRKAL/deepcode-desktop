@@ -28,12 +28,10 @@ export type {
 } from "./protocol.js";
 export type { WorkspacePurpose } from "./workspacePurpose.js";
 export {
-  LEGACY_ZCODE_USER_DATA_DIR_NAME,
   ZCODE_APP_CONFIG_SUBDIR_NAME,
   ZCODE_PLUGIN_MANIFEST_DIR_NAME,
   ZCODE_PLUGIN_MANIFEST_FILE_NAME,
   ZCODE_USER_DATA_DIR_NAME,
-  ZCODE_USER_DATA_MIGRATION_MARKER_FILE_NAME,
   ZCODE_WORKSPACE_CONFIG_DIR_NAME,
   ZCODE_WORKSPACE_CONFIG_FILE_NAME,
   ZCODE_WORKSPACE_IGNORE_FILE_NAME,
@@ -92,7 +90,6 @@ export * from "./account-provider-state.js";
 export * from "./zcode-protocol-legacy-types.js";
 export * from "./zcode-task-types-core.js";
 export * from "./task-realtime-core.js";
-export * from "./bots/bridge.js";
 export * from "./remote-workspace-identity.js";
 export * from "./zcode-api-retry-status.js";
 export * from "./zcode-network-debug-status.js";
@@ -142,7 +139,6 @@ export * from "./remoteAppConfig.js";
 export * from "./helpAppConfig.js";
 export * from "./onboardingRecord.js";
 export * from "./remoteResourcePackages.js";
-export * from "./plan-identity.js";
 export {
   BROWSER_SCREENSHOT_SURFACE_PREPARE_TIMEOUT_MS,
   BROWSER_VIEW_RESTORE_BOOTSTRAP_URL,
@@ -227,8 +223,6 @@ export * from "./zcode-agent-model-state.js";
 export * from "./task-realtime.js";
 export { formatTimestamp, formatLogPrefix } from "./log-format.js";
 export * from "./model-provider-types.js";
-export * from "./model-provider-family.js";
-export * from "./provider-family-connection-selection.js";
 export * from "./provider-provisioning.js";
 export * from "./custom-model-value.js";
 export * from "./model-selection-types.js";
@@ -253,7 +247,6 @@ export * from "./process-names.js";
 export * from "./mcp.js";
 export * from "./runtime-tool-runtime.js";
 export * from "./git.js";
-export * from "./bots.js";
 export * from "./assistant-message-parts.js";
 export * from "./zcodePersistedMessageMerge.js";
 export * from "./assistant-presentation.js";

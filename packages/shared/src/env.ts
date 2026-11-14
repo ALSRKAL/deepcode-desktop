@@ -38,10 +38,9 @@ export const ZCODE_PRODUCT_FLAVOR = normalizeZCodeProductFlavor(
 /**
  * ZCodium 自有更新源 origin（构建期注入，`ZCODIUM_UPDATE_ORIGIN`）。
  *
- * 上游 `DEFAULT_ZCODE_ENDPOINT_ORIGIN` 指向 zcode.z.ai，它的 manifest 分发的是官方 ZCode
- * 安装包（appId `dev.zcode.app`），与本仓库构建的 `dev.zcodium.app` 不是同一个应用。
- * 因此自有构建不能沿用该地址：未配置时返回空串，调用方据此跳过更新检查与强制升级门禁，
- * 而不是回退到上游。详见 `.agents/specs/update-source-ownership.md`。
+ * DeepCode Studio 的自有更新源 origin（构建期注入 `DEEPCODE_UPDATE_ORIGIN`）。
+ * 未配置时返回空串，调用方据此跳过更新检查与强制升级门禁，而不是回退到任何上游。
+ * 详见 docs/plan/01 §9（auto-update manifest 由 apps/web 提供）。
  */
 export const ZCODIUM_UPDATE_ORIGIN =
   typeof __ZCODIUM_UPDATE_ORIGIN__ !== "undefined" ? __ZCODIUM_UPDATE_ORIGIN__.trim() : "";

@@ -119,7 +119,7 @@ function ConversationShareSelectionPanelImpl({
           data-testid="conversation-share-selection-panel"
           data-conversation-share-left-navigation="true"
           data-conversation-share-mode-motion="selection-panel"
-          className="group/share-selection-panel absolute left-4 z-30 flex h-auto w-[14.375rem] flex-col overflow-hidden rounded-xl bg-popover py-2 text-popover-foreground shadow-md ring-1 ring-inset ring-popover-border max-md:left-2 max-md:w-[min(14.375rem,calc(100vw-1rem))]"
+          className="group/share-selection-panel absolute start-4 z-30 flex h-auto w-[14.375rem] flex-col overflow-hidden rounded-xl bg-popover py-2 text-popover-foreground shadow-md ring-1 ring-inset ring-popover-border max-md:left-2 max-md:w-[min(14.375rem,calc(100vw-1rem))]"
           style={PANEL_LAYOUT_STYLE}
           initial={motionConfig.initial}
           animate={motionConfig.animate}
@@ -182,7 +182,7 @@ function ConversationShareSelectionPanelImpl({
                             onInspect({ unitIndex: item.unitIndex, rowId: item.rowId })
                           }
                           className={cn(
-                            "flex min-w-0 flex-1 flex-col rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused",
+                            "flex min-w-0 flex-1 flex-col rounded-md text-start outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused",
                             index === 0 ? "gap-1" : "gap-1.5",
                           )}
                         >
@@ -217,7 +217,7 @@ function ConversationShareSelectionPanelImpl({
               ref={visualThumbRef}
               aria-hidden="true"
               data-testid="conversation-share-selection-scroll-thumb"
-              className="pointer-events-none absolute right-1 top-0 z-10 hidden w-1.5 rounded-full bg-border opacity-0 transition-opacity group-hover/share-selection-panel:opacity-100 group-focus-within/share-selection-panel:opacity-100 [@media(hover:none)]:opacity-100"
+              className="pointer-events-none absolute end-1 top-0 z-10 hidden w-1.5 rounded-full bg-border opacity-0 transition-opacity group-hover/share-selection-panel:opacity-100 group-focus-within/share-selection-panel:opacity-100 [@media(hover:none)]:opacity-100"
             />
           </div>
         </motion.aside>

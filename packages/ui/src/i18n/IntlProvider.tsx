@@ -16,14 +16,47 @@ import {
   readSafeLocalStorage,
   writeSafeLocalStorage,
 } from "@/lib/browserEnvironment.js";
-import zhCN from "./locales/zh-CN.js";
+import ar from "./locales/ar.js";
 import enUS from "./locales/en-US.js";
 
-/** 语言 → 翻译消息映射 */
+/**
+ * 语言 → 翻译消息映射（docs/plan/01 §5.2）。zh-CN 留在源码树作为上游合并锚点，
+ * 但不再进入发行包（不被 import 即不打包）。
+ */
 const MESSAGES: Record<Locale, Record<string, string>> = {
-  "zh-CN": zhCN,
+  ar,
   "en-US": enUS,
 };
+
+/** 每个语言的文字方向（docs/plan/01 §5.3）：阿拉伯语 RTL，其余 LTR。 */
+export function localeDirection(locale: Locale): "rtl" | "ltr" {
+  return locale === "ar" ? "rtl" : "ltr";
+}
+
+/**
+ * 数字格式化：两种语言都用西数（latn），键 / 价格 / token 数必须可复制。
+ * formatCompactNumber 等展示层复用这里的实例语义。
+ */
+export function createLocaleNumberFormatter(locale: Locale): Intl.NumberFormat {
+  return new Intl.NumberFormat(locale === "ar" ? "ar" : "en-US", {
+    numberingSystem: "latn",
+  });
+}
+
+export function createLocaleDateTimeFormatter(locale: Locale): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en-US", {
+    numberingSystem: "latn",
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+/** 复数选择：阿拉伯语有 six categories，ICU 由 Intl.PluralRules 处理。 */
+export function selectPluralCategory(locale: Locale, count: number): Intl.PluralRuleCategory {
+  return new Intl.PluralRules(locale === "ar" ? "ar" : "en-US", { numberingSystem: "latn" }).select(
+    count,
+  );
+}
 
 /** 简易 intl 工具：根据 id 查找翻译，支持 {key} 占位符替换 */
 export interface IntlInstance {
@@ -39,7 +72,7 @@ interface LocaleBroadcastPayload {
 }
 
 function isLocale(value: unknown): value is Locale {
-  return value === "zh-CN" || value === "en-US";
+  return value === "ar" || value === "en-US";
 }
 
 function isLocalePreference(value: unknown): value is LocalePreference {
@@ -164,7 +197,8 @@ export function ZCodeIntlProvider({
       return DEFAULT_LOCALE;
     }
 
-    return language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US";
+    // 阿拉伯语是默认语言（docs/plan/01 §5.2）：系统语言以 ar 开头 → ar，否则英语。
+    return language.toLowerCase().startsWith("ar") ? "ar" : "en-US";
   }, []);
   const resolveSystemLocale = useCallback(async (): Promise<Locale> => {
     const resolvedLocale = await resolveHostSystemLocale?.();
@@ -355,6 +389,14 @@ export function ZCodeIntlProvider({
   );
 
   const intl = useMemo(() => createIntl(locale), [locale]);
+
+  // <html lang dir> 由 Provider 统一设置（docs/plan/01 §5.3）：shell 镜像由 CSS
+  // 逻辑属性完成，无需刷新窗口。
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = locale === "ar" ? "ar" : "en";
+    document.documentElement.dir = localeDirection(locale);
+  }, [locale]);
 
   const value = useMemo<IntlContextValue>(
     () => ({ intl, locale, localePreference, setLocale, setLocalePreference }),

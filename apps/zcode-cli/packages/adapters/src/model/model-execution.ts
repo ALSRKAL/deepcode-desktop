@@ -48,6 +48,12 @@ export interface AiSdkModelExecutionConfig {
   defaultHeaders?: Readonly<Record<string, string>>;
   env?: EnvRecord;
   network?: AiSdkNetworkConfig;
+  /**
+   * DeepCode 订阅账号（access.type = "deepcode-account"）的设备密钥来源：
+   * 由宿主进程在登录后注册，读取 safeStorage 加密的 credential（docs/plan/01 §6）。
+   * 密钥从不进入 Provider 持久化配置。
+   */
+  deepcodeApiKeyProvider?: () => string | undefined;
 }
 
 export interface AiSdkModelExecutionOptions {
@@ -153,6 +159,7 @@ export class AiSdkModelExecution {
   private readonly env: EnvRecord;
   private readonly defaultHeaders: Record<string, string>;
   private readonly network: AiSdkNetworkConfig;
+  private readonly deepcodeApiKeyProvider?: () => string | undefined;
   private readonly logger?: Logger;
   private readonly baseTransport?: ProviderFetch;
   private readonly providerTransports = new Map<string, ProviderFetch>();
@@ -161,6 +168,7 @@ export class AiSdkModelExecution {
     this.env = config.env ?? process.env;
     this.defaultHeaders = { ...config.defaultHeaders };
     this.network = { ...config.network };
+    this.deepcodeApiKeyProvider = config.deepcodeApiKeyProvider;
     this.logger = options.logger;
     this.baseTransport = options.transport;
   }
@@ -197,8 +205,11 @@ export class AiSdkModelExecution {
     readonly supportsJsonSchemaOutput: boolean;
   }): AiSdkModelSnapshot {
     // 官方账号执行链已退休：在构造 SDK/transport 之前拒绝，不能退化为匿名请求，
-    // 也不能通过旧调用方注入的票据重新启用。显式 API provider 不受此限制。
-    if (input.providerConfig.access.type === "zhipu-account") {
+    // 也不能通过旧调用方注入的票据重新启用。显式 API provider 与 DeepCode 订阅
+    // （deepcode-account，密钥由宿主 credential 回调提供）不受此限制。
+    if (
+      input.providerConfig.access.type === "zhipu-account"
+    ) {
       throw new ModelProtocolError(
         ModelErrorCode.ModelRequestAuthMissing,
         "Official account models are no longer supported. Configure an API provider.",
@@ -334,6 +345,10 @@ export class AiSdkModelExecution {
   }
 
   private resolveApiKey(providerConfig: AiSdkProviderConfig): string | undefined {
+    if (providerConfig.access.type === "deepcode-account") {
+      // 设备密钥不落 Provider 配置：请求期从宿主注册的 credential 回调取。
+      return this.deepcodeApiKeyProvider?.();
+    }
     return providerConfig.apiKey;
   }
 

@@ -10,10 +10,10 @@ import {
 
 // 条目 id 必须与 deb/rpm 安装的系统级条目同名（linuxPackageName），
 // 否则"系统级条目已存在就不写用户级"的抑制永远不生效，启动器里会同时出现两个图标。
-const DEFAULT_LINUX_DEEP_LINK_DESKTOP_ENTRY_ID = "zcodium";
-const LINUX_DEEP_LINK_MIME_TYPE = "x-scheme-handler/zcode";
+const DEFAULT_LINUX_DEEP_LINK_DESKTOP_ENTRY_ID = "deepcode-studio";
+const LINUX_DEEP_LINK_MIME_TYPE = "x-scheme-handler/deepcodestudio";
 // 归属标记：用于识别用户级条目是否由本应用写入。改名前的旧标记只用于清理遗留条目。
-const LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER = "Comment=ZCodium Desktop App";
+const LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER = "Comment=DeepCode Studio Desktop App";
 const LEGACY_LINUX_DEEP_LINK_DESKTOP_FILE = "zcode.desktop";
 const LEGACY_LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER = "Comment=ZCode Desktop App";
 

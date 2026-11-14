@@ -1,4 +1,5 @@
 import {
+  DeepcodeAccountAccessConfig,
   ProviderConfig,
   ProviderConfigMap,
   ZhipuAccountAccessConfig,
@@ -96,13 +97,27 @@ export function resolveAccountProviderConfigs(
   const resolved: Array<readonly [ProviderId, ProviderConfig]> = [];
   for (const [providerId, configured] of input.configuredProviders.entries()) {
     const access = configured.access;
-    if (access?.type !== "zhipu-account") continue;
+    // deepcode-account（docs/plan/01 §4/§6）与 zhipu-account 一样走连接状态解析。
+    if (access?.type !== "zhipu-account" && access?.type !== "deepcode-account") continue;
+    const isDeepcode = access.type === "deepcode-account";
     const connection = connectionByProviderId.get(providerId) ?? {
       providerId,
       status: "unknown" as const,
     };
 
     if (connection.status === "available" || connection.status === "pending") {
+      if (isDeepcode) {
+        // DeepCode：模型清单来自连接结果（网关按计划过滤后的 allowedModels）。
+        const models = normalizeModelIds(connection.models);
+        resolved.push([
+          providerId,
+          new ProviderConfig({
+            access: new DeepcodeAccountAccessConfig(),
+            builtinModelIds: models,
+          }),
+        ]);
+        continue;
+      }
       if (access.mode === "start-plan") {
         const models = normalizeModelIds(connection.models);
         resolved.push([
@@ -125,7 +140,7 @@ export function resolveAccountProviderConfigs(
     }
 
     if (connection.status === "unavailable") {
-      resolved.push([providerId, createEntitlementOverlay(false)]);
+      resolved.push([providerId, createEntitlementOverlay(false, isDeepcode)]);
       continue;
     }
 
@@ -133,15 +148,17 @@ export function resolveAccountProviderConfigs(
     if (previous) {
       resolved.push([providerId, previous]);
     } else {
-      resolved.push([providerId, createEntitlementOverlay(false)]);
+      resolved.push([providerId, createEntitlementOverlay(false, isDeepcode)]);
     }
   }
 
   return new ProviderConfigMap(resolved);
 }
 
-function createEntitlementOverlay(entitled: boolean): ProviderConfig {
-  return new ProviderConfig({ access: new ZhipuAccountAccessConfig({ entitled }) });
+function createEntitlementOverlay(entitled: boolean, isDeepcode = false): ProviderConfig {
+  return isDeepcode
+    ? new ProviderConfig({ access: new DeepcodeAccountAccessConfig() })
+    : new ProviderConfig({ access: new ZhipuAccountAccessConfig({ entitled }) });
 }
 
 function indexConnections(

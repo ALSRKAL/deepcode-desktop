@@ -3,10 +3,11 @@ import type { Locale } from "@zcode/shared";
 import { TID_LOCALE_TOGGLE } from "@zcode/shared";
 import { useZCodeIntl } from "./IntlProvider.js";
 
-const LOCALE_CYCLE: Locale[] = ["zh-CN", "en-US"];
+// zh-CN 已从发行包移除（docs/plan/01 §5.2）；切换器在 ar 与 en-US 间循环。
+const LOCALE_CYCLE: Locale[] = ["ar", "en-US"];
 
 const LOCALE_LABELS: Record<Locale, string> = {
-  "zh-CN": "中",
+  ar: "ع",
   "en-US": "En",
 };
 

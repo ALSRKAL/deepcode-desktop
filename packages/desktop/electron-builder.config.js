@@ -103,7 +103,8 @@ const runtimeModuleLookupRoots = [
   resolve(workspaceRoot, "node_modules", ".pnpm", "node_modules"),
 ];
 const desktopDistDir = process.env.ZCODE_DESKTOP_DIST_DIR || "dist";
-const DEFAULT_ELECTRON_MIRROR = "https://npmmirror.com/mirrors/electron/";
+// DeepCode builds use the official Electron distribution (no regional mirror).
+const DEFAULT_ELECTRON_MIRROR = "https://github.com/electron/electron/releases/";
 // `pnpm exec asar` 依赖 `.bin/asar`，但 @electron/asar 仅是 electron-builder 传递依赖时，
 // Linux CI（pnpm hoisted）往往解析不到该二进制，`asar list` 未运行即 exit 1。
 // 显式依赖 @electron/asar 并用 Node 直接执行 CLI，避免跨平台找不齐 shim。
@@ -167,7 +168,7 @@ const PACMAN_RUNTIME_DEPENDENCIES = [
   "xdg-utils",
 ];
 
-const WINDOWS_INSTALL_MANIFEST_NAME = ".zcodium-install-manifest";
+const WINDOWS_INSTALL_MANIFEST_NAME = ".deepcode-install-manifest";
 
 async function writeWindowsInstallManifest(context) {
   if (context.electronPlatformName !== "win32") return;
@@ -717,10 +718,9 @@ export default {
   // OAuth deep link 协议注册（macOS 打包后需要 Info.plist 中声明 CFBundleURLTypes）
   protocols: [
     {
-      // 协议处理器的展示名之前使用小写 scheme，打包产物里的协议描述无法体现产品名。
-      // 展示名跟随安装包身份；scheme 仍保持 zcode，因此两个应用中最后注册者会成为默认 handler。
+      // DeepCode Studio 的 deep link：deepcodestudio://auth（docs/plan/01 §6）。
       name: desktopProductIdentity.productName,
-      schemes: ["zcode"],
+      schemes: ["deepcodestudio"],
     },
   ],
   mac: {

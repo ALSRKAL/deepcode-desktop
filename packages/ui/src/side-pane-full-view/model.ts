@@ -17,8 +17,8 @@ export const SIDE_PANE_FULL_VIEW_ENTER_STATE: SidePaneFullViewState = {
 export const FLOATING_ANCHORS: readonly FloatingAnchor[] = [
   "top-left",
   "top-right",
-  "left-center",
-  "right-center",
+  "start-center",
+  "end-center",
   "bottom-left",
   "bottom-center",
   "bottom-right",

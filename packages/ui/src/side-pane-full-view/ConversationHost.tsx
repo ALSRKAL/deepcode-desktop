@@ -219,7 +219,7 @@ export function SidePaneFullViewConversationHost({
             <button
               type="button"
               aria-label={intl.formatMessage({ id: "sidePane.fullView.openAnswer" })}
-              className="block w-full rounded-2xl border border-border bg-background px-4 py-3 text-left shadow-lg transition-colors hover:bg-hover"
+              className="block w-full rounded-2xl border border-border bg-background px-4 py-3 text-start shadow-lg transition-colors hover:bg-hover"
               onClick={handleOpenAnswer}
             >
               <span className="line-clamp-2 text-ui-base text-foreground">{answerPreview}</span>

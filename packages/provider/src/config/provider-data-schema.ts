@@ -12,6 +12,8 @@ export const providerGroupDataSchema = z.enum([
   "standard-personal",
   "zai-family",
   "bigmodel-family",
+  /** DeepCode Studio 订阅 provider（docs/plan/01 §4）。 */
+  "deepcode",
 ]);
 export const zhipuAccountModeDataSchema = z.enum([
   "start-plan",
@@ -40,6 +42,17 @@ export const completeApiKeyAccessDataSchema = apiKeyAccessDataSchema.extend({
   apiKey: nonBlankRequiredString,
 });
 
+/**
+ * DeepCode 订阅账号（docs/plan/01 §4、§6）：API key 不由用户输入，登录后由
+ * credential service 写入（deepcode.deviceKey），运行时按此 access type 注入。
+ */
+export const completeDeepcodeAccountAccessDataSchema = z
+  .object({
+    type: z.literal("deepcode-account"),
+  })
+  .strict();
+export const deepcodeAccountAccessDataSchema = completeDeepcodeAccountAccessDataSchema;
+
 export const completeZhipuAccountAccessDataSchema = z
   .object({
     type: z.literal("zhipu-account"),
@@ -57,10 +70,12 @@ export const zhipuAccountAccessDataSchema = z
 export const providerAccessDataSchema = z.discriminatedUnion("type", [
   apiKeyAccessDataSchema,
   zhipuAccountAccessDataSchema,
+  deepcodeAccountAccessDataSchema,
 ]);
 const completeProviderAccessDataSchema = z.discriminatedUnion("type", [
   completeApiKeyAccessDataSchema,
   completeZhipuAccountAccessDataSchema,
+  completeDeepcodeAccountAccessDataSchema,
 ]);
 
 export const completeProviderApiDataSchema = z

@@ -79,7 +79,7 @@ export function ProjectTimelineView({
           variant="ghost"
           size="sm"
           data-testid="project-timeline-show-more"
-          className="ml-8.5 h-auto justify-start p-0 text-ui-base text-foreground-subtlest hover:bg-transparent"
+          className="ms-8.5 h-auto justify-start p-0 text-ui-base text-foreground-subtlest hover:bg-transparent"
           onClick={() => setLimit((current) => current + TIMELINE_PAGE_SIZE)}
         >
           {intl.formatMessage({ id: "projectSidebar.showMore" })}

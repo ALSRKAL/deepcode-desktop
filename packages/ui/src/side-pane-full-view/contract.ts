@@ -32,8 +32,8 @@ export interface SidePaneFullViewController {
 export type FloatingAnchor =
   | "top-left"
   | "top-right"
-  | "left-center"
-  | "right-center"
+  | "start-center"
+  | "end-center"
   | "bottom-left"
   | "bottom-center"
   | "bottom-right";

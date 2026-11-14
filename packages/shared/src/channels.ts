@@ -136,10 +136,6 @@ export const ServiceChannels = {
   Memory: "memory",
   /** 首次启动设置同步服务 */
   SettingsSync: "settings-sync",
-  /** Bots 远程聊天控制服务 */
-  Bots: "bots",
-  /** AstrBot 桥接传输控制面（官方 BotsService 的 astrbot provider） */
-  AstrBotBridge: "bots-astrbot-bridge",
   /** Composer 附件在 host-local 与 remote runtime 之间的预传服务 */
   PromptAttachmentTransfer: "prompt-attachment-transfer",
   /** Onboarding 完成记录服务（本地持久化，后续上传服务器） */
