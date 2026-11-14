@@ -45,7 +45,9 @@ const DEEPCODE_MODELS = [
 
 const REMOVED_TEMPLATE_IDS = new Set(["zai-api", "zai-standard-api", "bigmodel-api", "bigmodel-standard-api", "qwen-alibaba-model-studio-cn", "qwen-alibaba-model-studio-intl"]);
 
-const DEEPCODE_GATEWAY_URL = "${DEEPCODE_GATEWAY_URL}";
+// 构建期注入的网关地址（docs/plan/00 §6：DEEPCODE_GATEWAY_URL 为 B/P 类）。
+// schema 在构建期就会校验 URL，占位符必须替换为具体地址；生产构建由 CI 传入。
+const DEEPCODE_GATEWAY_URL = (process.env.DEEPCODE_GATEWAY_URL ?? "http://127.0.0.1:8790").replace(/\/$/, "");
 
 /** 网关四协议面：上游一 provider 一 API type 的约束下的内部拆分。 */
 function deepcodeProviderRules() {
@@ -74,9 +76,19 @@ const cfg = {
   revision: upstream.revision + 1,
   config: {
     providerConfigRules: {
-      templateRules: upstream.config.providerConfigRules.templateRules.filter(
-        (t) => !REMOVED_TEMPLATE_IDS.has(t.templateId),
-      ),
+      templateRules: upstream.config.providerConfigRules.templateRules
+        .filter((t) => !REMOVED_TEMPLATE_IDS.has(t.templateId))
+        // 语言的唯一事实是 Locale = ar | en-US（docs/plan/01 §5.2）：模板展示名
+        // 把上游 zh-CN 键换成 ar（沿用英文展示名；品牌/产品名保持拉丁）。
+        .map((t) => {
+          const nameMap = t.templateNameMap ?? {};
+          return {
+            ...t,
+            templateNameMap: {
+              ...(nameMap["en-US"] ? { ar: nameMap["en-US"], "en-US": nameMap["en-US"] } : nameMap),
+            },
+          };
+        }),
       providerRules: deepcodeProviderRules(),
     },
     modelConfigRules: {

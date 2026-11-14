@@ -7,7 +7,7 @@
         {
           "templateId": "moonshot-kimi",
           "templateNameMap": {
-            "zh-CN": "Kimi",
+            "ar": "Kimi",
             "en-US": "Kimi"
           },
           "config": {
@@ -36,7 +36,7 @@
         {
           "templateId": "minimax",
           "templateNameMap": {
-            "zh-CN": "MiniMax",
+            "ar": "MiniMax",
             "en-US": "MiniMax"
           },
           "config": {
@@ -67,7 +67,7 @@
         {
           "templateId": "deepseek",
           "templateNameMap": {
-            "zh-CN": "DeepSeek",
+            "ar": "DeepSeek",
             "en-US": "DeepSeek"
           },
           "config": {
@@ -92,7 +92,7 @@
         {
           "templateId": "xiaomi-mimo",
           "templateNameMap": {
-            "zh-CN": "Xiaomi MiMo",
+            "ar": "Xiaomi MiMo",
             "en-US": "Xiaomi MiMo"
           },
           "config": {
@@ -117,7 +117,7 @@
         {
           "templateId": "openai",
           "templateNameMap": {
-            "zh-CN": "OpenAI",
+            "ar": "OpenAI",
             "en-US": "OpenAI"
           },
           "config": {
@@ -150,7 +150,7 @@
         {
           "templateId": "anthropic",
           "templateNameMap": {
-            "zh-CN": "Anthropic",
+            "ar": "Anthropic",
             "en-US": "Anthropic"
           },
           "config": {
@@ -178,7 +178,7 @@
         {
           "templateId": "xai",
           "templateNameMap": {
-            "zh-CN": "xAI",
+            "ar": "xAI",
             "en-US": "xAI"
           },
           "config": {
@@ -204,7 +204,7 @@
         {
           "templateId": "openrouter",
           "templateNameMap": {
-            "zh-CN": "OpenRouter",
+            "ar": "OpenRouter",
             "en-US": "OpenRouter"
           },
           "config": {
@@ -286,7 +286,7 @@
         {
           "templateId": "opencode-go-chat",
           "templateNameMap": {
-            "zh-CN": "OpenCode Go (Chat)",
+            "ar": "OpenCode Go (Chat)",
             "en-US": "OpenCode Go (Chat)"
           },
           "config": {
@@ -324,7 +324,7 @@
         {
           "templateId": "opencode-go-messages",
           "templateNameMap": {
-            "zh-CN": "OpenCode Go (Anthropic)",
+            "ar": "OpenCode Go (Anthropic)",
             "en-US": "OpenCode Go (Anthropic)"
           },
           "config": {
@@ -355,7 +355,7 @@
         {
           "templateId": "opencode-go-responses",
           "templateNameMap": {
-            "zh-CN": "OpenCode Go (Responses)",
+            "ar": "OpenCode Go (Responses)",
             "en-US": "OpenCode Go (Responses)"
           },
           "config": {
@@ -380,7 +380,7 @@
         {
           "templateId": "opencode-go-google",
           "templateNameMap": {
-            "zh-CN": "OpenCode Go (Google)",
+            "ar": "OpenCode Go (Google)",
             "en-US": "OpenCode Go (Google)"
           },
           "config": {
@@ -404,7 +404,7 @@
         {
           "templateId": "opencode-zen-google",
           "templateNameMap": {
-            "zh-CN": "OpenCode Zen (Google)",
+            "ar": "OpenCode Zen (Google)",
             "en-US": "OpenCode Zen (Google)"
           },
           "config": {
@@ -435,7 +435,7 @@
         {
           "templateId": "opencode-zen-responses",
           "templateNameMap": {
-            "zh-CN": "OpenCode Zen (Responses)",
+            "ar": "OpenCode Zen (Responses)",
             "en-US": "OpenCode Zen (Responses)"
           },
           "config": {
@@ -472,7 +472,7 @@
         {
           "templateId": "opencode-zen-messages",
           "templateNameMap": {
-            "zh-CN": "OpenCode Zen (Anthropic)",
+            "ar": "OpenCode Zen (Anthropic)",
             "en-US": "OpenCode Zen (Anthropic)"
           },
           "config": {
@@ -510,7 +510,7 @@
         {
           "templateId": "opencode-zen-chat",
           "templateNameMap": {
-            "zh-CN": "OpenCode Zen (Chat)",
+            "ar": "OpenCode Zen (Chat)",
             "en-US": "OpenCode Zen (Chat)"
           },
           "config": {
@@ -574,7 +574,7 @@
             },
             "api": {
               "type": "openai-chat-completions",
-              "baseUrl": "${DEEPCODE_GATEWAY_URL}/v1"
+              "baseUrl": "http://127.0.0.1:8790/v1"
             },
             "logo": {
               "type": "builtin",
@@ -610,7 +610,7 @@
             },
             "api": {
               "type": "anthropic-messages",
-              "baseUrl": "${DEEPCODE_GATEWAY_URL}/v1"
+              "baseUrl": "http://127.0.0.1:8790/v1"
             },
             "logo": {
               "type": "builtin",
@@ -646,7 +646,7 @@
             },
             "api": {
               "type": "openai-responses",
-              "baseUrl": "${DEEPCODE_GATEWAY_URL}/v1"
+              "baseUrl": "http://127.0.0.1:8790/v1"
             },
             "logo": {
               "type": "builtin",
@@ -682,7 +682,7 @@
             },
             "api": {
               "type": "google-generative-ai",
-              "baseUrl": "${DEEPCODE_GATEWAY_URL}/v1"
+              "baseUrl": "http://127.0.0.1:8790/v1"
             },
             "logo": {
               "type": "builtin",
