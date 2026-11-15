@@ -13,12 +13,11 @@
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const root = resolve(process.argv[2] ?? ".");
-const APPLY = process.argv.includes("--apply");
 
-const LOCALE_FILES = ["packages/ui/src/i18n/locales/en-US.ts", "packages/ui/src/i18n/locales/ar.ts"];
-const EXTRA_TARGETS = [
+export const LOCALE_FILES = ["packages/ui/src/i18n/locales/en-US.ts", "packages/ui/src/i18n/locales/ar.ts"];
+export const EXTRA_TARGETS = [
   "packages/shared/src/desktopMenu.ts",
   "packages/shared/src/helpAppConfig.ts",
   "packages/desktop/src/main/about.ts",
@@ -32,18 +31,21 @@ const EXTRA_TARGETS = [
 ];
 
 // 品牌映射，长串优先。
+// Whole words only: `toggleZCodeStdioTap` / `openZCode` are identifiers, not brand
+// text — rewriting them broke menu ids (re-run safety for scripts/upstream/sync.mjs).
 const MAPPINGS = [
-  [/ZCodium Exp/g, "DeepCode Studio"],
-  [/ZCodium/g, "DeepCode Studio"],
-  [/Z Code/g, "DeepCode Studio"],
-  [/ZCode/g, "DeepCode Studio"],
-  [/Z\.ai/g, "DeepCode Studio"],
+  [/\bZCodium Exp\b/g, "DeepCode Studio"],
+  [/\bZCodium\b/g, "DeepCode Studio"],
+  [/\bZ Code\b/g, "DeepCode Studio"],
+  [/\bZCode\b/g, "DeepCode Studio"],
+  [/\bZ\.ai\b/g, "DeepCode Studio"],
   [/智谱/g, "DeepCode Studio"],
 ];
 
 /** 行内 allowlist：内部标识与路径不在品牌清洗范围。 */
+// Apache-2.0 attribution ("Based on ZCodium (Apache-2.0)") must survive every run.
 const LINE_ALLOW =
-  /@zcode\/|zcode-protocol|window\.zcode|window\.__zcode|ZCODE_[A-Z_]+|zcode\.cjs|TID_ZCODE|zcode:\/\/|deepcode|zcode-plugins|zcode-guide|document@|x-zcode-bot/i;
+  /Apache-2\.0|basedOn|@zcode\/|zcode-protocol|window\.zcode|window\.__zcode|ZCODE_[A-Z_]+|zcode\.cjs|TID_ZCODE|zcode:\/\/|deepcode|zcode-plugins|zcode-guide|document@|x-zcode-bot/i;
 
 function rebrandValue(value) {
   let out = value;
@@ -95,6 +97,18 @@ function rebrandSourceFile(text) {
   return { text: text2, count };
 }
 
+/** Pure transform for one repo-relative path (used by scripts/upstream/sync.mjs). */
+export function rebrandText(relPath, text) {
+  return LOCALE_FILES.includes(relPath) ? rebrandLocaleFile(text).text : rebrandSourceFile(text).text;
+}
+
+export function appliesToBrandStrings(relPath) {
+  return LOCALE_FILES.includes(relPath) || EXTRA_TARGETS.includes(relPath);
+}
+
+function main() {
+const root = resolve(process.argv[2] ?? ".");
+const APPLY = process.argv.includes("--apply");
 const targets = [];
 for (const f of LOCALE_FILES) {
   const full = join(root, f);
@@ -119,3 +133,6 @@ for (const file of targets) {
 }
 
 console.log(`brand codemod: files changed ${files}, values ${values}, apply=${APPLY}`);
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) main();

@@ -7,6 +7,8 @@ import {
 /* eslint-disable max-lines -- preload bridge 集中暴露桌面平台 IPC，拆散会让 contextBridge 权限边界更难审计。 */
 import { contextBridge, ipcRenderer, webFrame, webUtils } from "electron";
 import type {
+  DeepCodeAuthState,
+  DeepCodeSubscriptionStatusResult,
   WebRemoteControlResetPairingRequest,
   WebRemoteControlStartRequest,
   WebRemoteControlStatusSnapshot,
@@ -547,6 +549,22 @@ contextBridge.exposeInMainWorld("zcode", {
     callback(latestWindowControlsOverlayMetrics ?? readCurrentWindowControlsOverlayMetrics());
     ipcRenderer.on(PlatformChannels.WindowControlsOverlayChanged, handler);
     return () => ipcRenderer.removeListener(PlatformChannels.WindowControlsOverlayChanged, handler);
+  },
+  /** DeepCode 订阅账号：密钥只在 main；这里仅转发状态与动作（docs/plan/01 §6） */
+  deepcode: {
+    getAuthState: (): Promise<DeepCodeAuthState> =>
+      ipcRenderer.invoke(PlatformChannels.DeepCodeGetAuthState),
+    startSignIn: (): Promise<void> => ipcRenderer.invoke(PlatformChannels.DeepCodeStartSignIn),
+    signOut: (): Promise<void> => ipcRenderer.invoke(PlatformChannels.DeepCodeSignOut),
+    fetchSubscriptionStatus: (): Promise<DeepCodeSubscriptionStatusResult> =>
+      ipcRenderer.invoke(PlatformChannels.DeepCodeFetchSubscriptionStatus),
+    openPortal: (path: string): Promise<void> =>
+      ipcRenderer.invoke(PlatformChannels.DeepCodeOpenPortal, path),
+    onAuthChanged: (callback: (state: DeepCodeAuthState) => void): (() => void) => {
+      const handler = (_event: unknown, state: DeepCodeAuthState) => callback(state);
+      ipcRenderer.on(PlatformChannels.DeepCodeAuthChanged, handler);
+      return () => ipcRenderer.removeListener(PlatformChannels.DeepCodeAuthChanged, handler);
+    },
   },
   /** 同步读取当前桌面窗口页面缩放档位 */
   getDesktopZoomLevel: async (): Promise<DesktopZoomState> => {

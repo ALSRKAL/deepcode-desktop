@@ -319,7 +319,7 @@ async function runTimedAsync(label, fn) {
 
 function resolveAppAsarPath(context) {
   if (context.electronPlatformName === "darwin") {
-    const appName = `${context.packager?.appInfo?.productFilename ?? "ZCodium"}.app`;
+    const appName = `${context.packager?.appInfo?.productFilename ?? "DeepCode Studio"}.app`;
     return resolve(context.appOutDir, appName, "Contents", "Resources", "app.asar");
   }
 
@@ -328,7 +328,7 @@ function resolveAppAsarPath(context) {
 
 function resolvePackagedResourcesDir(context) {
   if (context.electronPlatformName === "darwin") {
-    const appName = `${context.packager?.appInfo?.productFilename ?? "ZCodium"}.app`;
+    const appName = `${context.packager?.appInfo?.productFilename ?? "DeepCode Studio"}.app`;
     return resolve(context.appOutDir, appName, "Contents", "Resources");
   }
 
@@ -341,7 +341,7 @@ function resolvePackagedResourcesDir(context) {
  * electron-builder 26 的 `AppInfo.updaterCacheDirName` 由 `metadata.name` 派生
  * （appInfo.js: `this.sanitizedName.toLowerCase() + "-updater"`），而本仓库的 desktop
  * package.json 名为 `@zcode/desktop`，因此默认值是从上游继承的 `@zcodedesktop-updater`——
- * 与官方 ZCode 共用同一个 ~/Library/Caches 目录，pending/ 下已下载的官方安装包会被当成
+ * 与上游官方发行版共用同一个 ~/Library/Caches 目录，pending/ 下已下载的官方安装包会被当成
  * 本应用的更新。schema 里没有可覆盖该值的配置项，publish.updaterCacheDirName 会被忽略
  * （PublishManager 始终写入 appInfo 的值），所以只能在 afterPack 里改文件。
  *
@@ -474,16 +474,18 @@ export default {
   extraMetadata: {
     version: buildMetadata.appVersion,
     zcodeProductFlavor: desktopProductIdentity.flavor,
-    homepage: "https://zcode.z.ai",
+    // 品牌元数据（docs/plan/01 §2.1）：真实域名由 DEEPCODE_WEB_ORIGIN 在构建期注入（owner decision 7）。
+    homepage: process.env.DEEPCODE_WEB_ORIGIN?.trim() || "https://deepcode.example",
     author: {
-      name: "ZCodium",
-      email: "dev@zcode.z.ai",
+      name: "DeepCode Studio",
+      email: process.env.DEEPCODE_SUPPORT_EMAIL?.trim() || "support@deepcode.example",
     },
   },
   // macOS 签名阶段会对 Electron Framework 下每个语言包逐个 codesign。
   // 默认全量语言会产生大量 locale.pak 签名调用，显著拉长打包时长。
   // 这里仅保留当前产品必需语言，减少签名文件数并缩短 CI 总耗时。
-  electronLanguages: ["en-US", "zh-CN"],
+  // DeepCode 发行语言：ar（默认）与 en-US（docs/plan/01 §5.2；zh-CN 不随包发行）。
+  electronLanguages: ["ar", "en-US"],
   // pnpm workspace + semver range（如 ^41.0.3）下，electron-builder
   // 有时无法从依赖树里稳定推导出 Electron 版本，导致 bundle 直接中断。
   // 显式写死当前桌面端使用的 Electron 版本，避免打包阶段再做不可靠的猜测。
@@ -626,7 +628,7 @@ export default {
       to: "config/default.json",
     },
     {
-      // Provider Registry 的 ZCode Built-in Config 是静态 Provider/Model 事实的唯一内置来源。
+      // Provider Registry 的 Built-in Config 是静态 Provider/Model 事实的唯一内置来源。
       // 显式随包发布，避免正式 Host 回退到旧 Catalog/Preset hardcode。
       from: builtinProviderConfig.sourcePath,
       to: "config/provider/deepcode-builtin.json",
@@ -680,7 +682,7 @@ export default {
       to: "glm/node_modules",
       filter: ["**/*", "!**/*.map"],
     },
-    // Rust CLI runtime，只在 Preview（ZCodium Rust）口味随包分发，落到 resources/rust。
+    // Rust CLI runtime，只在 Preview（Rust）口味随包分发，落到 resources/rust。
     // 生产口味不构建也不打包，继续只用上面的 glm/ JS bundle。
     // 目录与 glm/ 平级但分开，保证两套 runtime 的启停与回退互不影响。
     ...(runtimeAssetsPlan.includeRustCliRuntime
@@ -765,11 +767,11 @@ export default {
     artifactName: buildDesktopArtifactName("linux"),
     // desktop 包名是 scoped package（@zcode/desktop），electron-builder 默认会把
     // Linux executable/Icon 推成 @zcodedesktop。部分桌面环境无法按这个 icon name 命中
-    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=zcode
-    // 与 /usr/share/icons/hicolor/*/apps/zcode.png 保持一致。
+    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=<linuxExecutableName>
+    // 与 /usr/share/icons/hicolor/*/apps/<linuxExecutableName>.png 保持一致。
     executableName: desktopProductIdentity.linuxExecutableName,
     category: "Development",
-    maintainer: "MoyaMryia <MryiaMoya@outlook.com>",
+    maintainer: `DeepCode Studio <${process.env.DEEPCODE_SUPPORT_EMAIL?.trim() || "support@deepcode.example"}>`,
   },
   deb: {
     // 生产版与 Preview 必须是两个 dpkg package；只改可执行名仍会让安装器把另一版本当成升级替换。

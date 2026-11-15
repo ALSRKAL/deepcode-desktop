@@ -2073,7 +2073,6 @@ export const diagnosticPrefixes: readonly string[] = [
   "[remote-assets] uploading ",
   "[scheduler] ",
   "[settings] closeToTrayOnWindows=",
-  "[spawnHostProcess] BIGMODEL_OAUTH_APP_SECRET source: ",
   "[spawnHostProcess] forked host process for (",
   "[spawnHostProcess] glm binary path: ",
   "[spawnHostProcess] host module path: ",

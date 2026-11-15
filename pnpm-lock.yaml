@@ -810,6 +810,9 @@ importers:
       '@zcode/client':
         specifier: workspace:*
         version: link:../client
+      '@zcode/deepcode':
+        specifier: workspace:*
+        version: link:../deepcode
       '@zcode/provider':
         specifier: workspace:*
         version: link:../provider

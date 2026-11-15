@@ -119,6 +119,7 @@ export function createDesktopPlatform(options: {
     getWindowControlsOverlayMetrics: () => window.zcode.getWindowControlsOverlayMetrics?.() ?? null,
     onWindowControlsOverlayChanged: (handler) =>
       window.zcode.onWindowControlsOverlayChanged?.(handler) ?? (() => {}),
+    deepcode: window.zcode.deepcode,
     getDesktopZoomLevel: () =>
       window.zcode.getDesktopZoomLevel?.() ?? Promise.resolve({ zoomLevel: 0 }),
     onDesktopZoomLevelChanged: (handler) =>

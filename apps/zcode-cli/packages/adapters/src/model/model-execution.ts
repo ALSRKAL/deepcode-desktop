@@ -23,6 +23,7 @@ import {
 import type { RegistryProviderConfig } from "@zcode/provider";
 import { withOpenRouterAttributionHeaders } from "@zcode/shared";
 import { createAnthropicCompatFetch } from "./anthropic-stream-compat.js";
+import { createDeepCodeDeviceKeyReader } from "../auth/deepcode-device-key.js";
 import { createOpenAIResponsesJsonCompatFetch } from "./openai-responses-json-compat.js";
 import { createModelOptionMapFetch, type RawRequestBodyCapture } from "./model-option-map-fetch.js";
 import { createNetworkProxyFetch } from "../network/proxy-fetch.js";
@@ -85,6 +86,31 @@ export interface AiSdkBoundModelResolution {
 
 type LanguageModelFactory = (modelId: string) => LanguageModel;
 type ProviderFetch = typeof globalThis.fetch;
+
+function deepcodeSignInRequiredError(): ModelProtocolError {
+  return new ModelProtocolError(
+    ModelErrorCode.ModelRequestAuthMissing,
+    "Sign in to DeepCode Studio to use the built-in models.",
+  );
+}
+
+/** 每个请求读取当前设备密钥，替换 SDK 在创建时写入的鉴权头。 */
+export function createDeepCodeAuthFetch(
+  inner: ProviderFetch,
+  readKey: () => string | undefined,
+): ProviderFetch {
+  return (async (input: Parameters<ProviderFetch>[0], init?: Parameters<ProviderFetch>[1]) => {
+    const key = readKey();
+    if (!key) throw deepcodeSignInRequiredError();
+    const headers = new Headers(
+      init?.headers ?? (input instanceof Request ? input.headers : undefined),
+    );
+    headers.delete("x-api-key");
+    headers.delete("x-goog-api-key");
+    headers.set("authorization", `Bearer ${key}`);
+    return inner(input, { ...init, headers });
+  }) as ProviderFetch;
+}
 type ProviderCode = string | number;
 
 export interface ProviderBusinessErrorFetchOptions {
@@ -168,7 +194,9 @@ export class AiSdkModelExecution {
     this.env = config.env ?? process.env;
     this.defaultHeaders = { ...config.defaultHeaders };
     this.network = { ...config.network };
-    this.deepcodeApiKeyProvider = config.deepcodeApiKeyProvider;
+    // 默认从桌面写入的加密凭据文件按请求读取（docs/plan/01 §6）；测试可注入。
+    this.deepcodeApiKeyProvider =
+      config.deepcodeApiKeyProvider ?? createDeepCodeDeviceKeyReader({ env: this.env });
     this.logger = options.logger;
     this.baseTransport = options.transport;
   }
@@ -214,6 +242,9 @@ export class AiSdkModelExecution {
         ModelErrorCode.ModelRequestAuthMissing,
         "Official account models are no longer supported. Configure an API provider.",
       );
+    }
+    if (input.providerConfig.access.type === "deepcode-account" && !this.deepcodeApiKeyProvider?.()) {
+      throw deepcodeSignInRequiredError();
     }
     const configuredProvider = toAiSdkProviderConfig(input.providerId, input.providerConfig);
     // 重构后模型 SDK 曾只接到用户 Header，漏掉版本和站点归因；在公共绑定边界恢复，
@@ -277,7 +308,13 @@ export class AiSdkModelExecution {
   ): LanguageModelFactory {
     const apiKey = this.resolveApiKey(providerConfig);
     const headers = providerConfig.headers;
-    const providerTransport = this.resolveProviderTransport(providerId);
+    const baseProviderTransport = this.resolveProviderTransport(providerId);
+    // DeepCode 订阅：binding 冻结的是创建时的密钥；登录/登出/轮换后必须按请求取最新值，
+    // 并统一用 Bearer 发给网关（网关三种头都接受，Bearer 优先）。
+    const providerTransport =
+      providerConfig.access.type === "deepcode-account" && this.deepcodeApiKeyProvider
+        ? createDeepCodeAuthFetch(baseProviderTransport, this.deepcodeApiKeyProvider)
+        : baseProviderTransport;
     const fetch = createProviderBusinessErrorFetch({
       fetch: providerTransport,
       providerId,

@@ -1,0 +1,78 @@
+name: Upstream sync
+
+# Weekly: merge new ZCodium commits while keeping the DeepCode identity
+# (scripts/upstream/sync.mjs, docs/upstream-sync.md).
+#   clean merge     → branch upstream-sync/<sha> + Pull Request with a review checklist,
+#                     and the DeepCode checks are started on that branch
+#   real conflicts  → an Issue listing the files to merge by hand
+# Nothing reaches users until you merge the PR and tag a release.
+on:
+  schedule:
+    - cron: "17 3 * * 1" # Mondays 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO_URL: https://github.com/axiom-desu/ZCodium.git
+  UPSTREAM_BRANCH: main
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+      - name: Configure git
+        run: |
+          git config user.name "deepcode-upstream-sync"
+          git config user.email "upstream-sync@users.noreply.github.com"
+      - name: Merge upstream
+        id: sync
+        run: |
+          set +e
+          node scripts/upstream/sync.mjs --ci --report "$RUNNER_TEMP/report.md"
+          code=$?
+          set -e
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          [ -f "$RUNNER_TEMP/report.md" ] && cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" = "1" ]; then exit 1; fi
+
+      - name: Open pull request
+        if: steps.sync.outputs.status == 'merged'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.sync.outputs.branch }}
+        run: |
+          git push origin "HEAD:refs/heads/$BRANCH"
+          gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+            --title "Upstream sync: ZCodium ${BRANCH#upstream-sync/}" \
+            --body-file "$RUNNER_TEMP/report.md"
+          # Pull requests opened with GITHUB_TOKEN do not trigger other workflows;
+          # start the DeepCode checks on the branch explicitly.
+          gh workflow run deepcode-desktop.yml --ref "$BRANCH" -f checks_only=true
+
+      - name: Open issue for a manual merge
+        if: steps.sync.outputs.status == 'conflicts'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.sync.outputs.upstream_sha }}
+        run: |
+          title="Upstream sync needs a manual merge (ZCodium ${SHA:0:7})"
+          if gh issue list --state open --search "\"$title\" in:title" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "issue already open"; exit 0
+          fi
+          gh issue create --title "$title" --body-file "$RUNNER_TEMP/report.md"

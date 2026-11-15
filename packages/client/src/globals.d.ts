@@ -1,4 +1,5 @@
 import type {
+  DeepCodeAccountBridge,
   DesktopCommandId,
   DesktopZoomState,
   DesktopWindowChromeState,
@@ -183,6 +184,8 @@ declare global {
       onDesktopWindowChromeStateChanged?(
         handler: (state: DesktopWindowChromeState) => void,
       ): () => void;
+      /** DeepCode 订阅账号桥（main 持密钥；renderer 只见状态） */
+      deepcode?: DeepCodeAccountBridge;
       /** 读取当前桌面窗口页面缩放档位 */
       getDesktopZoomLevel?(): Promise<DesktopZoomState>;
       /** 订阅当前桌面窗口页面缩放档位变化 */

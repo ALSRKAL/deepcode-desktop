@@ -151,6 +151,9 @@ export {
 export type { LaunchMarks } from "./launchMarks.js";
 export { LAUNCH_MARKS_QUERY_KEY, parseLaunchMarks, serializeLaunchMarks } from "./launchMarks.js";
 export type {
+  DeepCodeAccountBridge,
+  DeepCodeAuthState,
+  DeepCodeSubscriptionStatusResult,
   CancelPendingRemoteConnectionRequest,
   BindRemoteWorkspaceSessionContextRequest,
   BotRemoteWorkspaceReconnectedEvent,

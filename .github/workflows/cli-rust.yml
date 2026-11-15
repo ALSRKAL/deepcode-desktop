@@ -1,11 +1,10 @@
 name: CLI Rust CI
 
+# DeepCode: upstream ZCodium pipeline, kept for upstream merges. It tests
+# upstream services this fork removed, so it only runs on demand.
+# The DeepCode pipeline is deepcode-desktop.yml.
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
 

@@ -427,6 +427,36 @@ export interface WindowControlsOverlayReadyPayload {
   metrics: WindowControlsOverlayMetrics;
 }
 
+/** DeepCode 账号的 renderer 可见状态：永远不含设备密钥（docs/plan/01 §6）。 */
+export interface DeepCodeAuthState {
+  signedIn: boolean;
+  /** 已发起登录、等待浏览器 deep link 回调。 */
+  pending: boolean;
+  user: { id: string; email: string; name: string | null } | null;
+  plan: { id: string; tier: string; name: { en: string; ar: string } } | null;
+  /** 最近一次登录失败的错误类别（不含原始 URL/码）。 */
+  lastError: string | null;
+}
+
+/**
+ * main 代查订阅状态的结果。`status` 由 renderer 侧用 @zcode/deepcode 的 schema 校验，
+ * shared 不依赖 deepcode 包（架构分层）。
+ */
+export type DeepCodeSubscriptionStatusResult =
+  | { ok: true; status: unknown; receivedAt: number }
+  | { ok: false; code: string; renewUrl?: string };
+
+/** Desktop 专属：DeepCode 订阅账号桥（Web fallback 不提供）。 */
+export interface DeepCodeAccountBridge {
+  getAuthState(): Promise<DeepCodeAuthState>;
+  startSignIn(): Promise<void>;
+  signOut(): Promise<void>;
+  fetchSubscriptionStatus(): Promise<DeepCodeSubscriptionStatusResult>;
+  /** 仅接受以 `/` 开头的门户同源路径。 */
+  openPortal(path: string): Promise<void>;
+  onAuthChanged(handler: (state: DeepCodeAuthState) => void): () => void;
+}
+
 export interface DesktopZoomState {
   zoomLevel: number;
 }
@@ -882,6 +912,9 @@ export interface IPlatformService {
   onWindowControlsOverlayChanged?(
     handler: (metrics: WindowControlsOverlayMetrics) => void,
   ): () => void;
+
+  /** DeepCode 订阅账号（登录、状态、门户）；仅 Desktop 提供 */
+  deepcode?: DeepCodeAccountBridge;
 
   /** 同步读取当前桌面窗口页面缩放档位；Web fallback 可返回默认 0 */
   getDesktopZoomLevel?(): Promise<DesktopZoomState>;

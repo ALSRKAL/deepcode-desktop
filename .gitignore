@@ -102,3 +102,6 @@ packages/desktop/bundled-remote-assets/
 
 # Rust CLI runtime
 /apps/zcode-cli-rust/target/
+
+# upstream sync report (scripts/upstream/sync.mjs)
+upstream-sync-report.md

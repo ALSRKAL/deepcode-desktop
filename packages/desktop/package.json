@@ -36,6 +36,7 @@
     "@modelcontextprotocol/core": "2.0.0",
     "@modelcontextprotocol/ext-apps": "2.0.0",
     "@zcode/client": "workspace:*",
+    "@zcode/deepcode": "workspace:*",
     "@zcode/provider": "workspace:*",
     "@zcode/provider-node": "workspace:*",
     "@zcode/rpc": "workspace:*",

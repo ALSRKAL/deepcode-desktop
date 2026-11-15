@@ -1766,6 +1766,10 @@ const ar: Record<string, string> = {
   "deepcode.lock.action.payment": "تحديث الدفع",
   "deepcode.lock.action.contact": "تواصل مع الدعم",
   "deepcode.lock.action.signIn": "تسجيل الدخول",
+  "deepcode.account.signIn": "تسجيل الدخول إلى DeepCode",
+  "deepcode.account.waiting": "أكمل تسجيل الدخول في المتصفح…",
+  "deepcode.account.signOut": "تسجيل الخروج",
+  "deepcode.account.error": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
   // File tree
   "fileTree.loading": "جارٍ التحميل...",
   "fileTree.error": "فشل التحميل",

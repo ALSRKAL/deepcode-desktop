@@ -1,6 +1,6 @@
 /** D-04（docs/plan/04 §2.3）：deep link 处理器的 state/重放/无待处理语义。 */
 import { describe, expect, it } from "vitest";
-import { handleDeepLink } from "../src/main/desktopOAuthDeepLink.js";
+import { handleDeepLink } from "./desktopOAuthDeepLink.js";
 
 const noopLogger = { info: () => {}, warn: () => {} };
 
@@ -18,7 +18,10 @@ function makeHarness() {
   const auth = (url: URL): boolean => {
     const state = url.searchParams.get("state") ?? "";
     const token = url.searchParams.get("token") ?? "";
-    if (!acceptedStates.includes(state)) return false;
+    const index = acceptedStates.indexOf(state);
+    if (index < 0) return false;
+    // 与真实账号服务一致：一次待处理登录只消费一次（pending 在兑换时清空）。
+    acceptedStates.splice(index, 1);
     handled.push({ state, token });
     return true;
   };

@@ -1,5 +1,15 @@
 import { recordDesktopDiagnostic, shutdownDesktopDiagnostics } from "./localDiagnosticSink.js";
-import { DiagnosticRecordSchema, ZCODE_USER_DATA_DIR_NAME } from "@zcode/shared";
+import {
+  DiagnosticRecordSchema,
+  ZCODE_USER_DATA_DIR_NAME,
+  resolveRuntimeZCodeEndpointOrigin,
+} from "@zcode/shared";
+import {
+  broadcastDeepCodeAuthState,
+  createDeepCodeAccount,
+  registerDeepCodeAccountIpc,
+  type DeepCodeAccount,
+} from "./deepcodeAccount.js";
 import {
   registerDesktopResourceTelemetry,
   stopDesktopResourceTelemetry,
@@ -1652,6 +1662,23 @@ function createWindowInstance(startupBootstrap: StartupWindowBootstrap = {}) {
   return win;
 }
 
+// DeepCode 账号（docs/plan/01 §6）：懒创建，凭据目录在 setDataBaseDir 之后才确定。
+let deepcodeAccount: DeepCodeAccount | null = null;
+function getDeepCodeAccount(): DeepCodeAccount {
+  deepcodeAccount ??= createDeepCodeAccount({
+    credentials: createCredentialService(),
+    webOrigin: resolveRuntimeZCodeEndpointOrigin(),
+    appVersion: app.getVersion(),
+    broadcast: broadcastDeepCodeAuthState,
+    logger,
+  });
+  return deepcodeAccount;
+}
+/** 所有 handleDeepLink 入口共享：auth 回调交给 DeepCode 账号服务。 */
+const deepcodeDeepLinkOptions = {
+  onAuthCallback: (url: URL) => getDeepCodeAccount().handleAuthCallback(url),
+};
+
 registerDeepLinkProtocol(logger, { iconPath: linuxDesktopIntegrationIconPath });
 app.on("open-url", (event, url) => {
   event.preventDefault();
@@ -1671,6 +1698,7 @@ app.on("open-url", (event, url) => {
     return;
   }
   handleDeepLink(url, logger, {
+    ...deepcodeDeepLinkOptions,
     confirmationCopy: resolveExternalWorkspaceConfirmationCopy(),
     resolveApplicationWindow: () => getApplicationWindowsExcludingCuaIndicator()[0] ?? null,
   });
@@ -1686,7 +1714,8 @@ app.on("second-instance", (_event, argv, _workingDirectory, additionalData) => {
       argv,
       focusForceUpdateGateWindow,
       forceUpdateBlocked: forceUpdateMainWindowCreationBlocked,
-      handleDeepLink: (url, options) => handleDeepLink(url, logger, options),
+      handleDeepLink: (url, options) =>
+        handleDeepLink(url, logger, { ...deepcodeDeepLinkOptions, ...options }),
       handleOpenWorkspacePath: (path, options) =>
         handleOpenWorkspacePath(path, logger, {
           allowWithoutReadyWindow: true,
@@ -1881,6 +1910,8 @@ app.whenReady().then(async () => {
     return null;
   });
 
+  registerDeepCodeAccountIpc(getDeepCodeAccount());
+
   registerPlatformIpcHandlers({
     logger,
     // CDP-on-guest pivot：renderer `<webview>` dom-ready 上报 guest webContentsId → attach。
@@ -2044,6 +2075,7 @@ app.whenReady().then(async () => {
   const protocolUrl = extractDeepLinkUrlFromArgs(process.argv);
   if (startupDeepLinkConsumptionGate.shouldHandleReadyProtocolUrl(protocolUrl)) {
     handleDeepLink(protocolUrl, logger, {
+      ...deepcodeDeepLinkOptions,
       confirmationCopy: resolveExternalWorkspaceConfirmationCopy(),
       resolveApplicationWindow: () => getApplicationWindowsExcludingCuaIndicator()[0] ?? null,
     });

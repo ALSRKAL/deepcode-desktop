@@ -23,6 +23,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip.js";
 import { Button } from "@/components/ui/button.js";
 import { PlatformProvider } from "@/hooks/usePlatform.js";
+import { DeepCodeAccountSync } from "@/subscription/DeepCodeAccount.js";
 import { ServiceProvider } from "@/hooks/useServices.js";
 import { useDynamicWorkflowAvailabilityLoader } from "@/hooks/useDynamicWorkflowAvailability.js";
 import { useDynamicWorkflowUserModeSync } from "@/hooks/useDynamicWorkflowAvailability.js";
@@ -109,6 +110,7 @@ export function Root(props: RootProps) {
                     enabled={props.assistantCodeCommentCardsEnabled}
                   >
                     <RootInner {...props} />
+                    <DeepCodeAccountSync />
                   </AssistantCodeCommentFeatureProvider>
                 </DiffsWorkerPoolProvider>
               </TabStoreProvider>

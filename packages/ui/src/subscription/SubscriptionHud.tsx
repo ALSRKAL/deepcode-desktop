@@ -8,6 +8,7 @@
  */
 import { useEffect, useState } from "react";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
+import { usePlatform } from "@/hooks/usePlatform.js";
 import {
   severityOfInput,
   useSubscriptionStore,
@@ -101,9 +102,21 @@ export function SubscriptionHudChip({ compact = false }: { compact?: boolean }) 
 }
 
 /** 锁定模态：app 级阻塞对话框，focus trap 由 Radix Dialog 提供。 */
+/** renewUrl 可能是门户绝对地址或相对路径；只把 path+query 交给 main（同源打开）。 */
+export function portalPathFromRenewUrl(renewUrl: string | undefined): string {
+  if (!renewUrl) return "/dashboard/billing";
+  try {
+    const url = new URL(renewUrl, "https://portal.invalid");
+    return `${url.pathname}${url.search}` || "/dashboard/billing";
+  } catch {
+    return "/dashboard/billing";
+  }
+}
+
 export function SubscriptionLockModal() {
-  const { intl, locale } = useZCodeIntl();
-  const { store, snapshot } = useSubscriptionViewState();
+  const { intl } = useZCodeIntl();
+  const platform = usePlatform();
+  const { store } = useSubscriptionViewState();
   const lock = store.lock;
   if (!lock || store.status === "signed_out") return null;
 
@@ -135,7 +148,6 @@ export function SubscriptionLockModal() {
     },
   };
   const copy = copyByReason[lock.reason] ?? copyByReason.expired!;
-  const webUrl = `${snapshot ? "" : ""}https://deepcode.example/dashboard/billing`;
 
   return (
     <Dialog open>
@@ -153,8 +165,12 @@ export function SubscriptionLockModal() {
         <DialogFooter>
           <Button
             onClick={() => {
-              // 用系统浏览器打开门户（renderer 不承载外部站点导航）。
-              window.open(webUrl, "_blank", "noopener");
+              // 门户在系统浏览器打开（main 校验同源路径）；未登录时直接走 PKCE 登录。
+              if (lock.reason === "signed_out") {
+                void platform.deepcode?.startSignIn();
+                return;
+              }
+              void platform.deepcode?.openPortal(portalPathFromRenewUrl(lock.renewUrl));
             }}
           >
             {copy.action}

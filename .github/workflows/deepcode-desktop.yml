@@ -1,0 +1,186 @@
+name: DeepCode Desktop
+
+# Checks on every push/PR; installers for Linux, Windows and macOS on a version
+# tag (v*) or a manual run. Installers are published to a GitHub Release.
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   DEEPCODE_GATEWAY_URL   e.g. https://deepcode-xxxx.onrender.com   (https only)
+#   DEEPCODE_WEB_ORIGIN    e.g. https://deepcode-xxxx.onrender.com
+# No signing certificates are used: Windows shows SmartScreen and macOS needs
+# "Open Anyway" (see docs/deploy/README.ar.md in the server repo).
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      checks_only:
+        description: "Run checks only (no installers)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deepcode-desktop-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+env:
+  HUSKY: "0"
+  ZCODE_ENV: production
+  ZCODE_SKIP_REMOTE_ASSETS: "1"
+  CSC_IDENTITY_AUTO_DISCOVERY: "false"
+  DEEPCODE_GATEWAY_URL: ${{ vars.DEEPCODE_GATEWAY_URL }}
+  DEEPCODE_WEB_ORIGIN: ${{ vars.DEEPCODE_WEB_ORIGIN }}
+  # Auto-update source: the portal serves /api/v1/releases/electron/manifest.
+  # Empty would build an app that never checks for updates.
+  DEEPCODE_UPDATE_ORIGIN: ${{ vars.DEEPCODE_WEB_ORIGIN }}
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-workspace
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Architecture
+        run: pnpm architecture:check
+      - name: Brand leak
+        run: node scripts/ci/brand-leak-check.mjs .
+      - name: DeepCode tests (account, deep link, HUD, sync, locale parity)
+        run: |
+          pnpm --dir packages/deepcode exec vitest run
+          pnpm --dir packages/ui exec vitest run src/store/subscriptionStore.test.ts src/i18n/locale-parity.test.ts src/subscription/DeepCodeAccount.test.ts
+          pnpm --dir packages/desktop exec vitest run src/main/desktopOAuthDeepLink.test.ts src/main/deepcodeAccount.test.ts
+      - name: Upstream sync safety (codemods idempotent, identity kept)
+        run: node --test --test-isolation=none scripts/upstream/sync.test.mjs
+      - name: Agent adapter tests (per-request device key)
+        run: |
+          pnpm -r --filter './apps/zcode-cli/packages/*' build
+          pnpm --dir apps/zcode-cli/packages/adapters test
+
+  remote-assets:
+    name: Bundled Linux remote runtime
+    if: (github.event_name == 'workflow_dispatch' && !inputs.checks_only) || (github.event_name == 'push' && github.ref_type == 'tag')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-workspace
+      - name: Build remote components from source
+        run: pnpm prepare:remote-assets
+      - name: Verify native remote runtime
+        run: node scripts/ci/remote-assets-smoke.mjs
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bundled-remote-linux-x64
+          path: packages/desktop/bundled-remote-assets/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  build:
+    name: Build (${{ matrix.target.platform }} ${{ matrix.target.arch }})
+    needs: [checks, remote-assets]
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - { platform: linux, arch: x64, runner: ubuntu-24.04 }
+          - { platform: linux, arch: arm64, runner: ubuntu-24.04-arm }
+          - { platform: win, arch: x64, runner: windows-2025 }
+          - { platform: mac, arch: arm64, runner: macos-15 }
+          - { platform: mac, arch: x64, runner: macos-15-intel }
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    env:
+      ZCODE_TARGET_OS: ${{ matrix.target.platform }}
+      ZCODE_TARGET_ARCH: ${{ matrix.target.arch }}
+      ZCODE_PREVIEW_IDENTITY: "0"
+    steps:
+      - name: Require server addresses
+        run: |
+          if [[ "$DEEPCODE_GATEWAY_URL" != https://* || "$DEEPCODE_WEB_ORIGIN" != https://* ]]; then
+            echo "::error::Set repository variables DEEPCODE_GATEWAY_URL and DEEPCODE_WEB_ORIGIN (https://…)"
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends rpm libarchive-tools zstd
+      - uses: ./.github/actions/setup-workspace
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: bundled-remote-linux-x64
+          path: packages/desktop/bundled-remote-assets
+      - name: Verify bundled remote components
+        run: node scripts/bundle-remote-assets.mjs verify
+      - name: Bake the gateway address into the built-in provider
+        run: node scripts/codemod/generate-deepcode-builtin.mjs
+      - name: Prepare desktop runtime
+        run: pnpm prepare:desktop-runtime
+      - name: Build workspace and desktop
+        run: pnpm build:bootstrap
+      - name: Package desktop
+        run: pnpm bundle:desktop -- --os "$ZCODE_TARGET_OS" --arch "$ZCODE_TARGET_ARCH" --skip-prepare --skip-build
+      - name: Collect installers
+        run: node scripts/ci/desktop-release.mjs collect "$ZCODE_TARGET_OS" "$ZCODE_TARGET_ARCH"
+      - name: Brand leak in packaged output
+        if: runner.os == 'Linux'
+        # Reported, not blocking: vendored upstream bundles may still carry
+        # attribution strings; review the list in the job log.
+        continue-on-error: true
+        run: node scripts/ci/brand-leak-check.mjs . --dist
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: desktop-${{ matrix.target.platform }}-${{ matrix.target.arch }}
+          path: dist/release-assets/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  release:
+    name: Publish GitHub Release
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: desktop-*
+          path: dist/release-assets
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist/release-assets && sha256sum * > SHA256SUMS.txt
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "DeepCode Studio $GITHUB_REF_NAME" \
+            --generate-notes

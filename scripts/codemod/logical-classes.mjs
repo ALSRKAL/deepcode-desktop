@@ -14,12 +14,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const root = resolve(process.argv[2] ?? ".");
-const APPLY = process.argv.includes("--apply");
 
 // 刻意物理方向的文件（review 后决定不改）。
-const SKIP_FILES = new Set([]);
+export const SKIP_FILES = new Set([]);
 
 const REPLACEMENTS = [
   // margin / padding（含任意数值后缀与任意修饰前缀）
@@ -45,6 +44,23 @@ const REPLACEMENTS = [
   [/(^|[\s"'`])space-x-([a-z0-9[\]./-]+)/g, "$1gap-$2"],
 ];
 
+/** Pure transform (used by scripts/upstream/sync.mjs on single files). */
+export function toLogicalClasses(text) {
+  let after = text;
+  for (const [pattern, replacement] of REPLACEMENTS) {
+    after = after.replace(pattern, replacement);
+  }
+  return after;
+}
+
+/** Repo-relative paths the codemod owns: UI sources (.ts/.tsx) under packages/ui/src. */
+export function appliesToLogicalClasses(relPath) {
+  return /^packages\/ui\/src\/.+\.(ts|tsx)$/.test(relPath) && !SKIP_FILES.has(relPath);
+}
+
+function main() {
+const root = resolve(process.argv[2] ?? ".");
+const APPLY = process.argv.includes("--apply");
 const files = execSync(
   `grep -rlE '(ml-|mr-|pl-|pr-|text-left|text-right|border-l|border-r|rounded-l|rounded-r|left-|right-|space-x-)' "${join(root, "packages/ui/src")}" --include="*.tsx" --include="*.ts"`,
   { encoding: "utf8" },
@@ -56,10 +72,7 @@ const files = execSync(
 let changed = 0;
 for (const file of files) {
   const before = readFileSync(file, "utf8");
-  let after = before;
-  for (const [pattern, replacement] of REPLACEMENTS) {
-    after = after.replace(pattern, replacement);
-  }
+  const after = toLogicalClasses(before);
   if (after !== before) {
     changed += 1;
     if (APPLY) writeFileSync(file, after);
@@ -67,3 +80,6 @@ for (const file of files) {
 }
 
 console.log(`files scanned: ${files.length}, files to change: ${changed}, apply=${APPLY}`);
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) main();

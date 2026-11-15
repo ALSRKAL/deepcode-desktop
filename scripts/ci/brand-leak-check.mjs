@@ -65,6 +65,10 @@ const SOURCE_TARGETS = [
   "packages/desktop/src/renderer",
   "config",
   "public",
+  // 打包元数据与默认环境：homepage/author/maintainer 会写进 .deb/.AppImage（review 2026-11-15）。
+  "packages/desktop/electron-builder.config.js",
+  ".env.example",
+  "packages/deepcode/src",
 ];
 const DIST_TARGETS = ["packages/desktop/dist", "packages/desktop/out", "packages/ui/dist", "public"];
 
@@ -74,7 +78,8 @@ const result = spawnSync(
   ["-i", "-e", PATTERN, ...targets, "--no-ignore", "-g", "!node_modules", "-g", "!*.map"],
   { encoding: "utf8", cwd: root, maxBuffer: 128 * 1024 * 1024 },
 );
-if (result.error && result.error.code !== "ENOENT") {
+if (result.error) {
+  // rg 缺失时不能静默判定 clean（fail closed）。
   console.error(`brand-leak-check: rg failed: ${result.error.message}`);
   process.exit(2);
 }

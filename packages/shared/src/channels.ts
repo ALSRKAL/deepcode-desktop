@@ -419,6 +419,18 @@ export const PlatformChannels = {
   SetTitleBarTheme: "zcode:set-title-bar-theme",
   /** Renderer → Main：迁移旧版 Common MCP 配置 */
   MigrateLegacyCommonMcp: "zcode:migrate-legacy-common-mcp",
+  /** Renderer → Main：DeepCode 账号状态（不含密钥，docs/plan/01 §6） */
+  DeepCodeGetAuthState: "deepcode:get-auth-state",
+  /** Renderer → Main：打开系统浏览器开始 PKCE 登录 */
+  DeepCodeStartSignIn: "deepcode:start-sign-in",
+  /** Renderer → Main：本地登出并在服务端撤销设备密钥 */
+  DeepCodeSignOut: "deepcode:sign-out",
+  /** Renderer → Main：main 持密钥代查 GET /v1/subscription/status */
+  DeepCodeFetchSubscriptionStatus: "deepcode:fetch-subscription-status",
+  /** Renderer → Main：在系统浏览器打开门户同源路径 */
+  DeepCodeOpenPortal: "deepcode:open-portal",
+  /** Main → Renderer：账号状态变化（登录完成/登出/密钥被撤销） */
+  DeepCodeAuthChanged: "deepcode:auth-changed",
 } as const;
 
 export type PlatformChannelName = (typeof PlatformChannels)[keyof typeof PlatformChannels];
@@ -1105,6 +1117,30 @@ export interface PlatformChannelMap {
   };
   [PlatformChannels.SetTitleBarTheme]: {
     request: DesktopTitleBarTheme;
+    response: void;
+  };
+  [PlatformChannels.DeepCodeGetAuthState]: {
+    request: void;
+    response: import("./platform.js").DeepCodeAuthState;
+  };
+  [PlatformChannels.DeepCodeStartSignIn]: {
+    request: void;
+    response: void;
+  };
+  [PlatformChannels.DeepCodeSignOut]: {
+    request: void;
+    response: void;
+  };
+  [PlatformChannels.DeepCodeFetchSubscriptionStatus]: {
+    request: void;
+    response: import("./platform.js").DeepCodeSubscriptionStatusResult;
+  };
+  [PlatformChannels.DeepCodeOpenPortal]: {
+    request: string;
+    response: void;
+  };
+  [PlatformChannels.DeepCodeAuthChanged]: {
+    request: import("./platform.js").DeepCodeAuthState;
     response: void;
   };
 }
