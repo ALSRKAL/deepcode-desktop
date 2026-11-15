@@ -32,11 +32,6 @@ env:
   ZCODE_ENV: production
   ZCODE_SKIP_REMOTE_ASSETS: "1"
   CSC_IDENTITY_AUTO_DISCOVERY: "false"
-  DEEPCODE_GATEWAY_URL: ${{ vars.DEEPCODE_GATEWAY_URL }}
-  DEEPCODE_WEB_ORIGIN: ${{ vars.DEEPCODE_WEB_ORIGIN }}
-  # Auto-update source: the portal serves /api/v1/releases/electron/manifest.
-  # Empty would build an app that never checks for updates.
-  DEEPCODE_UPDATE_ORIGIN: ${{ vars.DEEPCODE_WEB_ORIGIN }}
 
 jobs:
   checks:
@@ -56,7 +51,9 @@ jobs:
       - name: Architecture
         run: pnpm architecture:check
       - name: Brand leak
-        run: node scripts/ci/brand-leak-check.mjs .
+        run: |
+          command -v rg >/dev/null || (sudo apt-get update && sudo apt-get install -y --no-install-recommends ripgrep)
+          node scripts/ci/brand-leak-check.mjs .
       - name: DeepCode tests (account, deep link, HUD, sync, locale parity)
         run: |
           pnpm --dir packages/deepcode exec vitest run
@@ -114,12 +111,29 @@ jobs:
       ZCODE_TARGET_ARCH: ${{ matrix.target.arch }}
       ZCODE_PREVIEW_IDENTITY: "0"
     steps:
-      - name: Require server addresses
+      - name: Server addresses
+        env:
+          GATEWAY: ${{ vars.DEEPCODE_GATEWAY_URL }}
+          WEB: ${{ vars.DEEPCODE_WEB_ORIGIN }}
         run: |
-          if [[ "$DEEPCODE_GATEWAY_URL" != https://* || "$DEEPCODE_WEB_ORIGIN" != https://* ]]; then
-            echo "::error::Set repository variables DEEPCODE_GATEWAY_URL and DEEPCODE_WEB_ORIGIN (https://…)"
-            exit 1
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            # Releases must point at the real server (https, not the placeholder).
+            if [[ "$GATEWAY" != https://* || "$WEB" != https://* || "$GATEWAY$WEB" == *deepcode.example* ]]; then
+              echo "::error::Set repository variables DEEPCODE_GATEWAY_URL and DEEPCODE_WEB_ORIGIN (https://…) before tagging a release"
+              exit 1
+            fi
+          else
+            # Manual test builds may run before the server exists.
+            [[ "$GATEWAY" == https://* ]] || GATEWAY=https://deepcode.example
+            [[ "$WEB" == https://* ]] || WEB=https://deepcode.example
+            echo "::notice::Test build against $GATEWAY (not for distribution unless it is your real server)"
           fi
+          {
+            echo "DEEPCODE_GATEWAY_URL=$GATEWAY"
+            echo "DEEPCODE_WEB_ORIGIN=$WEB"
+            # Auto-update source: the portal serves /api/v1/releases/electron/manifest.
+            echo "DEEPCODE_UPDATE_ORIGIN=$WEB"
+          } >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
@@ -128,7 +142,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends rpm libarchive-tools zstd
+          sudo apt-get install -y --no-install-recommends rpm libarchive-tools zstd xvfb ripgrep
       - uses: ./.github/actions/setup-workspace
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -144,6 +158,20 @@ jobs:
         run: pnpm build:bootstrap
       - name: Package desktop
         run: pnpm bundle:desktop -- --os "$ZCODE_TARGET_OS" --arch "$ZCODE_TARGET_ARCH" --skip-prepare --skip-build
+      - name: Launch the packaged app (identity, account bridge, no upstream hosts)
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            xvfb-run -a --server-args="-screen 0 1440x900x24" node scripts/ci/deepcode-packaged-smoke.mjs --evidence "dist/smoke-evidence"
+          else
+            node scripts/ci/deepcode-packaged-smoke.mjs --evidence "dist/smoke-evidence"
+          fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: smoke-${{ matrix.target.platform }}-${{ matrix.target.arch }}
+          path: dist/smoke-evidence/
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Collect installers
         run: node scripts/ci/desktop-release.mjs collect "$ZCODE_TARGET_OS" "$ZCODE_TARGET_ARCH"
       - name: Brand leak in packaged output
