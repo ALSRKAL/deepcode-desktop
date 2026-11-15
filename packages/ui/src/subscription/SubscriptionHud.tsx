@@ -147,7 +147,16 @@ export function SubscriptionLockModal() {
       action: intl.formatMessage({ id: "deepcode.lock.action.signIn" }),
     },
   };
-  const copy = copyByReason[lock.reason] ?? copyByReason.expired!;
+  // A brand-new account has never subscribed: invite it to choose a plan instead of
+  // telling it that a subscription it never had "expired".
+  const neverSubscribed = lock.reason === "expired" && store.snapshot?.plan.id === "none";
+  const copy = neverSubscribed
+    ? {
+        title: intl.formatMessage({ id: "deepcode.lock.noPlan.title" }),
+        body: intl.formatMessage({ id: "deepcode.lock.noPlan.body" }),
+        action: intl.formatMessage({ id: "deepcode.lock.action.choosePlan" }),
+      }
+    : (copyByReason[lock.reason] ?? copyByReason.expired!);
 
   return (
     <Dialog open>
