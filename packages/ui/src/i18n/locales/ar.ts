@@ -1770,6 +1770,7 @@ const ar: Record<string, string> = {
   "deepcode.account.signInForModels": "سجّل الدخول إلى DeepCode لاستخدام نماذج خطتك.",
   "deepcode.account.waiting": "أكمل تسجيل الدخول في المتصفح…",
   "deepcode.account.signOut": "تسجيل الخروج",
+  "deepcode.account.manage": "إدارة الحساب في الموقع",
   "deepcode.account.error": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
   // File tree
   "fileTree.loading": "جارٍ التحميل...",

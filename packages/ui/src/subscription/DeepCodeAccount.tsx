@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DeepCodeAccountBridge, DeepCodeAuthState } from "@zcode/shared";
 import { SubscriptionStatusResponseSchema } from "@zcode/deepcode";
-import { LogIn, LogOut } from "lucide-react";
+import { ExternalLink, LogIn, LogOut } from "lucide-react";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
 import { Button } from "@/components/ui/button.js";
@@ -98,6 +98,7 @@ export function DeepCodeAccountChip() {
   const auth = useDeepCodeAuthState(bridge);
   const signIn = useCallback(() => void bridge?.startSignIn(), [bridge]);
   const signOut = useCallback(() => void bridge?.signOut(), [bridge]);
+  const openAccount = useCallback(() => void bridge?.openPortal("/dashboard"), [bridge]);
 
   if (!bridge) return null;
 
@@ -121,21 +122,56 @@ export function DeepCodeAccountChip() {
     );
   }
 
+  const email = auth.user?.email ?? "";
+  const displayName = auth.user?.name?.trim() || email;
   return (
-    <div className="flex items-start gap-1" data-testid="deepcode-account-signed-in">
-      <div className="min-w-0 flex-1">
-        <SubscriptionHudChip />
+    <div className="flex flex-col gap-2" data-testid="deepcode-account-signed-in">
+      {/* The account that is signed in on the website: same name, email and brand colours. */}
+      <div className="flex min-w-0 items-center gap-2">
+        <span
+          aria-hidden="true"
+          className="grid size-8 shrink-0 place-items-center rounded-full bg-[#111827] text-[12px] font-semibold text-[#F8FAFC] ring-1 ring-[#22D3EE]/70"
+        >
+          {accountInitials(auth.user?.name ?? null, email)}
+        </span>
+        <div className="min-w-0 flex-1" data-testid="deepcode-account-identity">
+          <p className="truncate text-ui-sm font-medium text-foreground">{displayName}</p>
+          {displayName !== email ? (
+            <p className="truncate text-ui-xs text-foreground-subtle" dir="ltr">
+              {email}
+            </p>
+          ) : null}
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={openAccount}
+          aria-label={intl.formatMessage({ id: "deepcode.account.manage" })}
+          title={intl.formatMessage({ id: "deepcode.account.manage" })}
+        >
+          <ExternalLink className="size-4" aria-hidden="true" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={signOut}
+          aria-label={intl.formatMessage({ id: "deepcode.account.signOut" })}
+          title={intl.formatMessage({ id: "deepcode.account.signOut" })}
+        >
+          <LogOut className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+        </Button>
       </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={signOut}
-        aria-label={intl.formatMessage({ id: "deepcode.account.signOut" })}
-        title={auth.user?.email ?? undefined}
-      >
-        <LogOut className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-      </Button>
+      <SubscriptionHudChip />
     </div>
   );
+}
+
+/** Up to two initials from the account name (any script), else the email's first letter. */
+export function accountInitials(name: string | null, email: string): string {
+  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  const letters = words.length >= 2 ? [words[0]!, words[words.length - 1]!] : words.slice(0, 1);
+  const fromName = letters.map((w) => Array.from(w)[0]!).join("");
+  return (fromName || Array.from(email)[0] || "?").toLocaleUpperCase();
 }

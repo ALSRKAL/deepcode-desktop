@@ -1791,6 +1791,7 @@ const enUS: Record<string, string> = {
   "deepcode.account.signInForModels": "Sign in to DeepCode to use the models in your plan.",
   "deepcode.account.waiting": "Finish signing in in your browser…",
   "deepcode.account.signOut": "Sign out",
+  "deepcode.account.manage": "Manage account on the website",
   "deepcode.account.error": "Sign-in did not complete. Try again.",
 
   // File tree

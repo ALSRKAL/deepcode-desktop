@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import type { DeepCodeAccountBridge, DeepCodeSubscriptionStatusResult } from "@zcode/shared";
 import { createSubscriptionStore } from "@/store/subscriptionStore.js";
-import { refreshDeepCodeSubscription } from "@/subscription/DeepCodeAccount.js";
+import { accountInitials, refreshDeepCodeSubscription } from "@/subscription/DeepCodeAccount.js";
 import { portalPathFromRenewUrl } from "@/subscription/SubscriptionHud.js";
 
 const STATUS = {
@@ -66,5 +66,17 @@ describe("portalPathFromRenewUrl", () => {
     expect(portalPathFromRenewUrl("https://evil.test/dashboard/billing?x=1")).toBe("/dashboard/billing?x=1");
     expect(portalPathFromRenewUrl("/ar/dashboard/billing")).toBe("/ar/dashboard/billing");
     expect(portalPathFromRenewUrl(undefined)).toBe("/dashboard/billing");
+  });
+});
+
+describe("account identity in the sidebar", () => {
+  it("shows initials from the website account name, in any script", () => {
+    expect(accountInitials("Mohammed Aref Saeed Alsrkal", "m@x.com")).toBe("MA");
+    expect(accountInitials("محمد السركال", "m@x.com")).toBe("ما");
+    expect(accountInitials("alsrkal", "m@x.com")).toBe("A");
+  });
+  it("falls back to the email when the account has no name", () => {
+    expect(accountInitials(null, "owner@deepcode.dev")).toBe("O");
+    expect(accountInitials("   ", "")).toBe("?");
   });
 });
