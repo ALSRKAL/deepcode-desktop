@@ -156,6 +156,9 @@ export default defineConfig([
       // TS loader，必须随 Desktop bundle 内联，不能留下指向 src/index.ts 的裸包引用。
       "@zcode/provider",
       "@zcode/provider-node",
+      // DeepCode account/sync package also exports TypeScript source (packaged app
+      // failed to start without it — caught by deepcode-packaged-smoke.mjs).
+      "@zcode/deepcode",
       // services 已内联进 main，但其 producer import 曾被保留为裸包引用；
       // electron-builder 又会排除 node_modules/@zcode，导致安装包启动即 ERR_MODULE_NOT_FOUND。
       // producer 的 JS broker 必须跟随 services 一起内联，原生 addon 仍只存在于独立 Helper。
@@ -243,6 +246,9 @@ export default defineConfig([
       "@zcode/client",
       "@zcode/provider",
       "@zcode/provider-node",
+      // DeepCode account/sync package also exports TypeScript source (packaged app
+      // failed to start without it — caught by deepcode-packaged-smoke.mjs).
+      "@zcode/deepcode",
       "@zcode/zcode-cua",
     ],
     define: createSharedDefines(),
@@ -273,6 +279,9 @@ export default defineConfig([
       "@zcode/client",
       "@zcode/provider",
       "@zcode/provider-node",
+      // DeepCode account/sync package also exports TypeScript source (packaged app
+      // failed to start without it — caught by deepcode-packaged-smoke.mjs).
+      "@zcode/deepcode",
       "@zcode/zcode-cua",
     ],
     define: createSharedDefines(),
