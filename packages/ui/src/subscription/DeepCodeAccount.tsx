@@ -48,7 +48,7 @@ export async function refreshDeepCodeSubscription(
   store.setLockFromError(result.code, result.renewUrl);
 }
 
-function useDeepCodeAuthState(bridge: DeepCodeAccountBridge | undefined): DeepCodeAuthState {
+export function useDeepCodeAuthState(bridge: DeepCodeAccountBridge | undefined): DeepCodeAuthState {
   const [state, setState] = useState<DeepCodeAuthState>(SIGNED_OUT);
   useEffect(() => {
     if (!bridge) return;

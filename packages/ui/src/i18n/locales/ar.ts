@@ -1767,6 +1767,7 @@ const ar: Record<string, string> = {
   "deepcode.lock.action.contact": "تواصل مع الدعم",
   "deepcode.lock.action.signIn": "تسجيل الدخول",
   "deepcode.account.signIn": "تسجيل الدخول إلى DeepCode",
+  "deepcode.account.signInForModels": "سجّل الدخول إلى DeepCode لاستخدام نماذج خطتك.",
   "deepcode.account.waiting": "أكمل تسجيل الدخول في المتصفح…",
   "deepcode.account.signOut": "تسجيل الخروج",
   "deepcode.account.error": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",

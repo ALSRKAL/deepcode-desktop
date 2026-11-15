@@ -146,6 +146,11 @@ async function main() {
     if (watermark === null || watermark === "deepcode") pass("identity.watermark", watermark ?? "not on this screen");
     else fail("identity.watermark", watermark);
 
+    // Signed out with no model: the banner must offer DeepCode sign-in (not only "Configure model").
+    const bannerSignIn = await handle.page.locator('[data-testid="deepcode-banner-sign-in"]').count();
+    if (bannerSignIn > 0) pass("account.bannerSignIn", "no-model banner offers DeepCode sign-in");
+    else warn("account.bannerSignIn", "no-model banner not on screen");
+
     const signInButtons = await handle.page.locator('[data-testid="deepcode-account-signed-out"]').count();
     if (signInButtons > 0) pass("account.signInEntry", `${signInButtons} rendered`);
     else fail("account.signInEntry", "sign-in entry not rendered");

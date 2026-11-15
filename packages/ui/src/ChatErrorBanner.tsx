@@ -12,7 +12,7 @@ import {
   TID_CHAT_ERROR_BANNER,
   TID_CHAT_ERROR_HOOK_ICON,
 } from "@zcode/shared";
-import { AnchorIcon, CopyIcon, InfoIcon, SettingsIcon, X } from "lucide-react";
+import { AnchorIcon, CopyIcon, InfoIcon, LogIn, SettingsIcon, X } from "lucide-react";
 import { useZCodeIntl } from "./i18n/IntlProvider.js";
 import type { IntlInstance } from "./i18n/IntlProvider.js";
 import { Button } from "./components/ui/button.js";
@@ -26,6 +26,7 @@ import {
 import { cn } from "./components/lib/utils.js";
 import { toast } from "./components/ui/toast.js";
 import { usePlatform } from "@/hooks/usePlatform.js";
+import { useDeepCodeAuthState } from "@/subscription/DeepCodeAccount.js";
 import {
   isSuspiciousEmptyModelResultMessage,
   resolveOffPeakTicketExpiredBusinessCode,
@@ -119,8 +120,14 @@ export function ChatErrorBanner({
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const actionButtonClassName = "shrink-0";
   const iconButtonClassName = "shrink-0";
-  const localizedErrorMessage = resolveChatErrorBannerDisplayMessage(error, intl);
   const modelConfigMissing = isModelConfigMissingError(error);
+  // DeepCode: with no model and no DeepCode sign-in, the fix is to sign in (the
+  // built-in models come with the plan); "Configure model" stays for own keys.
+  const deepcodeAuth = useDeepCodeAuthState(platform.deepcode);
+  const deepcodeSignInNeeded = modelConfigMissing && Boolean(platform.deepcode) && !deepcodeAuth.signedIn;
+  const localizedErrorMessage = deepcodeSignInNeeded
+    ? intl.formatMessage({ id: "deepcode.account.signInForModels" })
+    : resolveChatErrorBannerDisplayMessage(error, intl);
   const hookBlocked = error.code === "fault.runtime.hookBlocked";
   if (shouldSuppressChatErrorBanner(error)) {
     return null;
@@ -184,11 +191,24 @@ export function ChatErrorBanner({
           <div className="min-w-0 truncate font-medium">{localizedErrorMessage}</div>
         </div>
 
+        {deepcodeSignInNeeded ? (
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => void platform.deepcode?.startSignIn()}
+            className={cn(actionButtonClassName, "gap-1.5")}
+            data-testid="deepcode-banner-sign-in"
+          >
+            <LogIn className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+            {intl.formatMessage({ id: "deepcode.account.signIn" })}
+          </Button>
+        ) : null}
+
         {modelConfigMissing ? (
           <>
             <Button
               type="button"
-              variant="outline"
+              variant={deepcodeSignInNeeded ? "ghost" : "outline"}
               size="sm"
               onClick={onOpenModelSettings}
               className={cn(actionButtonClassName, "gap-1.5")}
