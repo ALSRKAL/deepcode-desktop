@@ -9,7 +9,7 @@ import { cn } from "@/components/lib/utils.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useIsOfficeMode } from "@/hooks/useInterfaceMode.js";
 import { logger } from "@/logger.js";
-import { ZCODIUM_WATERMARK_PATH } from "@/v4/zcodiumWatermarkPath.js";
+import { DEEPCODE_WATERMARK } from "@/v4/deepcodeWatermarkPath.js";
 
 const GREETING_BOUNDARY_HOURS = [5, 9, 12, 14, 18, 23] as const;
 const GREETING_MIN_FONT_SIZE_PX = 20;
@@ -209,24 +209,19 @@ export function ConversationDraftEmptyState({ className }: { className?: string 
 }
 
 function ZCodeEmptyStateLogo({ className }: { className?: string }) {
-  // 沿用官方浅色主题那版的手法：内联矢量 + currentColor，由 DOM 同步绘制。
-  // 不能改回位图蒙版——`mask-image` 指向 PNG 时，元素光栅化若早于图片解码完成，
-  // Chromium 只画出当时已就绪的那一段轮廓，水印会缺掉半截并一直留到下次重绘。
-  // 轮廓取自珊瑚单色 alpha 资产（public/logo/watermark.png）；应用图标是黑底 +
-  // 白珊瑚的双色设计，整体压到 14% 透明度时白珊瑚会先消失，只剩一块灰方块，
-  // 所以水印只用轮廓并跟随主题前景色。viewBox 与原资产同构，contain 由
-  // preserveAspectRatio 默认值负责，水印的大小与位置和位图版完全一致。
-  //
-  // 底端渐隐：珊瑚墨迹底边比 composer 卡片顶边低约 5px（标题字号变化时 3~11px），
-  // 而卡片只是 3% 的染色（bg-surface 带 alpha）、阴影还会从卡片顶边往上溢约 3px，
-  // 否则那一小段珊瑚会画进输入框的染色/阴影里。渐隐到 78% 处全透明，比阴影带上沿
-  // 还高约 9px；官方浅色那版 logo 也有同样的底端渐隐，rebrand 成珊瑚时漏掉了。
+  // DeepCode 分体 D 标志（deepcodeWatermarkPath.ts）：内联矢量 + currentColor，随 DOM
+  // 同步绘制（位图蒙版会在图片解码前光栅化，只画出半截）。竖笔用品牌强调色。
+  // 底端渐隐避免水印画进 composer 卡片的染色/阴影里。
   return (
     <svg
       aria-hidden="true"
-      data-v4-draft-logo="zcodium"
-      viewBox="0 0 512 512"
-      fill="currentColor"
+      data-v4-draft-logo="deepcode"
+      viewBox={DEEPCODE_WATERMARK.viewBox}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={DEEPCODE_WATERMARK.strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={cn(
         "opacity-[0.14] dark:opacity-[0.2]",
         "[mask-image:linear-gradient(to_bottom,black_0%,black_60%,transparent_78%)]",
@@ -236,7 +231,8 @@ function ZCodeEmptyStateLogo({ className }: { className?: string }) {
         className,
       )}
     >
-      <path d={ZCODIUM_WATERMARK_PATH} />
+      <path d={DEEPCODE_WATERMARK.bowl} />
+      <path d={DEEPCODE_WATERMARK.stem} className="text-brand" stroke="currentColor" />
     </svg>
   );
 }

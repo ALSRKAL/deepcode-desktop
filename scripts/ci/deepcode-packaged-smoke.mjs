@@ -141,6 +141,11 @@ async function main() {
     if (auth && auth.signedIn === false && !JSON.stringify(auth).includes("sk-dc-")) pass("account.bridge", auth);
     else fail("account.bridge", auth);
 
+    // Visual identity: the empty-state watermark must be the DeepCode mark, not an upstream logo.
+    const watermark = await handle.page.locator("[data-v4-draft-logo]").first().getAttribute("data-v4-draft-logo").catch(() => null);
+    if (watermark === null || watermark === "deepcode") pass("identity.watermark", watermark ?? "not on this screen");
+    else fail("identity.watermark", watermark);
+
     const signInButtons = await handle.page.locator('[data-testid="deepcode-account-signed-out"]').count();
     if (signInButtons > 0) pass("account.signInEntry", `${signInButtons} rendered`);
     else fail("account.signInEntry", "sign-in entry not rendered");
