@@ -382,7 +382,10 @@ function toAiSdkProviderConfig(
   config: RegistryProviderConfig,
 ): AiSdkProviderConfig {
   const common = {
-    ...(config.access.type !== "zhipu-account" && config.access.apiKey
+    // 只有 API-key 族带静态 apiKey；deepcode-account 的密钥在请求期由宿主注入
+    // （resolveApiKey 的 deepcodeApiKeyProvider），zhipu-account 已退休。
+    ...((config.access.type === "api-key" || config.access.type === "zhipu-coding-plan-api-key") &&
+    config.access.apiKey
       ? { apiKey: config.access.apiKey }
       : {}),
     baseURL: config.api.baseUrl,

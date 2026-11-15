@@ -246,7 +246,7 @@ export const workspaceHookBundleSnapshotSchema = z
           canonicalPath: nonEmptyStringSchema,
           baseDir: nonEmptyStringSchema,
           discoveryOrder: nonnegativeIntegerSchema,
-          configFileKind: z.enum(["zcodium.json", ".zcodium/config.json", "explicit"]),
+          configFileKind: z.enum(["deepcode.json", ".deepcode/config.json", "explicit"]),
           explicitProjectConfig: z.boolean(),
           editable: z.boolean(),
           hooksRoot: z
