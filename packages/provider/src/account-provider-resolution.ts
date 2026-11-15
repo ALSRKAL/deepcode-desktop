@@ -156,8 +156,9 @@ export function resolveAccountProviderConfigs(
 }
 
 function createEntitlementOverlay(entitled: boolean, isDeepcode = false): ProviderConfig {
+  // DeepCode 未登录/不可用：清空构建期静态清单，模型选择器里不出现不可用的模型。
   return isDeepcode
-    ? new ProviderConfig({ access: new DeepcodeAccountAccessConfig() })
+    ? new ProviderConfig({ access: new DeepcodeAccountAccessConfig(), builtinModelIds: entitled ? undefined : [] })
     : new ProviderConfig({ access: new ZhipuAccountAccessConfig({ entitled }) });
 }
 
@@ -183,7 +184,8 @@ function indexConnections(
 }
 
 function isAccountConstrainedProvider(config: ProviderConfig): boolean {
-  return config.access?.type === "zhipu-account";
+  // DeepCode：deepcode-account 同样由连接结果（网关 /v1/models）决定可用性与模型。
+  return config.access?.type === "zhipu-account" || config.access?.type === "deepcode-account";
 }
 
 function normalizeModelIds(values: readonly ModelId[] | null | undefined): readonly ModelId[] {

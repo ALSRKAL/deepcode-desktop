@@ -3,9 +3,12 @@ import {
   createNodeModelSelectionFacade,
 } from "@zcode/provider-node";
 import {
+  AccountProviderService,
   ProviderRegistryService,
   ProviderSettingsFacade,
   EmptyAccountProviderConfigSource,
+  createAccountProviderConfigResolver,
+  type AccountProviderConnectionResolver,
   type ProviderSettingsMutationTarget,
 } from "@zcode/provider";
 import {
@@ -34,6 +37,11 @@ export interface ProviderRuntimeDependencies {
   readonly modelCatalog?: ProviderModelCatalogLister;
   readonly modelSelectionConfiguredDefaultSource?: ModelSelectionConfiguredDefaultSource;
   readonly disposeModelSelectionConfiguredDefaultSource?: () => void;
+  /**
+   * DeepCode: resolves account providers (the built-in DeepCode entries) from the
+   * gateway's plan-filtered model list. Without it account providers stay static.
+   */
+  readonly accountConnectionResolver?: AccountProviderConnectionResolver;
 }
 
 /** 组装一个进程内共享的 Provider Config、Registry 与 Facade。 */
@@ -46,6 +54,7 @@ export class ProviderRuntime {
   readonly #modelSelectionRuntime: IModelSelectionService & { dispose(): void };
   readonly #disposeModelSelectionConfiguredDefaultSource?: () => void;
   #startPromise: ReturnType<ProviderRegistryService["start"]> | null = null;
+  readonly #accountService: AccountProviderService | null;
   #disposed = false;
 
   constructor(dependencies: ProviderRuntimeDependencies) {
@@ -53,7 +62,13 @@ export class ProviderRuntime {
     this.#disposeModelSelectionConfiguredDefaultSource =
       dependencies.disposeModelSelectionConfiguredDefaultSource;
     this.configService = this.#configRuntime.configService;
-    const accountSource = new EmptyAccountProviderConfigSource(this.configService);
+    const accountSource = dependencies.accountConnectionResolver
+      ? new AccountProviderService({
+          configSource: this.configService,
+          resolve: createAccountProviderConfigResolver(dependencies.accountConnectionResolver),
+        })
+      : new EmptyAccountProviderConfigSource(this.configService);
+    this.#accountService = accountSource instanceof AccountProviderService ? accountSource : null;
     this.registryService = new ProviderRegistryService({
       configSource: this.configService,
       accountSource,
@@ -86,9 +101,16 @@ export class ProviderRuntime {
     return startPromise;
   }
 
+  /** Re-reads account providers (sign-in/out, plan change); no-op without a resolver. */
+  async refreshAccountProviders(reason = "explicit"): Promise<void> {
+    if (!this.#accountService || this.#disposed) return;
+    await this.#accountService.refresh(reason);
+  }
+
   dispose(): void {
     if (this.#disposed) return;
     this.#disposed = true;
+    this.#accountService?.dispose();
     this.#modelSelectionRuntime.dispose();
     this.registryService.dispose();
     this.#disposeModelSelectionConfiguredDefaultSource?.();

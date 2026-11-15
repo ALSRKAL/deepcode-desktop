@@ -128,12 +128,12 @@ async function main() {
     }
 
     const appName = await handle.app.evaluate(({ app }) => app.getName()).catch(() => null);
-    appName === PRODUCT || (appName ?? "").startsWith(PRODUCT)
-      ? pass("identity.appName", appName)
-      : fail("identity.appName", appName);
+    if (appName === PRODUCT || (appName ?? "").startsWith(PRODUCT)) pass("identity.appName", appName);
+    else fail("identity.appName", appName);
 
     const dir = await handle.page.evaluate(() => document.documentElement.dir || getComputedStyle(document.body).direction);
-    dir === "rtl" ? pass("identity.arabicUi", "dir=rtl") : warn("identity.arabicUi", `dir=${dir} (system locale decides on first run)`);
+    if (dir === "rtl") pass("identity.arabicUi", "dir=rtl");
+    else warn("identity.arabicUi", `dir=${dir} (system locale decides on first run)`);
 
     const auth = await handle.page
       .evaluate(() => window.zcode?.deepcode?.getAuthState?.() ?? null)
@@ -142,7 +142,8 @@ async function main() {
     else fail("account.bridge", auth);
 
     const signInButtons = await handle.page.locator('[data-testid="deepcode-account-signed-out"]').count();
-    signInButtons > 0 ? pass("account.signInEntry", `${signInButtons} rendered`) : fail("account.signInEntry", "sign-in entry not rendered");
+    if (signInButtons > 0) pass("account.signInEntry", `${signInButtons} rendered`);
+    else fail("account.signInEntry", "sign-in entry not rendered");
 
     await handle.page.screenshot({ path: join(evidenceDir, `${report.platform}-workbench.png`) }).catch(() => {});
 
@@ -156,7 +157,8 @@ async function main() {
     ];
     report.network = { attempted: [...new Set(attempted)] };
     const upstream = report.network.attempted.filter((t) => UPSTREAM_HOST.test(t));
-    upstream.length === 0 ? pass("network.noUpstreamHosts", `${report.network.attempted.length} other attempt(s) recorded`) : fail("network.noUpstreamHosts", upstream);
+    if (upstream.length === 0) pass("network.noUpstreamHosts", `${report.network.attempted.length} other attempt(s) recorded`);
+    else fail("network.noUpstreamHosts", upstream);
     report.errors = handle.errors.slice(0, 50);
   } catch (error) {
     fail("launch", String(error?.stack ?? error));

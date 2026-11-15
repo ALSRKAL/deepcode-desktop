@@ -59,6 +59,7 @@ jobs:
           pnpm --dir packages/deepcode exec vitest run
           pnpm --dir packages/ui exec vitest run src/store/subscriptionStore.test.ts src/i18n/locale-parity.test.ts src/subscription/DeepCodeAccount.test.ts
           pnpm --dir packages/desktop exec vitest run src/main/desktopOAuthDeepLink.test.ts src/main/deepcodeAccount.test.ts
+          pnpm exec vitest run packages/services/src/model-provider/deepcodeAccountConnections.test.ts
       - name: Upstream sync safety (codemods idempotent, identity kept)
         run: node --test --test-isolation=none scripts/upstream/sync.test.mjs
       - name: Agent adapter tests (per-request device key)

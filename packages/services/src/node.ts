@@ -3,7 +3,7 @@ import { createGenUiService } from "./gen-ui/node.js";
 /* eslint-disable max-lines -- host process 服务注册和启动装配需要集中维护，拆散后会更难追踪依赖注入顺序 */
 // Node.js service implementations — NOT safe to import in browser code
 import { randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, watch as watchFs } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import {
@@ -12,6 +12,10 @@ import {
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
 } from "@zcode/provider-node";
 import { getAppConfigDir as resolveAppConfigDir, getZCodeDataRootDir } from "./paths.js";
+import {
+  DEEPCODE_DEVICE_CREDENTIAL_KEY,
+  createDeepcodeAccountConnectionResolver,
+} from "./model-provider/deepcodeAccountConnections.js";
 import {
   ZCODE_USER_DATA_DIR_NAME,
   buildLocalMediaPreviewUrl,
@@ -1193,7 +1197,33 @@ export function createLocalServices(options: {
     }),
     // 自定义 Provider 的模型目录读取走宿主 ApiClient（代理/超时/ZCode 端点判定复用同一出口）。
     modelCatalog: createProviderModelCatalogLister({ apiClient }),
+    // DeepCode：内置 Provider 的模型清单 = 网关按计划过滤的 /v1/models（docs/plan/01 §4）。
+    accountConnectionResolver: createDeepcodeAccountConnectionResolver({
+      loadDeviceKey: () => credentialService.load(DEEPCODE_DEVICE_CREDENTIAL_KEY),
+    }),
   });
+  // 登录/登出由 main 进程写同一个凭据文件：文件变化即刷新；另每 5 分钟拉一次以跟上
+  // 管理员对计划模型的修改。失败只影响模型清单，不影响宿主启动。
+  {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refreshSoon = (reason: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        void providerRuntime.refreshAccountProviders(reason).catch(() => {});
+      }, 300);
+      timer.unref?.();
+    };
+    try {
+      const watcher = watchFs(resolveAppConfigDir(), (_event, file) => {
+        if (file === "credentials.json") refreshSoon("deepcode:credentials");
+      });
+      watcher.unref?.();
+    } catch {
+      // 配置目录尚未创建时不阻断；定时刷新兜底。
+    }
+    const interval = setInterval(() => refreshSoon("deepcode:interval"), 5 * 60_000);
+    interval.unref?.();
+  }
   // mcpSync/hooks 里引用 zcodeAgentService 的闭包是惰性调用，声明顺序不影响初始化。
   const skillsService = createSkillsService({ isDesktopRuntime: true });
   const mcpSyncService = createMcpSyncService({
