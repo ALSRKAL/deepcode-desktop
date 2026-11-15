@@ -46,8 +46,19 @@ const DEEPCODE_MODELS = [
 const REMOVED_TEMPLATE_IDS = new Set(["zai-api", "zai-standard-api", "bigmodel-api", "bigmodel-standard-api", "qwen-alibaba-model-studio-cn", "qwen-alibaba-model-studio-intl"]);
 
 // 构建期注入的网关地址（docs/plan/00 §6：DEEPCODE_GATEWAY_URL 为 B/P 类）。
-// schema 在构建期就会校验 URL，占位符必须替换为具体地址；生产构建由 CI 传入。
-const DEEPCODE_GATEWAY_URL = (process.env.DEEPCODE_GATEWAY_URL ?? "http://127.0.0.1:8790").replace(/\/$/, "");
+// schema 在构建期就会校验 URL，占位符必须替换为具体地址。
+// Review M5：生产构建必须显式提供 HTTPS 网关地址；loopback/HTTP 只允许本地
+// 打包时用 DEEPCODE_ALLOW_INSECURE_GATEWAY=1 显式放行。默认落在 placeholder 域名
+// （docs/plan/04 §3 决策 7），保证干净检出的产物不会指向本机明文地址。
+const configuredGateway = process.env.DEEPCODE_GATEWAY_URL?.trim();
+const isProductionBuild = process.env.ZCODE_ENV?.trim().toLowerCase() === "production";
+const allowInsecure = process.env.DEEPCODE_ALLOW_INSECURE_GATEWAY === "1";
+const DEEPCODE_GATEWAY_URL = (configuredGateway || "https://deepcode.example").replace(/\/$/, "");
+if (isProductionBuild && !allowInsecure && !DEEPCODE_GATEWAY_URL.startsWith("https://")) {
+  throw new Error(
+    "production builds require an https DEEPCODE_GATEWAY_URL (or DEEPCODE_ALLOW_INSECURE_GATEWAY=1 for local packaging)",
+  );
+}
 
 /** 网关四协议面：上游一 provider 一 API type 的约束下的内部拆分。 */
 function deepcodeProviderRules() {

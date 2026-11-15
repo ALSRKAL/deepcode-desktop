@@ -14,7 +14,7 @@
 import { createHash, createPublicKey, verify as verifySignature } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { SyncManifestSchema, type SyncManifest } from "../contracts.js";
 
 export interface ManagedContentSyncServiceDeps {
@@ -26,6 +26,11 @@ export interface ManagedContentSyncServiceDeps {
   manifestPublicKeyBase64: string;
   /** managed 根目录（默认 ~/.deepcode/managed；测试注入临时目录）。 */
   managedRoot: string;
+  /**
+   * 允许接收设备密钥的归档源白名单（review L16）：manifest 里的归档 URL 不在
+   * per-item 签名范围内，因此只向配置的 origin 发送 Bearer 凭据。
+   */
+  allowedArchiveOrigins: string[];
   /** 可注入 fetch。 */
   fetchImpl?: typeof fetch;
   logger?: { info: (msg: string, meta?: Record<string, unknown>) => void; warn: (msg: string, meta?: Record<string, unknown>) => void };
@@ -101,7 +106,39 @@ export function createManagedContentSyncService(deps: ManagedContentSyncServiceD
     }
   }
 
+  /** MCP preset 的签名覆盖 canonicalJson(config)（与 apps/web publish 端一致）。 */
+  async function verifyPresetSignature(preset: SyncManifest["mcpPresets"][number]): Promise<boolean> {
+    try {
+      const publicKey = createPublicKey({
+        key: Buffer.from(deps.manifestPublicKeyBase64, "base64"),
+        format: "der",
+        type: "spki",
+      });
+      return verifySignature(
+        null,
+        Buffer.from(canonicalJson(preset.config), "utf8"),
+        publicKey,
+        Buffer.from(preset.signature, "base64"),
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function archiveOriginAllowed(url: string): boolean {
+    try {
+      const origin = new URL(url).origin;
+      return deps.allowedArchiveOrigins.includes(origin);
+    } catch {
+      return false;
+    }
+  }
+
   async function fetchArchive(url: string): Promise<Buffer> {
+    if (!archiveOriginAllowed(url)) {
+      // Never send the device key to an origin that is not configured.
+      throw new Error(`archive origin not allowed: ${url}`);
+    }
     const res = await fetchImpl(url, {
       headers: { authorization: `Bearer ${deps.deviceKey}` },
     });
@@ -110,7 +147,15 @@ export function createManagedContentSyncService(deps: ManagedContentSyncServiceD
   }
 
   async function stageSkill(item: SyncManifest["skills"][number], archive: Buffer): Promise<void> {
-    const finalDir = join(deps.managedRoot, "skills", item.id);
+    // review L6: id 进入文件系统路径前必须校验，且解析后的路径必须在 skills 根内。
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(item.id)) {
+      throw new Error(`invalid skill id: ${item.id}`);
+    }
+    const skillsRoot = join(deps.managedRoot, "skills");
+    const finalDir = join(skillsRoot, item.id);
+    if (!finalDir.startsWith(`${skillsRoot}${sep}`)) {
+      throw new Error(`skill id escapes the managed root: ${item.id}`);
+    }
     const stagingDir = `${finalDir}.staging-${process.pid}`;
     await rm(stagingDir, { recursive: true, force: true });
     // 归档是 .tar 成员集；这里用最小 tar 读取（ustar 头部）解包，条目路径经
@@ -157,9 +202,16 @@ export function createManagedContentSyncService(deps: ManagedContentSyncServiceD
           applied.push(skill.id);
         }
 
-        // MCP presets 是惰性模板：写入待启用清单，不自动执行。
+        // MCP presets 是惰性模板：写入待启用清单，不自动执行。每个模板都经过
+        // per-item 签名校验（review M4），验签失败的模板直接丢弃。
+        const verifiedPresets: typeof manifest.mcpPresets = [];
+        for (const preset of manifest.mcpPresets) {
+          if (await verifyPresetSignature(preset)) verifiedPresets.push(preset);
+          else deps.logger?.warn("[deepcode-sync] MCP preset signature verification failed; dropping", { id: preset.id });
+        }
+        const verifiedManifest = { ...manifest, mcpPresets: verifiedPresets };
         await mkdir(deps.managedRoot, { recursive: true });
-        await writeFile(manifestCachePath, JSON.stringify(manifest, null, 2));
+        await writeFile(manifestCachePath, JSON.stringify(verifiedManifest, null, 2));
         await writeFile(revisionPath, String(manifest.revision));
         deps.logger?.info("[deepcode-sync] synced", { revision: manifest.revision, skills: applied.length });
         return { status: "synced", revision: manifest.revision, skillsApplied: applied };

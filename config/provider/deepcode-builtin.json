@@ -574,7 +574,7 @@
             },
             "api": {
               "type": "openai-chat-completions",
-              "baseUrl": "http://127.0.0.1:8790/v1"
+              "baseUrl": "https://deepcode.example/v1"
             },
             "logo": {
               "type": "builtin",
@@ -610,7 +610,7 @@
             },
             "api": {
               "type": "anthropic-messages",
-              "baseUrl": "http://127.0.0.1:8790/v1"
+              "baseUrl": "https://deepcode.example/v1"
             },
             "logo": {
               "type": "builtin",
@@ -646,7 +646,7 @@
             },
             "api": {
               "type": "openai-responses",
-              "baseUrl": "http://127.0.0.1:8790/v1"
+              "baseUrl": "https://deepcode.example/v1"
             },
             "logo": {
               "type": "builtin",
@@ -682,7 +682,7 @@
             },
             "api": {
               "type": "google-generative-ai",
-              "baseUrl": "http://127.0.0.1:8790/v1"
+              "baseUrl": "https://deepcode.example/v1"
             },
             "logo": {
               "type": "builtin",
