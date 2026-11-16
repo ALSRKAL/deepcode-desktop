@@ -19,6 +19,7 @@ import {
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import pkg, { CancellationToken } from "electron-updater";
 import semver from "semver";
+import { isVersionGreaterThan, normalizeVersionForCompare } from "./updateVersion.js";
 import { logger } from "./logger.js";
 import {
   fetchLatestManifestVersion,
@@ -290,20 +291,6 @@ function applyDevAutoUpdateRuntimeOverrides(): void {
   logger.info(
     `[auto-update] dev update enabled version=${devAutoUpdateVersionOverride ?? app.getVersion()}`,
   );
-}
-
-function normalizeVersionForCompare(version: string): string | null {
-  return semver.valid(semver.coerce(version.trim()));
-}
-
-function isVersionGreaterThan(candidateVersion: string, baselineVersion: string): boolean {
-  const candidate = normalizeVersionForCompare(candidateVersion);
-  const baseline = normalizeVersionForCompare(baselineVersion);
-  if (candidate && baseline) {
-    return semver.gt(candidate, baseline);
-  }
-
-  return candidateVersion.trim() !== baselineVersion.trim();
 }
 
 function shouldDownloadAvailableUpdate(version: string): boolean {
@@ -988,8 +975,8 @@ function shouldDiscardStalePendingReleaseNotes(
     return false;
   }
 
-  const pendingCoerced = semver.valid(semver.coerce(pending));
-  const appCoerced = semver.valid(semver.coerce(current));
+  const pendingCoerced = normalizeVersionForCompare(pending);
+  const appCoerced = normalizeVersionForCompare(current);
   if (!pendingCoerced || !appCoerced) {
     return false;
   }
