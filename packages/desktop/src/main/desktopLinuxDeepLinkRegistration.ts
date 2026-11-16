@@ -14,8 +14,9 @@ const DEFAULT_LINUX_DEEP_LINK_DESKTOP_ENTRY_ID = "deepcode-studio";
 const LINUX_DEEP_LINK_MIME_TYPE = "x-scheme-handler/deepcodestudio";
 // 归属标记：用于识别用户级条目是否由本应用写入。改名前的旧标记只用于清理遗留条目。
 const LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER = "Comment=DeepCode Studio Desktop App";
-const LEGACY_LINUX_DEEP_LINK_DESKTOP_FILE = "zcode.desktop";
-const LEGACY_LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER = "Comment=ZCode Desktop App";
+// DeepCode Studio never removes another product's launcher: "zcode.desktop" with
+// "Comment=ZCode Desktop App" is exactly what the real ZCode app installs, and deleting
+// it made ZCode vanish from the user's menu (owner report 2026-11-17).
 
 type LinuxDesktopEnv = {
   APPIMAGE?: string;
@@ -334,15 +335,6 @@ export function registerLinuxDeepLinkProtocol(options: RegisterLinuxDeepLinkProt
   });
   let protocolRegistered = false;
   const runCommand = options.runCommand ?? runXdgCommand;
-
-  // 条目 id 改名前的用户级 zcode.desktop 与新 id 不同名，不会被下面的同名抑制覆盖，
-  // 会把 Name=ZCode 的旧图标一直留在启动器里，用户同时看到 ZCode 和 ZCodium 两个入口。
-  // 只有带旧归属标记（证明是本应用写的）才删除，用户手写条目保留。
-  removeOwnedUserDesktopEntry(
-    resolveLinuxDeepLinkDesktopFilePath(dataDir, LEGACY_LINUX_DEEP_LINK_DESKTOP_FILE),
-    LEGACY_LINUX_DESKTOP_ENTRY_OWNERSHIP_MARKER,
-    options.logger,
-  );
 
   // 用户级条目在 XDG 解析中永远优先于系统级同名条目。rpm/deb 安装后，旧 AppImage 写入的
   // 用户级条目会把系统级同名条目持续遮蔽，快捷方式和 zcode:// deep link 一直指向旧 AppImage

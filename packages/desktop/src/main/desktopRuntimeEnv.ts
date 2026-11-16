@@ -70,8 +70,10 @@ export const runtimeApplicationName =
 // 若不做迁移，存量用户的登录态、会话与缓存会留在旧目录，表现为升级后要重新登录。
 // 于是这里从"单条链"变成"按时间倒序的链"：先搬最近一次改名前的身份，搬不动再试更早的。
 // 顺序很重要——若先把 `ZCode` 搬成 `ZCodium Exp`，用户的 `ZCodium` 数据就被跳过而遗留在原地。
-const LEGACY_RUNTIME_APPLICATION_NAME = "ZCode";
-const RENAMED_FROM_RUNTIME_APPLICATION_NAME = "ZCodium";
+// DeepCode Studio has always used its own name. "ZCode" and "ZCodium" are other
+// products a user may also have installed: their data folders are never moved
+// (moving ~/.config/ZCode took over the real ZCode app's data; owner report 2026-11-17).
+const LEGACY_RUNTIME_APPLICATION_NAMES: readonly string[] = [];
 // Electron 的 app.getPath("home") 不一定跟随测试进程里的 HOME 覆盖。
 // e2e 默认工作区依赖 home 路径，因此提供显式覆盖，避免测试写到开发者真实 ~/ZCodeProject。
 export const runtimeHomePath = readRuntimeEnvOverride("ZCODE_DESKTOP_HOME_DIR");
@@ -116,10 +118,7 @@ export function migrateRuntimeUserDataDir(logger: RuntimeUserDataMigrationLogger
   // 从最近的旧身份开始试：`ZCodium` 优先于更早的 `ZCode`。只搬一次到 nextPath 就停，
   // 避免连锁覆盖——连续换名两次时，用户真正的数据在 `ZCodium` 里，先搬 `ZCode` 会把
   // 更近的那份留在原地。
-  for (const legacyName of [
-    RENAMED_FROM_RUNTIME_APPLICATION_NAME,
-    LEGACY_RUNTIME_APPLICATION_NAME,
-  ]) {
+  for (const legacyName of LEGACY_RUNTIME_APPLICATION_NAMES) {
     const legacyPath = join(appDataDir, legacyName);
     if (nextPath === legacyPath || !existsSync(legacyPath)) {
       continue;
