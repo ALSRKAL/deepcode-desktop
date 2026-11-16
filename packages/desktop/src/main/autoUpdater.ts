@@ -21,6 +21,11 @@ import pkg, { CancellationToken } from "electron-updater";
 import semver from "semver";
 import { logger } from "./logger.js";
 import { getElectronReleasePlatform, ManifestUpdateProvider } from "./manifestUpdateProvider.js";
+import {
+  appBundlePathFromExecPath,
+  installMacUnsignedUpdater,
+  isMacBuildWithoutDeveloperId,
+} from "./macUnsignedUpdate.js";
 
 type AutoUpdaterInstance = typeof pkg.autoUpdater;
 
@@ -1590,6 +1595,16 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
   resolveAutoUpdater().autoInstallOnAppQuit = process.platform !== "win32";
   resolveAutoUpdater().logger = logger;
   applyManifestUpdateProvider(options);
+  // 无 Apple 签名的 macOS 包：Squirrel 会拒绝安装，改走 macUnsignedUpdate 的下载与替换。
+  const macBundlePath = process.platform === "darwin" && app.isPackaged ? appBundlePathFromExecPath(process.execPath) : null;
+  if (macBundlePath) {
+    void isMacBuildWithoutDeveloperId(macBundlePath).then((unsigned) => {
+      if (unsigned) {
+        installMacUnsignedUpdater(resolveAutoUpdater() as never, logger);
+        logger.info("[auto-update] macOS build without Developer ID: using the in-place updater");
+      }
+    });
+  }
 
   const triggerCheckForUpdates = (reason: string) => {
     if (checkForUpdatesInFlight) {
