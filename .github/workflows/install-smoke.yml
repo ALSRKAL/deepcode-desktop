@@ -58,7 +58,7 @@ jobs:
           sleep 30
           echo "--- app output"; head -c 4000 /tmp/app.log
           log show --last 2m --predicate 'process == "DeepCode Studio" OR eventMessage CONTAINS "DeepCode"' --style compact 2>/dev/null | tail -20 || true
-          pgrep -f "DeepCode Studio.app/Contents/MacOS"
+          pgrep -x "DeepCode Studio" && echo "DeepCode Studio is running"
 
   linux:
     runs-on: ubuntu-24.04
