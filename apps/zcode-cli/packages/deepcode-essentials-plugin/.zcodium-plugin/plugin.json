@@ -1,0 +1,10 @@
+{
+  "name": "deepcode-essentials",
+  "version": "0.1.0",
+  "description": "DeepCode Studio's starter skills: distinctive frontend design, Chrome extensions (Manifest V3, CRXJS), and Android device testing with adb.",
+  "author": {
+    "name": "DeepCode Studio"
+  },
+  "license": "MIT AND Apache-2.0",
+  "skills": "skills"
+}

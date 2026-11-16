@@ -410,6 +410,28 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     ],
     version: "0.1.0",
   },
+  {
+    // DeepCode Studio 随包技能（前端设计、Chrome 扩展、Android adb 测试）。
+    // 纯内容插件（无 MCP、无系统依赖），默认启用；技能按各自 MIT / Apache-2.0 原样分发，见 NOTICE.md。
+    defaultEnabled: true,
+    listing: {
+      author: { name: "DeepCode Studio" },
+      category: "developer-tools",
+      displayName: "DeepCode Essentials",
+      displayName_i18n: { ar: "أساسيات DeepCode" },
+      description_i18n: {
+        ar: "مهارات جاهزة: تصميم واجهات مميزة، إضافات Chrome، واختبار تطبيقات Android عبر adb.",
+      },
+    },
+    name: "deepcode-essentials",
+    rootCandidates: [
+      "packages/deepcode-essentials-plugin",
+      "../deepcode-essentials-plugin",
+      "../../deepcode-essentials-plugin",
+      "../../../deepcode-essentials-plugin",
+    ],
+    version: "0.1.0",
+  },
 ];
 
 // 在 official plugin 定义里标了 defaultEnabled: true 的, 拼成 `<name>@<marketplace>` 形式,

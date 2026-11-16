@@ -246,6 +246,16 @@ export const BUILTIN_PLUGIN_SEED_PATHS = {
     ...OFFICE_VIEWER_RUNTIME_PATHS,
   ],
   "skill-creator-plugin": [],
+  "deepcode-essentials-plugin": [
+    "skills/anti-slop-design/SKILL.md",
+    "skills/capturing-screenshots-and-screenrecord/SKILL.md",
+    "skills/chrome-extension/SKILL.md",
+    "skills/crxjs/SKILL.md",
+    "skills/extracting-logs-with-logcat/SKILL.md",
+    "skills/frontend-design-deslop/SKILL.md",
+    "skills/injecting-input-and-state/SKILL.md",
+    "skills/installing-and-managing-apps/SKILL.md",
+  ],
   "plugin-creator-plugin": [
     "skills/plugin-creator/SKILL.md",
     "skills/plugin-creator/scripts/create-basic-plugin.mjs",

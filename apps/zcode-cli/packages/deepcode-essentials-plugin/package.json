@@ -1,0 +1,8 @@
+{
+  "name": "@zcode/deepcode-essentials-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DeepCode Studio starter skills, published as a built-in plugin.",
+  "license": "MIT AND Apache-2.0",
+  "skills": "./skills"
+}
