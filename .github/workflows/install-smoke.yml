@@ -52,8 +52,13 @@ jobs:
           test -d "$APP"
           if xattr -p com.apple.quarantine "$APP" >/dev/null 2>&1; then echo "quarantined"; exit 1; fi
           codesign --verify --deep "$APP" && echo "ad-hoc signature valid"
-          sleep 20
-          pgrep -f "DeepCode Studio.app/Contents/MacOS" || { open "$APP"; sleep 20; pgrep -f "DeepCode Studio.app/Contents/MacOS"; }
+          spctl --assess --type execute -vv "$APP" 2>&1 || true
+          BIN=$(ls "$APP/Contents/MacOS/" | head -n 1)
+          ("$APP/Contents/MacOS/$BIN" > /tmp/app.log 2>&1 &)
+          sleep 30
+          echo "--- app output"; head -c 4000 /tmp/app.log
+          log show --last 2m --predicate 'process == "DeepCode Studio" OR eventMessage CONTAINS "DeepCode"' --style compact 2>/dev/null | tail -20 || true
+          pgrep -f "DeepCode Studio.app/Contents/MacOS"
 
   linux:
     runs-on: ubuntu-24.04
