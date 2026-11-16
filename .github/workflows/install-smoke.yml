@@ -1,0 +1,71 @@
+name: Install script smoke
+
+# Runs the website's one-command installers on clean Windows, macOS and Linux
+# machines against the live site, and checks the app is installed and starts.
+on:
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: "Website origin (defaults to the DEEPCODE_WEB_ORIGIN variable)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    env:
+      ORIGIN: ${{ inputs.origin || vars.DEEPCODE_WEB_ORIGIN }}
+    steps:
+      - name: Install with irm | iex
+        shell: powershell
+        run: irm "$env:ORIGIN/install.ps1" | iex
+      - name: App is installed per user, runs, and carries no download mark
+        shell: powershell
+        run: |
+          $exe = Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Programs') -Filter 'DeepCode Studio.exe' -Recurse | Select-Object -First 1
+          if (-not $exe) { throw 'DeepCode Studio.exe not found' }
+          Write-Host "Installed: $($exe.FullName) $($exe.VersionInfo.ProductVersion)"
+          $zone = Get-Item $exe.FullName -Stream Zone.Identifier -ErrorAction SilentlyContinue
+          if ($zone) { throw 'Mark-of-the-Web present on the installed app' }
+          Start-Sleep -Seconds 20
+          $p = Get-Process -Name 'DeepCode Studio' -ErrorAction SilentlyContinue
+          if (-not $p) { Start-Process $exe.FullName; Start-Sleep -Seconds 20; $p = Get-Process -Name 'DeepCode Studio' -ErrorAction SilentlyContinue }
+          if (-not $p) { throw 'DeepCode Studio did not stay running' }
+          Write-Host "Running processes: $($p.Count)"
+          $reg = Get-ItemProperty 'HKCU:\Software\Classes\deepcodestudio\shell\open\command' -ErrorAction SilentlyContinue
+          Write-Host "deepcodestudio:// handler: $($reg.'(default)')"
+
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      ORIGIN: ${{ inputs.origin || vars.DEEPCODE_WEB_ORIGIN }}
+    steps:
+      - name: Install with curl | sh
+        run: curl -fsSL "$ORIGIN/install.sh" | sh
+      - name: App is installed, not quarantined, and starts
+        run: |
+          APP="/Applications/DeepCode Studio.app"; [ -d "$APP" ] || APP="$HOME/Applications/DeepCode Studio.app"
+          test -d "$APP"
+          if xattr -p com.apple.quarantine "$APP" >/dev/null 2>&1; then echo "quarantined"; exit 1; fi
+          codesign --verify --deep "$APP" && echo "ad-hoc signature valid"
+          sleep 20
+          pgrep -f "DeepCode Studio.app/Contents/MacOS" || { open "$APP"; sleep 20; pgrep -f "DeepCode Studio.app/Contents/MacOS"; }
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ORIGIN: ${{ inputs.origin || vars.DEEPCODE_WEB_ORIGIN }}
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb desktop-file-utils xdg-utils
+      - name: Install with curl | sh
+        run: xvfb-run -a sh -c 'curl -fsSL "$ORIGIN/install.sh" | sh; sleep 30; pgrep -f DeepCode-Studio.AppImage || pgrep -f deepcode-studio'
+      - name: Launcher, menu entry and deep link handler
+        run: |
+          test -x "$HOME/.local/bin/deepcode-studio"
+          desktop-file-validate "$HOME/.local/share/applications/deepcode-studio.desktop" || true
+          xdg-mime query default x-scheme-handler/deepcodestudio
