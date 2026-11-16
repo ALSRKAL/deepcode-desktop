@@ -51,8 +51,14 @@ export interface ModelSelectGroupItem {
   key: string;
   value: string;
   name: string;
+  /** Secondary text after the name (e.g. the upstream model behind a DeepCode model). */
+  detail?: string;
   badgeLabel?: string;
   supportsVisionInput?: boolean;
+  /** Shown but not selectable; the badge names what unlocks it (e.g. a plan). */
+  lockedBadge?: string;
+  /** Tooltip for a locked item; defaults to the select's lock reason. */
+  lockedMessage?: string;
 }
 
 export interface ModelSelectConnectionOption {
@@ -142,6 +148,8 @@ interface ModelConfigSelectProps {
   showManageModelsAction: boolean;
   lockReasonMessage: string;
   isItemLocked: (candidateValue: string) => boolean;
+  /** Clicking a locked item that carries a lockedBadge (e.g. open the plans page). */
+  onLockedItemSelect?: (item: ModelSelectGroupItem) => void;
   onValueChange: (value: string) => void;
   onConnectionValueChange?: (option: ModelSelectConnectionOption) => void;
   disabled?: boolean;
@@ -193,6 +201,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
   showManageModelsAction,
   lockReasonMessage,
   isItemLocked,
+  onLockedItemSelect,
   onValueChange,
   onConnectionValueChange,
   disabled,
@@ -285,7 +294,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
 
   const renderModelItem = useCallback(
     (item: ModelSelectGroupItem) => {
-      const itemLocked = isItemLocked(item.value);
+      const itemLocked = Boolean(item.lockedBadge) || isItemLocked(item.value);
       const itemSelected = item.value === normalizedValue;
       // React 的 key 不能跟随 props spread 传入，否则开发环境会在 CDP console 报警。
       const itemKey = item.key;
@@ -298,9 +307,11 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
       const content = (
         <>
           <span className="flex min-w-0 flex-1 items-center gap-1.5 text-start">
-            <span className="min-w-0 truncate" title={item.name}>
+            <span className="min-w-0 truncate" title={item.detail ? `${item.name} · ${item.detail}` : item.name}>
               {item.name}
+              {item.detail ? <span className="ms-1.5 text-foreground-subtle">{item.detail}</span> : null}
             </span>
+            {item.lockedBadge ? <span className={MODEL_CONFIG_SELECT_BADGE_CLASS_NAME}>{item.lockedBadge}</span> : null}
             {item.badgeLabel ? (
               <span className={MODEL_CONFIG_SELECT_BADGE_CLASS_NAME}>{item.badgeLabel}</span>
             ) : null}
@@ -325,7 +336,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="right" align="center" sideOffset={6}>
-                  {lockReasonMessage}
+                  {item.lockedMessage ?? lockReasonMessage}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -341,8 +352,15 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
           <DropdownMenuItem
             key={itemKey}
             {...commonProps}
-            className="min-h-8 cursor-not-allowed gap-2 px-2 text-ui-base text-foreground-subtlest data-[highlighted]:text-foreground-subtlest"
-            onSelect={(event) => event.preventDefault()}
+            className={`min-h-8 gap-2 px-2 text-ui-base text-foreground-subtlest data-[highlighted]:text-foreground-subtlest ${item.lockedBadge && onLockedItemSelect ? "cursor-pointer" : "cursor-not-allowed"}`}
+            onSelect={(event) => {
+              event.preventDefault();
+              // 计划锁定的 DeepCode 模型：点击打开订阅页，告诉用户哪个计划包含它。
+              if (item.lockedBadge && onLockedItemSelect) {
+                onLockedItemSelect(item);
+                handlePopoverOpenChange(false);
+              }
+            }}
           >
             {content}
           </DropdownMenuItem>
@@ -370,6 +388,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
       isItemLocked,
       lockReasonMessage,
       normalizedValue,
+      onLockedItemSelect,
     ],
   );
 

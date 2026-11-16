@@ -46,6 +46,7 @@ import type { ModelSelectionView } from "@zcode/services";
 import type { ModelSelectionState } from "@/hooks/useModelSelectionView.js";
 import { useToolbarConfigOptions } from "@/hooks/useZCodeConfig.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
+import { usePlatform } from "@/hooks/usePlatform.js";
 
 import { useShortcutCommandLabel } from "@/shortcuts/useShortcutBindings.js";
 import { logger } from "@/logger.js";
@@ -214,8 +215,29 @@ function V4ComposerModelControlsImpl({
       teamPlanFallbackLabel: intl.formatMessage({
         id: "settings.modelProvider.connectionMode.teamPlan",
       }),
+      deepcode: {
+        planBadge: (tier) => intl.formatMessage({ id: `deepcode.models.plan.${tier}` }),
+        lockedMessage: (tier) =>
+          intl.formatMessage(
+            { id: "deepcode.models.lockedMessage" },
+            { plan: intl.formatMessage({ id: `deepcode.models.plan.${tier}` }) },
+          ),
+        premiumGroupLabel: intl.formatMessage({ id: "deepcode.models.premiumGroup" }),
+        onRequestBadge: intl.formatMessage({ id: "deepcode.models.onRequest" }),
+        onRequestMessage: intl.formatMessage({ id: "deepcode.models.onRequestMessage" }),
+      },
     });
   }, [displayProvider, intl, modelSelectionView]);
+
+  // DeepCode：点击当前计划不含的模型（或“按需开通”的高端模型）→ 打开网站的订阅页。
+  const deepcodeBridge = usePlatform().deepcode;
+  const handleLockedModelSelect = useCallback(
+    (item: { value: string }) => {
+      const premium = item.value.includes(":premium:");
+      void deepcodeBridge?.openPortal(premium ? "/pricing" : "/dashboard/billing");
+    },
+    [deepcodeBridge],
+  );
 
   // 修复：恢复「管理模型」入口（老版 onManageModels = 打开设置页并定位模型供应商区）。
   const handleOpenModelProviderSettings = useCallback(() => {
@@ -512,6 +534,7 @@ function V4ComposerModelControlsImpl({
             id: "chat.toolbar.modelSwitch.lockedByRunningTask",
           })}
           isItemLocked={isModelOptionLocked}
+          onLockedItemSelect={handleLockedModelSelect}
           onValueChange={handleModelValueChange}
           disabled={disabled || recoveryPending || modelSelectionState.status !== "ready"}
           tooltipTitle={modelTriggerDisplay.fullLabel}

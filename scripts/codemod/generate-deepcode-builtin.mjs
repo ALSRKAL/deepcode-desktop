@@ -45,6 +45,64 @@ const DEEPCODE_MODELS = [
   "deepcode-background",
 ];
 
+/**
+ * DeepCode 模型的精确能力（Synthetic GET /openai/v1/models，2026-11-16 读取）：
+ * context_length、max_output_length、input_modalities、reasoning_parameters.efforts。
+ * 修复原因：此前全部落到通配规则（200K 窗口、仅 开/关 思考、无图片），导致
+ * gpt-oss（128K）在自动压缩前就超窗，DeepSeek/Kimi 的 512K 被浪费，且思考强度无法选择。
+ */
+const DEEPCODE_MODEL_FACTS = {
+  "deepcode-architect": { contextWindow: 524288, image: true, efforts: ["low", "high", "max"] },
+  "deepcode-coder-pro": { contextWindow: 524288, image: false, efforts: ["low", "high", "max"] },
+  "deepcode-default": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
+  "deepcode-fast-agent": { contextWindow: 524288, image: true, efforts: ["low", "high", "max"] },
+  "deepcode-mid": { contextWindow: 262144, image: true, efforts: ["low", "medium", "xhigh"] },
+  "deepcode-lite": { contextWindow: 196608, image: false, efforts: ["none", "low", "medium", "high"] },
+  "deepcode-general": { contextWindow: 131072, image: false, efforts: ["none", "low", "medium", "high"] },
+  "deepcode-background": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
+};
+
+/** 追加在上游规则之后（后者覆盖前者）：DeepCode 模型的属性与思考强度。 */
+function deepcodeModelRules() {
+  return Object.entries(DEEPCODE_MODEL_FACTS).map(([id, f]) => ({
+    modelMatch: `^${id.replace(/[-]/g, "\\-")}$`,
+    config: {
+      enabled: true,
+      properties: {
+        contextWindow: f.contextWindow,
+        inputFormat: { supportsText: true, supportsImage: f.image, supportsVideo: false, supportsAudio: false, supportsPdf: false },
+        outputFormat: { supportsText: true },
+        supportsToolCall: true,
+        supportsJsonSchemaOutput: true,
+      },
+      optionSpecs: {
+        reasoningLevel: { values: f.efforts },
+        maxOutputTokens: { max: 65536 },
+      },
+    },
+  }));
+}
+
+/**
+ * Synthetic 只认 OpenAI 的 reasoning_effort（none/low/medium/high/xhigh/max 按模型而定）；
+ * 通配规则还会一并发送 thinking / enable_thinking / reasoning，其中不被支持的字段需要
+ * 网关丢弃重试。DeepCode 模型只发 reasoning_effort。
+ */
+function deepcodeModelApiRules() {
+  return [
+    {
+      modelMatch: "^deepcode\\-.*$",
+      apiTypeMatch: "openai-chat-completions",
+      config: {
+        optionSpecs: {
+          reasoningLevel: { map: '{"reasoning_effort": reasoningLevel}' },
+          maxOutputTokens: { map: "{'max_completion_tokens': maxOutputTokens}" },
+        },
+      },
+    },
+  ];
+}
+
 const REMOVED_TEMPLATE_IDS = new Set(["zai-api", "zai-standard-api", "bigmodel-api", "bigmodel-standard-api", "qwen-alibaba-model-studio-cn", "qwen-alibaba-model-studio-intl"]);
 
 // 构建期注入的网关地址（docs/plan/00 §6：DEEPCODE_GATEWAY_URL 为 B/P 类）。
@@ -114,8 +172,8 @@ const cfg = {
       providerRules: deepcodeProviderRules(),
     },
     modelConfigRules: {
-      modelRules: upstream.config.modelConfigRules.modelRules,
-      modelApiRules: upstream.config.modelConfigRules.modelApiRules,
+      modelRules: [...upstream.config.modelConfigRules.modelRules, ...deepcodeModelRules()],
+      modelApiRules: [...upstream.config.modelConfigRules.modelApiRules, ...deepcodeModelApiRules()],
       providerSiteRules: upstream.config.modelConfigRules.providerSiteRules?.filter(
         (r) => !/z\.ai|bigmodel/i.test(r.baseUrlMatch ?? ""),
       ),

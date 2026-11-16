@@ -8,6 +8,14 @@ import type { ModelSelectionView } from "@zcode/services";
 import type { ModelSelectGroup } from "@/ModelConfigSelect.js";
 import { decodeCustomModelValue, encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
 import { shouldShowModelVisionBadge } from "@/lib/modelVisionBadge.js";
+import {
+  DEEPCODE_LOCKED_VALUE_PREFIX,
+  DEEPCODE_MODELS,
+  DEEPCODE_PREMIUM_PLACEHOLDERS,
+  deepCodeModelInfo,
+  isDeepCodeProviderId,
+  type DeepCodePlanTier,
+} from "@/lib/deepcodeModels.js";
 
 export interface ModelProviderGroupLabelOptions {
   apiKeyLabel?: string;
@@ -18,6 +26,17 @@ export interface ModelProviderGroupLabelOptions {
   startPlanBadgeLabel?: string;
   teamPlanBadgeLabel?: string;
   teamPlanFallbackLabel?: string;
+  /**
+   * DeepCode: also list the models the current plan does not include (locked, with
+   * the plan that has them) and the "on request" premium group. Composer only.
+   */
+  deepcode?: {
+    planBadge: (tier: DeepCodePlanTier) => string;
+    lockedMessage: (tier: DeepCodePlanTier) => string;
+    premiumGroupLabel: string;
+    onRequestBadge: string;
+    onRequestMessage: string;
+  };
 }
 
 function supportsRegistryApiFormat(
@@ -33,6 +52,14 @@ export function buildRegistryModelSelectGroups(
   selectedProvider: ZCodeProvider,
   view: ModelSelectionView,
   labels: ModelProviderGroupLabelOptions = {},
+): ModelSelectGroup[] {
+  return withDeepCodePresentation(buildRawRegistryModelSelectGroups(selectedProvider, view, labels), view, labels);
+}
+
+function buildRawRegistryModelSelectGroups(
+  selectedProvider: ZCodeProvider,
+  view: ModelSelectionView,
+  labels: ModelProviderGroupLabelOptions,
 ): ModelSelectGroup[] {
   return view.providers.flatMap((provider) => {
     if (!supportsRegistryApiFormat(selectedProvider, provider.config.api?.type)) {
@@ -53,7 +80,11 @@ export function buildRegistryModelSelectGroups(
         items: provider.models.map(({ modelId, config }) => ({
           key: `registry-provider:${provider.providerId}:${modelId}`,
           value: encodeCustomModelValue(provider.providerId, modelId),
-          name: modelId,
+          // DeepCode 品牌名 + 实际上游模型，用户看得到自己在用哪个模型。
+          name: (isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)?.name) || modelId,
+          ...(isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)
+            ? { detail: deepCodeModelInfo(modelId)!.detail }
+            : {}),
           ...(shouldShowModelVisionBadge(
             modelId,
             config.properties?.inputFormat?.supportsImage,
@@ -92,4 +123,56 @@ export function resolveModelDisplayName(
   }
 
   return decodeCustomModelValue(value)?.modelName ?? null;
+}
+
+const DEEPCODE_PLAN_ORDER: Record<DeepCodePlanTier, number> = { trial: 0, starter: 1, pro: 2, team: 3 };
+
+/**
+ * DeepCode groups: available models ordered cheapest → strongest, then the models of
+ * higher plans (locked, badge = plan), then a separate "on request" premium group.
+ * Only when the caller asks (labels.deepcode) and a DeepCode provider has models.
+ */
+function withDeepCodePresentation(
+  groups: ModelSelectGroup[],
+  view: ModelSelectionView,
+  labels: ModelProviderGroupLabelOptions,
+): ModelSelectGroup[] {
+  const deepcode = labels.deepcode;
+  if (!deepcode) return groups;
+  const available = new Set(
+    view.providers.filter((p) => isDeepCodeProviderId(p.providerId)).flatMap((p) => p.models.map((m) => m.modelId)),
+  );
+  if (available.size === 0) return groups;
+  const primary = groups.find((g) => g.key.startsWith("registry-provider:account:deepcode"));
+  if (!primary) return groups;
+  const rank = (name: string) => {
+    const i = DEEPCODE_MODELS.findIndex((m) => m.name === name);
+    return i < 0 ? DEEPCODE_MODELS.length : i;
+  };
+  primary.items = [...primary.items].sort((a, b) => rank(a.name) - rank(b.name));
+  const locked = DEEPCODE_MODELS.filter((m) => !available.has(m.id))
+    .sort((a, b) => DEEPCODE_PLAN_ORDER[a.plan] - DEEPCODE_PLAN_ORDER[b.plan])
+    .map((m) => ({
+      key: `deepcode-locked:${m.id}`,
+      value: `${DEEPCODE_LOCKED_VALUE_PREFIX}${m.id}`,
+      name: m.name,
+      detail: m.detail,
+      lockedBadge: deepcode.planBadge(m.plan),
+      lockedMessage: deepcode.lockedMessage(m.plan),
+    }));
+  primary.items = [...primary.items, ...locked];
+  const premium: ModelSelectGroup = {
+    key: "deepcode-premium-on-request",
+    label: deepcode.premiumGroupLabel,
+    labelBadge: deepcode.onRequestBadge,
+    items: DEEPCODE_PREMIUM_PLACEHOLDERS.map((m) => ({
+      key: `deepcode-premium:${m.id}`,
+      value: `${DEEPCODE_LOCKED_VALUE_PREFIX}premium:${m.id}`,
+      name: m.name,
+      detail: m.detail,
+      lockedBadge: deepcode.onRequestBadge,
+      lockedMessage: deepcode.onRequestMessage,
+    })),
+  };
+  return [...groups, premium];
 }
