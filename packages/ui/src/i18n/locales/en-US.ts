@@ -1770,6 +1770,7 @@ const enUS: Record<string, string> = {
   // DeepCode subscription HUD (docs/plan/01 §7)
   "deepcode.hud.credits": "{remaining} credits left",
   "deepcode.hud.expiresIn": "expires in {days} days",
+  "deepcode.hud.usedOf": "{used} of {limit} used",
   "deepcode.hud.stale": "last update a while ago",
   "deepcode.quota.warn": "You used {percent}% of your credits.",
   "deepcode.quota.critical": "Almost out of credits ({percent}% used) — renew soon.",

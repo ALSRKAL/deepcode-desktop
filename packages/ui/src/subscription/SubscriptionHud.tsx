@@ -95,6 +95,16 @@ export function SubscriptionHudChip({ compact = false }: { compact?: boolean }) 
       {!compact ? (
         <div className="mt-0.5 flex justify-between text-[11px] text-foreground-subtle tabular-nums">
           <span>{stale ? intl.formatMessage({ id: "deepcode.hud.stale" }) : intl.formatMessage({ id: "deepcode.hud.expiresIn" }, { days: daysLeft ?? 0 })}</span>
+          {/* 用户需要同时看到已用与总额，而不只是剩余数和进度条。 */}
+          <span data-testid="subscription-hud-used">
+            {intl.formatMessage(
+              { id: "deepcode.hud.usedOf" },
+              {
+                used: snapshot.credits.used.toLocaleString("en-US", { notation: "compact" }),
+                limit: snapshot.credits.limit.toLocaleString("en-US", { notation: "compact" }),
+              },
+            )}
+          </span>
         </div>
       ) : null}
     </div>

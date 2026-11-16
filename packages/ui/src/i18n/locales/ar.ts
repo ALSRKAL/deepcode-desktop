@@ -1749,6 +1749,7 @@ const ar: Record<string, string> = {
   // DeepCode subscription HUD (docs/plan/01 §7) — 需人工复核的机翻
   "deepcode.hud.credits": "متبقي {remaining} كريدت",
   "deepcode.hud.expiresIn": "ينتهي بعد {days} يوم",
+  "deepcode.hud.usedOf": "استُهلك {used} من {limit}",
   "deepcode.hud.stale": "آخر تحديث منذ فترة",
   "deepcode.quota.warn": "استخدمت {percent}% من رصيدك.",
   "deepcode.quota.critical": "اقترب رصيدك من النفاد ({percent}% مستخدم) — جدّد قريباً.",
