@@ -107,6 +107,7 @@ import {
   syncAutoUpdaterStateToWindow,
   syncPostUpdateReleaseNotesToWindow,
   syncReadyUpdateToWindow,
+  skipOutdatedUpdateOnQuit,
 } from "./autoUpdater.js";
 import { BroadcastHub } from "./broadcastHub.js";
 import { TaskRealtimeBus } from "./taskRealtimeBus.js";
@@ -839,6 +840,10 @@ async function prepareAppQuit(reason: string, kind: AppShutdownKind = "normal"):
     return;
   }
 
+  // A normal quit installs a downloaded update on macOS/Linux; skip it when a newer
+  // release is already published so the next launch updates straight to the newest.
+  const outdatedUpdateCheck =
+    activeAppShutdownKind === "update-install" ? Promise.resolve() : skipOutdatedUpdateOnQuit().catch(() => {});
   markForceQuit(reason);
   stopDesktopResourceTelemetry({ flushPendingWindows: true });
   stopDesktopNetworkTelemetry();
@@ -860,6 +865,7 @@ async function prepareAppQuit(reason: string, kind: AppShutdownKind = "normal"):
   );
 
   appQuitPreparationInFlight = Promise.all([
+    outdatedUpdateCheck,
     // 旧流程先等待 Cron 的 1.5s deadline，再启动 Host timer，导致声明的
     // 4.5s/9s 退出总预算被串行放大。两类 owner 无关闭依赖，统一并行进入同一屏障。
     (async () => {

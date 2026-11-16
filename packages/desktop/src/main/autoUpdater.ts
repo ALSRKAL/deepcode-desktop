@@ -20,7 +20,11 @@ import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import pkg, { CancellationToken } from "electron-updater";
 import semver from "semver";
 import { logger } from "./logger.js";
-import { getElectronReleasePlatform, ManifestUpdateProvider } from "./manifestUpdateProvider.js";
+import {
+  fetchLatestManifestVersion,
+  getElectronReleasePlatform,
+  ManifestUpdateProvider,
+} from "./manifestUpdateProvider.js";
 import {
   appBundlePathFromExecPath,
   installMacUnsignedUpdater,
@@ -195,6 +199,19 @@ interface InitAutoUpdaterOptions {
 }
 
 let quitAndInstallInFlight = false;
+/**
+ * Always install the newest release (owner request 2026-11-16): when the user asks to
+ * install but a newer version than the downloaded one is published, download that one
+ * and install it as soon as it is ready, instead of installing the older download and
+ * offering the next update after the restart.
+ */
+let installLatestAfterDownload = false;
+/** Reads the newest published version (set by initAutoUpdater; null before init). */
+let peekLatestPublishedVersion: ((timeoutMs: number) => Promise<string | null>) | null = null;
+/** Runs one awaited update check through electron-updater (set by initAutoUpdater). */
+let runAwaitedUpdateCheck: ((reason: string, timeoutMs: number) => Promise<void>) | null = null;
+const LATEST_CHECK_BEFORE_INSTALL_TIMEOUT_MS = 8_000;
+const LATEST_CHECK_ON_QUIT_TIMEOUT_MS = 3_000;
 let devAutoUpdateVersionOverride: string | null = null;
 
 type MutableAutoUpdaterForDev = AutoUpdaterInstance & {
@@ -468,7 +485,7 @@ function buildDownloadProgressState(
   };
 }
 
-async function quitAndInstallUpdate(rejectUnavailable = false) {
+async function quitAndInstallUpdate(rejectUnavailable = false, skipLatestCheck = false) {
   if (
     menuState.kind === "update-downloaded" &&
     readyUpdateVersion &&
@@ -506,6 +523,36 @@ async function quitAndInstallUpdate(rejectUnavailable = false) {
     logger.info("[auto-update] quitAndInstall already in flight");
     return;
   }
+
+  if (!skipLatestCheck && runAwaitedUpdateCheck && peekLatestPublishedVersion) {
+    const downloaded = readyUpdateVersion;
+    const latest = await peekLatestPublishedVersion(LATEST_CHECK_BEFORE_INSTALL_TIMEOUT_MS);
+    if (latest && isVersionGreaterThan(latest, downloaded)) {
+      logger.info(
+        `[auto-update] newer release ${latest} than downloaded ${downloaded}: download it and install that instead`,
+      );
+      installLatestAfterDownload = true;
+      await runAwaitedUpdateCheck("install-latest", LATEST_CHECK_BEFORE_INSTALL_TIMEOUT_MS);
+      // Re-read: the awaited check changed the state machine.
+      const stateAfterCheck = () => (menuState as AutoUpdaterMenuState).kind;
+      if (stateAfterCheck() === "update-available") {
+        downloadAvailableUpdate("install-latest");
+      }
+      if (stateAfterCheck() === "update-available" || stateAfterCheck() === "download-progress") {
+        // update-downloaded installs it (installLatestAfterDownload).
+        return;
+      }
+      installLatestAfterDownload = false;
+      if (stateAfterCheck() !== "update-downloaded" || !readyUpdateVersion) {
+        if (rejectUnavailable) {
+          throw new Error(`Update is not ready to install: state=${stateAfterCheck()}`);
+        }
+        return;
+      }
+      // The check could not move to the newer release: install what is ready.
+    }
+  }
+  installLatestAfterDownload = false;
   quitAndInstallInFlight = true;
   logger.info("[auto-update] user requested quit and install");
   // macOS 上 quitAndInstall() 在关窗前不会先走 app.before-quit。
@@ -1067,6 +1114,7 @@ function shouldIgnoreCancelledDownloadError(error: unknown): boolean {
 }
 
 function handleAutoUpdateFailure(error: unknown, source: string) {
+  installLatestAfterDownload = false;
   const message = error instanceof Error ? error.message : String(error);
   const failedDownload =
     menuState.kind === "download-progress"
@@ -1599,6 +1647,16 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
   resolveAutoUpdater().autoInstallOnAppQuit = process.platform !== "win32";
   resolveAutoUpdater().logger = logger;
   applyManifestUpdateProvider(options);
+  peekLatestPublishedVersion = async (timeoutMs) =>
+    fetchLatestManifestVersion({
+      endpointOrigin:
+        ZCODIUM_UPDATE_ORIGIN ||
+        (await options.resolveEndpointOrigin?.()) ||
+        resolveRuntimeZCodeEndpointOrigin(process.env),
+      manifestUrl: options.updateFeedSource?.url.trim() || undefined,
+      channel: await resolveUpdateReleaseChannel(options.settingService),
+      timeoutMs,
+    });
   // 无 Apple 签名的 macOS 包：Squirrel 会拒绝安装，改走 macUnsignedUpdate 的下载与替换。
   const macBundlePath = process.platform === "darwin" && app.isPackaged ? appBundlePathFromExecPath(process.execPath) : null;
   if (macBundlePath) {
@@ -1642,6 +1700,34 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
       .finally(() => {
         finishAutoUpdateCheck(reason, checkId);
       });
+  };
+
+  runAwaitedUpdateCheck = async (reason, timeoutMs) => {
+    if (checkForUpdatesInFlight) {
+      logger.info(`[auto-update] skip ${reason}: check already in flight`);
+      return;
+    }
+    const checkId = beginAutoUpdateCheck();
+    try {
+      await Promise.race([
+        (async () => {
+          if (options.settingService) {
+            await syncAutoUpdateCheckChannelFromSettings(checkId, options.settingService, reason);
+          }
+          await resolveAutoUpdater().checkForUpdates();
+        })(),
+        new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+      ]);
+      // The result handlers (update-available …) finish asynchronously after the request.
+      const deadline = Date.now() + timeoutMs;
+      while (checkForUpdatesInFlight && activeAutoUpdateCheckId === checkId && Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    } catch (error) {
+      handleAutoUpdateFailure(error, `${reason} check failed`);
+    } finally {
+      finishAutoUpdateCheck(reason, checkId);
+    }
   };
 
   resolveAutoUpdater().on("checking-for-update", () => {
@@ -1796,6 +1882,10 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
     if (activeForceAutoUpdateListener) {
       notifyForceAutoUpdate({ kind: "installing" });
       void quitAndInstallUpdate();
+    } else if (installLatestAfterDownload) {
+      // The user already asked to install; this is the newest release they get.
+      installLatestAfterDownload = false;
+      void quitAndInstallUpdate(false, true);
     }
 
     if (options.settingService) {
@@ -2034,4 +2124,25 @@ export function checkForUpdateMenuClick(originWindow?: BrowserWindow | null) {
     .finally(() => {
       finishAutoUpdateCheck("manual check", checkId);
     });
+}
+
+/**
+ * Before the app quits with a downloaded update (macOS/Linux install it on quit): if a
+ * newer release is already published, do not install the older download. The next
+ * launch downloads the newest one, so the user updates once instead of twice.
+ */
+export async function skipOutdatedUpdateOnQuit(): Promise<void> {
+  if (menuState.kind !== "update-downloaded" || !readyUpdateVersion || !peekLatestPublishedVersion) {
+    return;
+  }
+  const updater = resolveAutoUpdater();
+  if (!updater.autoInstallOnAppQuit) return;
+  const downloaded = readyUpdateVersion;
+  const latest = await peekLatestPublishedVersion(LATEST_CHECK_ON_QUIT_TIMEOUT_MS);
+  if (latest && isVersionGreaterThan(latest, downloaded)) {
+    updater.autoInstallOnAppQuit = false;
+    logger.info(
+      `[auto-update] quit: skip installing ${downloaded}; newer ${latest} is published and will be downloaded next launch`,
+    );
+  }
 }

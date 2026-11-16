@@ -173,6 +173,44 @@ function resolveManifestFiles(
   return resolved;
 }
 
+/**
+ * Read only the newest published version from the manifest, without touching
+ * electron-updater state. Used right before installing (or quitting with a ready
+ * update) to avoid installing an older download when a newer release exists.
+ */
+export async function fetchLatestManifestVersion(options: {
+  endpointOrigin: string;
+  manifestUrl?: string;
+  channel: ElectronReleaseChannel;
+  platform?: string;
+  timeoutMs: number;
+  fetchImpl?: typeof fetch;
+}): Promise<string | null> {
+  const releasePlatform = options.platform?.trim() || getElectronReleasePlatform();
+  const url = buildElectronManifestUrl({
+    endpointOrigin: options.endpointOrigin,
+    manifestUrl: options.manifestUrl,
+    platform: releasePlatform,
+    channel: options.channel,
+  });
+  try {
+    const res = await (options.fetchImpl ?? fetch)(url, {
+      headers: {
+        accept: MANIFEST_ACCEPT_HEADER,
+        "X-Platform": releasePlatform,
+        "X-Release-Channel": mapReleaseChannelToApiValue(options.channel),
+        "cache-control": "no-cache",
+      },
+      signal: AbortSignal.timeout(options.timeoutMs),
+    });
+    if (!res.ok) return null;
+    const parsed = parseYaml(await res.text());
+    return isRecord(parsed) && typeof parsed.version === "string" ? parsed.version : null;
+  } catch {
+    return null;
+  }
+}
+
 export class ManifestUpdateProvider extends Provider<UpdateInfo> {
   private readonly options: ManifestUpdateProviderOptions;
   private readonly releasePlatform: string;
