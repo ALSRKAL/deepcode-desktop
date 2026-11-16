@@ -70,6 +70,7 @@
     "packages/ui/src/components/ui",
     "packages/ui/src/components/ai-elements",
     ".agents/skills",
+    "apps/zcode-cli/packages/deepcode-essentials-plugin/skills",
     "packages/formal-proof",
     "docs/electron"
   ]

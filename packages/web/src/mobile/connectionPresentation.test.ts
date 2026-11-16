@@ -1,32 +1,35 @@
 import { describe, expect, it } from "vitest";
 import { presentMobileConnection } from "./connectionPresentation.js";
+import { setMobileLocale } from "./mobileI18n.js";
+
+setMobileLocale("en");
 
 describe("presentMobileConnection", () => {
   it("distinguishes initial connection, authentication, waiting, and paired states", () => {
     expect(presentMobileConnection("connecting")).toMatchObject({
-      label: "正在连接桌面",
-      description: "正在建立与桌面的连接…",
+      label: "Connecting to the desktop",
+      description: "Connecting to the desktop…",
       terminal: false,
     });
-    expect(presentMobileConnection("authenticating").label).toBe("正在验证连接");
-    expect(presentMobileConnection("waiting").label).toBe("等待桌面确认");
-    expect(presentMobileConnection("paired").label).toBe("已连接到当前桌面窗口");
+    expect(presentMobileConnection("authenticating").label).toBe("Verifying");
+    expect(presentMobileConnection("waiting").label).toBe("Waiting for the desktop");
+    expect(presentMobileConnection("paired").label).toBe("Connected to this desktop window");
   });
 
   it("identifies reconnecting from the close code without creating retry state", () => {
     expect(presentMobileConnection("connecting", { closeCode: 1006 })).toMatchObject({
-      label: "正在重新连接",
-      description: "连接中断，正在尝试重新连接…",
+      label: "Reconnecting",
+      description: "The connection dropped. Reconnecting…",
       terminal: false,
     });
   });
 
   it.each([
-    ["AUTH_FAILED", "配对信息已失效，请重新扫码连接。"],
-    ["WRONG_PARAM", "连接参数无效，请回到桌面端重新获取二维码。"],
+    ["AUTH_FAILED", "The pairing has expired. Scan the QR code again."],
+    ["WRONG_PARAM", "The link is invalid. Get a new QR code from the desktop."],
   ])("shows safe terminal guidance for %s", (reason, description) => {
     expect(presentMobileConnection("error", { reason })).toMatchObject({
-      label: "连接已终止",
+      label: "Connection ended",
       description,
       terminal: true,
     });
@@ -34,7 +37,7 @@ describe("presentMobileConnection", () => {
 
   it("asks a kicked page to close, and recognizes rejection only with close code 4001", () => {
     expect(presentMobileConnection("error", { reason: "KICKED" }).description).toContain(
-      "关闭其他重复页面",
+      "Close the other page",
     );
     expect(presentMobileConnection("connecting", { reason: "CONNECTION_REJECTED" }).terminal).toBe(
       false,
@@ -45,8 +48,8 @@ describe("presentMobileConnection", () => {
         closeCode: 4001,
       }),
     ).toMatchObject({
-      label: "连接已终止",
-      description: "连接请求已被拒绝，请重新扫码获取有效链接。",
+      label: "Connection ended",
+      description: "The connection was refused. Scan the QR code again for a valid link.",
       terminal: true,
     });
   });
@@ -66,15 +69,15 @@ describe("presentMobileConnection", () => {
         reason: "sensitive server text AUTH_FAILED proof=secret",
       }),
     ).toEqual({
-      label: "连接异常",
-      description: "连接暂时异常，请检查网络后重试。",
+      label: "Connection problem",
+      description: "The connection has a temporary problem. Check the network and try again.",
       terminal: false,
     });
   });
 
   it("does not present closed as automatic retry", () => {
     expect(presentMobileConnection("closed")).toMatchObject({
-      label: "连接已关闭",
+      label: "Connection closed",
       terminal: false,
     });
   });

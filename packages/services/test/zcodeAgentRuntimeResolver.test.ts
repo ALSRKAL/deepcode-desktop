@@ -27,6 +27,7 @@ const MANAGED_ENV_KEYS = [
   "ZCODE_DESKTOP_AGENT_BYTECODE",
   "GLM_BINARY_PATH",
   "ZCODE_DATA_BASE_DIR",
+  "ZCODE_DESKTOP_PACKAGED",
 ] as const;
 
 const resolverContext = { workspacePath: "/tmp/zcode-m8-workspace" } as const;
@@ -69,6 +70,20 @@ async function withIsolatedRepo(
     await rm(root, { recursive: true, force: true });
   }
 }
+
+test("打包桌面应用在含 apps/zcode-cli 的仓库内也不使用仓库里的开发态 Agent", async () => {
+  await withIsolatedRepo({ [tsDistEntry]: "" }, { ZCODE_RUNTIME_ENV: "production", ZCODE_DESKTOP_PACKAGED: "1" }, () => {
+    const command = resolveDefaultZCodeAgentCommand(resolverContext);
+    assert.ok(!command?.args?.some((a) => a.includes("apps/zcode-cli/packages/cli/dist")), JSON.stringify(command));
+  });
+});
+
+test("未打包（开发态）时仍可使用仓库里的开发态 Agent", async () => {
+  await withIsolatedRepo({ [tsDistEntry]: "" }, { ZCODE_RUNTIME_ENV: "production" }, () => {
+    const command = resolveDefaultZCodeAgentCommand(resolverContext);
+    assert.ok(command?.args?.some((a) => a.includes("apps/zcode-cli/packages/cli/dist")), JSON.stringify(command));
+  });
+});
 
 test("未设置 runtime 时不因随包 Rust 存在而自动选择 Rust", async () => {
   await withIsolatedRepo({ [rustResourceEntry]: "" }, { ZCODE_RUNTIME_ENV: "production" }, () => {

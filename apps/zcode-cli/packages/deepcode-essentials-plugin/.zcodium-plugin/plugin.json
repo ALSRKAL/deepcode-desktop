@@ -1,7 +1,7 @@
 {
   "name": "deepcode-essentials",
-  "version": "0.1.0",
-  "description": "DeepCode Studio's starter skills: distinctive frontend design, Chrome extensions (Manifest V3, CRXJS), and Android device testing with adb.",
+  "version": "0.2.0",
+  "description": "DeepCode Studio's starter skills: Impeccable UI design and audits, distinctive frontend design, React and React Native best practices, MCP server building, web app testing with Playwright, Chrome extensions (Manifest V3, CRXJS), and Android device testing with adb.",
   "author": {
     "name": "DeepCode Studio"
   },

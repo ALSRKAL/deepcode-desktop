@@ -26,6 +26,7 @@ import type {
   WebRemoteControlTaskRef,
   WebRemoteControlWorkspaceRef,
 } from "@zcode/shared";
+import { mobileLocale, t } from "./mobileI18n.js";
 
 /**
  * 移动端远控应用：mobileHome（工作区/任务列表） + mobileShell（任务会话）。
@@ -247,7 +248,7 @@ export function MobileApp() {
     return (
       <Shell notice={paramsError}>
         <p className="text-ui-base text-foreground-subtle">
-          远程控制链接无效，请回到桌面端重新生成二维码。
+          {t("invalidLink")}
         </p>
       </Shell>
     );
@@ -258,7 +259,7 @@ export function MobileApp() {
       <Shell
         connection={connection}
         connectionDetail={connectionSnapshot.detail}
-        title={`任务会话`}
+        title={t("taskTitle")}
         onBack={() => setView({ kind: "home" })}
         notice={notice}
       >
@@ -276,7 +277,7 @@ export function MobileApp() {
             </div>
           ))}
           {conversation.messages.length === 0 ? (
-            <p className="text-center text-ui-base text-foreground-subtle">暂无消息</p>
+            <p className="text-center text-ui-base text-foreground-subtle">{t("noMessages")}</p>
           ) : null}
         </div>
         <div className="fixed inset-x-0 bottom-0 border-t border-border bg-card p-3">
@@ -284,7 +285,7 @@ export function MobileApp() {
             <input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="发送消息"
+              placeholder={t("messagePlaceholder")}
               className="h-10 flex-1 rounded-lg border border-input-border bg-surface px-3 text-ui-base text-foreground"
             />
             <button
@@ -293,7 +294,7 @@ export function MobileApp() {
               disabled={!draft.trim()}
               onClick={() => void sendPrompt()}
             >
-              发送
+              {t("send")}
             </button>
           </div>
         </div>
@@ -311,14 +312,14 @@ export function MobileApp() {
       notice={notice}
     >
       <section className="space-y-1">
-        <h1 className="text-ui-lg font-medium text-foreground">ZCode 远程控制</h1>
+        <h1 className="text-ui-lg font-medium text-foreground">{t("title")}</h1>
         {knownDeviceName ? (
           <p data-testid="mobile-known-device-name" className="text-ui-base text-foreground-subtle">
-            桌面设备：{knownDeviceName}
+            {t("device", { name: knownDeviceName })}
           </p>
         ) : null}
         <p className="text-ui-base/relaxed text-foreground-subtle">
-          本次连接可以查看当前设备上已打开的项目、任务和会话；二维码失效后需要回到桌面端重新连接。
+          {t("intro")}
         </p>
       </section>
       <section className="flex flex-wrap items-center gap-2">
@@ -332,12 +333,12 @@ export function MobileApp() {
           {presentMobileConnection(connection, connectionSnapshot.detail).label}
         </span>
         <span className="text-ui-xs text-foreground-subtle">
-          {bootstrap?.workspaces.length ?? 0} 个工作区 · {bootstrap?.tasks.length ?? 0} 个任务
+          {t("stats", { workspaces: bootstrap?.workspaces.length ?? 0, tasks: bootstrap?.tasks.length ?? 0 })}
         </span>
       </section>
       {directory.roots ? (
-        <section aria-label="项目目录 / Project directory" className="space-y-2">
-          <h2 className="text-ui-base font-medium">项目目录 / Project directory</h2>
+        <section aria-label={t("projects")} className="space-y-2">
+          <h2 className="text-ui-base font-medium">{t("projects")}</h2>
           <ul className="space-y-2">
             {directory.roots.map((root) => {
               const workspace = bootstrap?.workspaces.find(
@@ -379,11 +380,11 @@ export function MobileApp() {
                       });
                     }}
                   >
-                    新建任务 / New task
+                    {t("newTask")}
                   </Button>
                   {!enabled ? (
                     <p className="text-ui-sm text-foreground-subtle">
-                      请在桌面端打开 / Open on desktop
+                      {t("openOnDesktop")}
                     </p>
                   ) : null}
                 </li>
@@ -405,14 +406,14 @@ export function MobileApp() {
             setOrganize((current) => (current === "timeline" ? "workspace" : "timeline"))
           }
         >
-          整理任务：{organize === "timeline" ? "按时间线" : "按工作区"}
+          {t("organize", { mode: organize === "timeline" ? t("organizeTimeline") : t("organizeWorkspace") })}
         </button>
         <button
           type="button"
           className="h-8 rounded-lg border border-border px-3 text-ui-xs text-foreground"
           onClick={() => setSortBy((current) => (current === "updated" ? "created" : "updated"))}
         >
-          排序：{sortBy === "updated" ? "更新时间" : "创建时间"}
+          {t("sort", { mode: sortBy === "updated" ? t("sortUpdated") : t("sortCreated") })}
         </button>
         <button
           type="button"
@@ -423,7 +424,7 @@ export function MobileApp() {
             )
           }
         >
-          {collapsed.size > 0 ? "展开全部" : "收起全部"}
+          {collapsed.size > 0 ? t("expandAll") : t("collapseAll")}
         </button>
       </section>
       <section className="space-y-4">
@@ -433,7 +434,7 @@ export function MobileApp() {
               <h2 className="text-ui-base font-medium text-foreground">{group.label}</h2>
             ) : null}
             {collapsed.has(group.key) ? null : group.tasks.length === 0 ? (
-              <p className="text-ui-base text-foreground-subtle">这个工作区暂无任务</p>
+              <p className="text-ui-base text-foreground-subtle">{t("noTasks")}</p>
             ) : (
               <ul className="space-y-2">
                 {group.tasks.map((task) => (
@@ -453,7 +454,7 @@ export function MobileApp() {
                       </div>
                       {typeof task.updatedAt === "number" ? (
                         <div className="mt-1 text-ui-xs text-foreground-subtle">
-                          更新于 {new Date(task.updatedAt).toLocaleString()}
+                          {t("updatedAt", { time: new Date(task.updatedAt).toLocaleString(mobileLocale()) })}
                         </div>
                       ) : null}
                     </button>
@@ -471,13 +472,13 @@ export function MobileApp() {
 function taskStatusLabel(status: WebRemoteControlTaskRef["displayStatus"]): string {
   switch (status) {
     case "running":
-      return "运行中";
+      return t("statusRunning");
     case "completed":
-      return "已完成";
+      return t("statusDone");
     case "error":
-      return "错误";
+      return t("statusError");
     default:
-      return "空闲";
+      return t("statusIdle");
   }
 }
 
@@ -498,15 +499,15 @@ function Shell(props: {
       <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-card px-3 py-2">
         {props.onBack ? (
           <button type="button" className="text-ui-base text-primary" onClick={props.onBack}>
-            返回任务首页
+            {t("back")}
           </button>
         ) : null}
         <span className="min-w-0 flex-1 truncate text-ui-base font-medium">
-          {props.title ?? "ZCode 远程控制"}
+          {props.title ?? t("title")}
         </span>
         {props.onRefresh ? (
           <button type="button" className="text-ui-xs text-primary" onClick={props.onRefresh}>
-            刷新
+            {t("refresh")}
           </button>
         ) : null}
       </header>

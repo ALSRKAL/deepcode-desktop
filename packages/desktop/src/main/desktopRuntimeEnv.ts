@@ -506,9 +506,14 @@ export function buildHostProcessEnv(
   // 少了这一行，production 包和 dev 的非法取值都会原样穿透到 Host。
   delete inheritedEnv[ZCODE_DYNAMIC_WORKFLOW_MODE_ENV];
 
+  // 打包产物不得使用工作区里的开发态 Agent（见 services zcodeAgentProcessManager）。
+  // 修复原因（2026-11-16）：Host 的 cwd 落在 DeepCode Studio 仓库内时会命中仓库里旧的
+  // dev 构建，它不注入 DeepCode 设备密钥，网关返回 Invalid API key。继承值一律丢弃。
+  delete inheritedEnv.ZCODE_DESKTOP_PACKAGED;
   return {
     ...inheritedEnv,
     ...agentServerRuntimeEnv,
+    ...(packagedDesktop ? { ZCODE_DESKTOP_PACKAGED: "1" } : {}),
     // ZCode 运行时不再使用 NODE_ENV；它会被用户 shell、包管理器和测试框架复用。
     // 这里显式下发 ZCODE_RUNTIME_ENV，并在继承环境里清掉 NODE_ENV，避免 host/agent/Bash 被污染。
     [ZCODE_RUNTIME_ENV_KEY]: resolveHostProcessNodeEnv(),

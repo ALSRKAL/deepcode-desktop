@@ -399,6 +399,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
       displayName: "Superpowers",
       description_i18n: {
         "zh-CN": "Superpowers 方法论：头脑风暴、计划、测试驱动开发、系统化调试与代码评审。",
+        ar: "منهجية Superpowers: العصف الذهني، التخطيط، التطوير بالاختبارات، التصحيح المنهجي ومراجعة الكود.",
       },
     },
     name: "superpowers",
@@ -420,7 +421,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
       displayName: "DeepCode Essentials",
       displayName_i18n: { ar: "أساسيات DeepCode" },
       description_i18n: {
-        ar: "مهارات جاهزة: تصميم واجهات مميزة، إضافات Chrome، واختبار تطبيقات Android عبر adb.",
+        ar: "مهارات جاهزة: تصميم وتدقيق الواجهات (Impeccable)، أفضل ممارسات React وReact Native، بناء خوادم MCP، اختبار تطبيقات الويب، إضافات Chrome، واختبار تطبيقات Android عبر adb.",
       },
     },
     name: "deepcode-essentials",
@@ -430,7 +431,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
       "../../deepcode-essentials-plugin",
       "../../../deepcode-essentials-plugin",
     ],
-    version: "0.1.0",
+    version: "0.2.0",
   },
 ];
 

@@ -1,4 +1,5 @@
 import type { MobileConnectionState } from "./protocol.js";
+import { t } from "./mobileI18n.js";
 
 export interface MobileConnectionDetail {
   reason?: string;
@@ -18,18 +19,18 @@ export interface MobileConnectionPresentation {
 
 const TERMINAL_PRESENTATIONS: Record<string, MobileConnectionPresentation> = {
   AUTH_FAILED: {
-    label: "连接已终止",
-    description: "配对信息已失效，请重新扫码连接。",
+    label: t("connEndedLabel"),
+    description: t("connEndedExpired"),
     terminal: true,
   },
   KICKED: {
-    label: "连接已终止",
-    description: "此配对仅支持一个手机页面，请关闭其他重复页面后重新扫码。",
+    label: t("connEndedLabel"),
+    description: t("connEndedDuplicate"),
     terminal: true,
   },
   WRONG_PARAM: {
-    label: "连接已终止",
-    description: "连接参数无效，请回到桌面端重新获取二维码。",
+    label: t("connEndedLabel"),
+    description: t("connEndedInvalid"),
     terminal: true,
   },
 };
@@ -47,8 +48,8 @@ export function presentMobileConnection(
   if (detail?.closeCode === 4003) return TERMINAL_PRESENTATIONS.AUTH_FAILED!;
   if (detail?.closeCode === 4001) {
     return {
-      label: "连接已终止",
-      description: "连接请求已被拒绝，请重新扫码获取有效链接。",
+      label: t("connEndedLabel"),
+      description: t("connEndedRejected"),
       terminal: true,
     };
   }
@@ -57,43 +58,43 @@ export function presentMobileConnection(
     case "connecting":
       return detail?.closeCode !== undefined
         ? {
-            label: "正在重新连接",
-            description: "连接中断，正在尝试重新连接…",
+            label: t("connReconnectingLabel"),
+            description: t("connReconnecting"),
             terminal: false,
           }
         : {
-            label: "正在连接桌面",
-            description: "正在建立与桌面的连接…",
+            label: t("connConnectingLabel"),
+            description: t("connConnecting"),
             terminal: false,
           };
     case "authenticating":
       return {
-        label: "正在验证连接",
-        description: "正在验证配对信息…",
+        label: t("connVerifyingLabel"),
+        description: t("connVerifying"),
         terminal: false,
       };
     case "waiting":
       return {
-        label: "等待桌面确认",
-        description: "手机已连接，正在等待桌面端确认配对。",
+        label: t("connWaitingLabel"),
+        description: t("connWaiting"),
         terminal: false,
       };
     case "paired":
       return {
-        label: "已连接到当前桌面窗口",
-        description: "手机已连接到当前桌面窗口。",
+        label: t("connPairedLabel"),
+        description: t("connPaired"),
         terminal: false,
       };
     case "closed":
       return {
-        label: "连接已关闭",
-        description: "连接已关闭，请回到桌面端重新扫码连接。",
+        label: t("connClosedLabel"),
+        description: t("connClosed"),
         terminal: false,
       };
     case "error":
       return {
-        label: "连接异常",
-        description: "连接暂时异常，请检查网络后重试。",
+        label: t("connErrorLabel"),
+        description: t("connError"),
         terminal: false,
       };
   }

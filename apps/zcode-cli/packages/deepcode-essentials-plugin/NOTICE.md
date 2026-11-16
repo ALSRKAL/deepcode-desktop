@@ -13,6 +13,13 @@ declared in each skill's `SKILL.md` front matter.
 | `extracting-logs-with-logcat` | Jaewoong Eum (skydoves) | Apache-2.0 |
 | `injecting-input-and-state` | Jaewoong Eum (skydoves) | Apache-2.0 |
 | `installing-and-managing-apps` | Jaewoong Eum (skydoves) | Apache-2.0 |
+| `impeccable` | Paul Bakaus ([pbakaus/impeccable](https://github.com/pbakaus/impeccable)), installed with `npx impeccable install` | Apache-2.0 (`skills/impeccable/LICENSE.txt`) |
+| `frontend-design` | Anthropic ([anthropics/skills](https://github.com/anthropics/skills)) | Apache-2.0 (`LICENSE.txt` in the skill) |
+| `mcp-builder` | Anthropic ([anthropics/skills](https://github.com/anthropics/skills)) | Apache-2.0 (`LICENSE.txt` in the skill) |
+| `webapp-testing` | Anthropic ([anthropics/skills](https://github.com/anthropics/skills)) | Apache-2.0 (`LICENSE.txt` in the skill) |
+| `react-best-practices` | Vercel ([vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)) | MIT |
+| `composition-patterns` | Vercel ([vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)) | MIT |
+| `react-native-skills` | Vercel ([vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)) | MIT |
 
 ## MIT License
 

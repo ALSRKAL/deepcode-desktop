@@ -325,6 +325,9 @@ async function buildZCodeAgentSpawnPreflight(
 function resolveBundledWorkspaceZCodeAgentCommand(
   context: ZCodeAgentCommandResolverContext,
 ): ZCodeAgentCommand | null {
+  // 打包的桌面应用只用随包 Agent：Host 的 cwd 可能落在包含 apps/zcode-cli 的仓库里
+  // （例如用户正在开发 DeepCode Studio 本身），不能因此启动仓库里的开发构建。
+  if (process.env.ZCODE_DESKTOP_PACKAGED === "1") return null;
   const distEntrypoint = findUpward("apps/zcode-cli/packages/cli/dist/zcode.cjs");
   if (distEntrypoint) {
     const useBytecode =
