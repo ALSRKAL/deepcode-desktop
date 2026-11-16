@@ -1,0 +1,101 @@
+name: Update smoke
+
+# Over-the-air update on clean Windows, macOS and Linux machines: install an older
+# release straight from GitHub, start it, let its own updater (live manifest)
+# download, verify and install the newest release, then check the new version is
+# what is installed.
+on:
+  workflow_dispatch:
+    inputs:
+      from_tag:
+        description: "Release to install first (must be older than the one live on the site)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-2025, asset: "win-x64.exe" }
+          - { os: macos-15, asset: "mac-arm64.zip" }
+          - { os: ubuntu-24.04, asset: "linux-x86_64.AppImage" }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    env:
+      GH_TOKEN: ${{ github.token }}
+      FROM: ${{ inputs.from_tag }}
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+      - name: Install the old release
+        run: |
+          mkdir -p old && cd old
+          gh release download "$FROM" --repo "$GITHUB_REPOSITORY" --pattern "*${{ matrix.asset }}" --pattern SHA256SUMS.txt
+          f=$(ls | grep -v SHA256SUMS)
+          want=$(grep "${{ matrix.asset }}" SHA256SUMS.txt | cut -d' ' -f1)
+          got=$( (sha256sum "$f" 2>/dev/null || shasum -a 256 "$f") | cut -d' ' -f1)
+          [ "$want" = "$got" ] || { echo "checksum mismatch"; exit 1; }
+          case "$RUNNER_OS" in
+            Windows) powershell -Command "Start-Process -FilePath '$f' -ArgumentList '/S','/currentuser' -Wait" ;;
+            macOS) ditto -x -k "$f" "$HOME/Applications" && codesign --force --deep --sign - "$HOME/Applications/DeepCode Studio.app" ;;
+            Linux) sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libfuse2t64 >/dev/null; mkdir -p "$HOME/app" && cp "$f" "$HOME/app/DeepCode-Studio.AppImage" && chmod +x "$HOME/app/DeepCode-Studio.AppImage" ;;
+          esac
+      - name: Let the app update itself
+        run: |
+          npm i --no-save --silent playwright-core@1.56.1
+          case "$RUNNER_OS" in
+            Windows) EXE="$(cygpath -u "$LOCALAPPDATA")/Programs/DeepCode Studio/DeepCode Studio.exe" ;;
+            macOS) EXE="$HOME/Applications/DeepCode Studio.app/Contents/MacOS/DeepCode Studio" ;;
+            Linux) EXE="$HOME/app/DeepCode-Studio.AppImage" ;;
+          esac
+          cat > drive.mjs <<'EOF'
+          import { _electron } from "playwright-core";
+          const exe = process.argv[2];
+          const app = await _electron.launch({ executablePath: exe, args: ["--no-sandbox"], timeout: 180000 });
+          await app.firstWindow({ timeout: 180000 });
+          const before = await app.evaluate(({ app }) => app.getVersion());
+          console.log("running", before);
+          await new Promise((r) => setTimeout(r, 20000));
+          const result = await app.evaluate(async () => {
+            const { autoUpdater } = process.mainModule.require(process.resourcesPath + "/app.asar/node_modules/electron-updater");
+            const check = await autoUpdater.checkForUpdates();
+            if (!check?.updateInfo) return "no update info";
+            return await new Promise((resolve) => {
+              const t = setTimeout(() => resolve("timeout"), 1500000);
+              autoUpdater.once("update-downloaded", (i) => { clearTimeout(t); resolve("downloaded " + i.version); });
+              autoUpdater.once("error", (e) => { clearTimeout(t); resolve("ERROR " + (e?.message ?? e)); });
+              autoUpdater.downloadUpdate().catch((e) => { clearTimeout(t); resolve("ERROR " + (e?.message ?? e)); });
+            });
+          });
+          console.log("update:", result);
+          if (!String(result).startsWith("downloaded")) process.exit(1);
+          // Same call the app's "Restart to update" button makes.
+          await app.evaluate(async () => {
+            const { autoUpdater } = process.mainModule.require(process.resourcesPath + "/app.asar/node_modules/electron-updater");
+            setTimeout(() => autoUpdater.quitAndInstall(), 500);
+          }).catch(() => {});
+          await new Promise((r) => setTimeout(r, 5000));
+          process.exit(0);
+          EOF
+          if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a node drive.mjs "$EXE"; else node drive.mjs "$EXE"; fi
+      - name: The new version is installed
+        run: |
+          sleep 90
+          want=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName,assets -q '.assets[].name' | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+' | sort -V | tail -1)
+          echo "newest release version: $want"
+          case "$RUNNER_OS" in
+            Windows) got=$(powershell -Command "(Get-Item \"\$env:LOCALAPPDATA\\Programs\\DeepCode Studio\\DeepCode Studio.exe\").VersionInfo.ProductVersion"); ls "$LOCALAPPDATA/Programs/DeepCode Studio" | head; echo "exe ProductVersion: $got" ;;
+            macOS) got=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$HOME/Applications/DeepCode Studio.app/Contents/Info.plist"); echo "app version: $got"; pgrep -x "DeepCode Studio" && echo "reopened after update" ;;
+            Linux) ls -la "$HOME/app"; got=$(ls "$HOME/app" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+' | sort -V | tail -1); [ -n "$got" ] || got=$(strings "$HOME/app/DeepCode-Studio.AppImage" | grep -o '3\.16\.2-2026[0-9]*\.[0-9]*' | sort -V | tail -1); echo "AppImage version: $got" ;;
+          esac
+          case "$got" in *"$want"*|"${want%%-*}"*) ;; esac
+          echo "installed=$got want=$want"
+          [ "$RUNNER_OS" = Windows ] || [ "$got" = "$want" ]
