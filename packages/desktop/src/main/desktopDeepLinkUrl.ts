@@ -31,6 +31,16 @@ export function isWorkspaceOpenUrl(parsedUrl: URL): boolean {
   return Boolean(host === WORKSPACE_OPEN_HOST && `/${pathParts.join("/")}` === "/open");
 }
 
+/** deepcodestudio://auth?token=…&state=… — the website's sign-in callback. */
+export function isAuthCallbackUrl(parsedUrl: URL): boolean {
+  return (
+    parsedUrl.protocol === `${DEEP_LINK_SCHEME}:` &&
+    parsedUrl.hostname === "auth" &&
+    parsedUrl.searchParams.has("token") &&
+    parsedUrl.searchParams.has("state")
+  );
+}
+
 export function extractWorkspaceOpenPath(parsedUrl: URL): string | null {
   if (!isWorkspaceOpenUrl(parsedUrl)) {
     return null;
@@ -99,8 +109,14 @@ function extractFromCandidate(value: string): string | null {
   const url = match?.[0].replace(/&amp;/gi, "&").replace(/\\([&=?:/])/g, "$1");
   if (!url) return null;
   try {
-    // 单实例转发只接收工作区入口，避免把旧登录凭据再次传给主进程。
-    return isWorkspaceOpenUrl(new URL(url)) ? url : null;
+    // 单实例转发接收工作区入口与 DeepCode 登录回调。
+    // 修复原因：Windows/Linux 上浏览器打开 deepcodestudio://auth 时会启动第二实例，
+    // 回调只能经 second-instance 的 argv 到达主进程；此前这里只放行工作区入口，
+    // 登录回调被丢弃，网页点“允许”后桌面端永远不登录（macOS 走 open-url 不受影响）。
+    // 放行是安全的：主进程只在本进程发起过登录时接受回调，并校验 state 与 PKCE，
+    // 一次性 code 被重放也无法兑换。
+    const parsed = new URL(url);
+    return isWorkspaceOpenUrl(parsed) || isAuthCallbackUrl(parsed) ? url : null;
   } catch {
     return null;
   }
@@ -114,7 +130,7 @@ function isCompleteDeepLinkUrl(value: string): boolean {
     return false;
   }
 
-  return isWorkspaceOpenUrl(parsedUrl) && parsedUrl.searchParams.has("path");
+  return (isWorkspaceOpenUrl(parsedUrl) && parsedUrl.searchParams.has("path")) || isAuthCallbackUrl(parsedUrl);
 }
 
 export function extractDeepLinkUrlFromArgs(args: readonly string[]): string | null {

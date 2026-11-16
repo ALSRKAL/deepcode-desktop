@@ -16,7 +16,7 @@
 import { mkdtemp, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
@@ -95,7 +95,18 @@ try {
   const email = `ui-e2e-${Date.now()}@deepcode.local`;
   run(`signup ${email} Ui-e2e-${Date.now()}-pw "Mohammed Alsrkal"`);
   const code = run(`approve ${email} ${q.get("state")} ${q.get("code_challenge")} "${q.get("device_name") ?? "e2e"}"`);
-  await app.evaluate(({ app: electronApp }, url) => electronApp.emit("open-url", { preventDefault() {} }, url), `deepcodestudio://auth?token=${code}&state=${q.get("state")}`);
+  // Real Windows/Linux path: the browser starts a second app process with the link,
+  // which hands it to the running one (second-instance). macOS would use open-url.
+  const callback = `deepcodestudio://auth?token=${code}&state=${q.get("state")}`;
+  if (process.platform === "darwin") {
+    await app.evaluate(({ app: electronApp }, url) => electronApp.emit("open-url", { preventDefault() {} }, url), callback);
+  } else {
+    execFileSync(exe, ["--no-sandbox", callback], {
+      env: { ...process.env, HOME: home, XDG_CONFIG_HOME: join(home, ".config"), DEEPCODE_WEB_ORIGIN: web },
+      stdio: "ignore",
+      timeout: 60_000,
+    });
+  }
 
   // 4. identity from the website appears in the app
   const identity = page.locator('[data-testid="deepcode-account-identity"]');
@@ -128,6 +139,7 @@ try {
   await sleep(800);
   await shot("04-plan-active");
   check("plan active: lock gone, plan and credits shown", !(await lock.isVisible().catch(() => false)) && /Starter/.test(hudText) && /\d/.test(hudText), hudText);
+  check("usage shows used of total", /\d.* of .*\d.* used/.test(hudText), hudText);
 
   // 7. credits run out → "Out of credits" lock
   run(`exhaust ${email}`);
