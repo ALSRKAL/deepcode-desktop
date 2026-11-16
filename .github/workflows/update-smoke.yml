@@ -52,7 +52,7 @@ jobs:
         run: |
           npm i --no-save --silent playwright-core@1.56.1
           case "$RUNNER_OS" in
-            Windows) EXE="$(cygpath -u "$LOCALAPPDATA")/Programs/DeepCode Studio/DeepCode Studio.exe" ;;
+            Windows) EXE="$(cygpath -w "$LOCALAPPDATA")\\Programs\\DeepCode Studio\\DeepCode Studio.exe" ;;
             macOS) EXE="$HOME/Applications/DeepCode Studio.app/Contents/MacOS/DeepCode Studio" ;;
             Linux) EXE="$HOME/app/DeepCode-Studio.AppImage" ;;
           esac
@@ -94,7 +94,7 @@ jobs:
           case "$RUNNER_OS" in
             Windows) got=$(powershell -Command "(Get-Item \"\$env:LOCALAPPDATA\\Programs\\DeepCode Studio\\DeepCode Studio.exe\").VersionInfo.ProductVersion"); ls "$LOCALAPPDATA/Programs/DeepCode Studio" | head; echo "exe ProductVersion: $got" ;;
             macOS) got=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$HOME/Applications/DeepCode Studio.app/Contents/Info.plist"); echo "app version: $got"; pgrep -x "DeepCode Studio" && echo "reopened after update" ;;
-            Linux) ls -la "$HOME/app"; got=$(ls "$HOME/app" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+' | sort -V | tail -1); [ -n "$got" ] || got=$(strings "$HOME/app/DeepCode-Studio.AppImage" | grep -o '3\.16\.2-2026[0-9]*\.[0-9]*' | sort -V | tail -1); echo "AppImage version: $got" ;;
+            Linux) ls -la "$HOME/app"; tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName -q '.[0].tagName'); gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS.txt -O sums.txt; f=$(ls -t "$HOME/app"/*.AppImage | head -1); sha=$(sha256sum "$f" | cut -d' ' -f1); grep -q "$sha" sums.txt && got="$want"; echo "AppImage $f sha matches $tag: ${got:-no}" ;;
           esac
           case "$got" in *"$want"*|"${want%%-*}"*) ;; esac
           echo "installed=$got want=$want"

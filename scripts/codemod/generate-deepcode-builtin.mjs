@@ -81,12 +81,21 @@ if (isProductionBuild && !allowInsecure && !DEEPCODE_GATEWAY_URL.startsWith("htt
   );
 }
 
+const DEEPCODE_ENTRY_NAMES = {
+  "": "DeepCode Studio",
+  messages: "DeepCode Studio · Anthropic API",
+  responses: "DeepCode Studio · OpenAI Responses",
+  google: "DeepCode Studio · Gemini",
+};
+
 /** 网关四协议面：上游一 provider 一 API type 的约束下的内部拆分。 */
 function deepcodeProviderRules() {
   const api = (type) => ({ type, baseUrl: `${DEEPCODE_GATEWAY_URL}/v1` });
   const entry = (suffix, type) => ({
     providerId: suffix ? `account:deepcode:${suffix}` : "account:deepcode",
-    providerName: "DeepCode Studio",
+    // 四个内部条目在模型选择器里各成一组；同名会出现四个相同的「DeepCode Studio」，
+    // 用户无法区分（owner 反馈 2026-11-16），所以非默认条目带上协议族名。
+    providerName: DEEPCODE_ENTRY_NAMES[suffix] ?? "DeepCode Studio",
     config: {
       group: "deepcode",
       builtinModelIds: DEEPCODE_MODELS,

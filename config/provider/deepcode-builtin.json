@@ -596,7 +596,7 @@
         },
         {
           "providerId": "account:deepcode:messages",
-          "providerName": "DeepCode Studio",
+          "providerName": "DeepCode Studio · Anthropic API",
           "config": {
             "group": "deepcode",
             "builtinModelIds": [
@@ -644,7 +644,7 @@
         },
         {
           "providerId": "account:deepcode:responses",
-          "providerName": "DeepCode Studio",
+          "providerName": "DeepCode Studio · OpenAI Responses",
           "config": {
             "group": "deepcode",
             "builtinModelIds": [
@@ -692,7 +692,7 @@
         },
         {
           "providerId": "account:deepcode:google",
-          "providerName": "DeepCode Studio",
+          "providerName": "DeepCode Studio · Gemini",
           "config": {
             "group": "deepcode",
             "builtinModelIds": [
