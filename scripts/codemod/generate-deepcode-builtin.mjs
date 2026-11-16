@@ -23,24 +23,45 @@ const check = process.argv.includes("--check");
 
 const upstream = JSON.parse(readFileSync(resolve(root, "config/provider/zcode-builtin.json"), "utf8"));
 
-/** DeepCode 网关目录模型（packages/db/src/catalog.ts 的私有模型子集）。 */
+/**
+ * DeepCode 网关可服务的全部模型（packages/db/src/catalog.ts GO_MODEL_PRICES 中仍在售、
+ * 不以用户数据训练的模型）。
+ *
+ * 修复原因：Agent 进程的 Registry 使用 EmptyAccountProviderConfigSource，不接收宿主按
+ * 计划下发的动态模型清单，只认这里的静态 builtinModelIds。此前清单只有 16 个旧模型，
+ * 用户在模型选择器里选中网关下发的 beam-free 等模型时，Agent 报
+ * "Provider Registry 中不存在 Model"。这里放全集即可：模型选择器仍只展示宿主从网关
+ * 取到的计划内模型，计划外模型由网关返回 403，权限边界始终在服务端。
+ */
 const DEEPCODE_MODELS = [
-  "glm-5.3-flash",
-  "glm-5.3",
-  "kimi-k3",
-  "kimi-k3.1-pro",
-  "deepseek-v4-pro",
+  "beam-free",
+  "longcat-2.5-free",
   "deepseek-v4.1-flash",
+  "glm-5.3-flash",
+  "glm-5.2",
+  "kimi-k2.7-code",
+  "longcat-2.0",
+  "mimo-v2.6-flash",
   "minimax-m3",
-  "qwen3.8-max",
-  "qwen3.8-flash",
   "qwen3.7-plus",
-  "mimo-v2.5",
-  "mimo-v2.5-pro",
-  "gpt-6-luna",
-  "grok-4.7",
-  "claude-haiku-5-5",
+  "hy4",
+  "hy3",
+  "qwen3.8-flash",
+  "hy4-preview",
   "gemini-4-argon",
+  "minimax-m3.1-flash",
+  "glm-5.3",
+  "kimi-k3.1-pro",
+  "kimi-k3",
+  "step-5-preview",
+  "mimo-v2.6-pro",
+  "qwen4-max",
+  "qwen3.8-max",
+  "deepseek-v4-pro",
+  "grok-4.7",
+  "gpt-6-luna",
+  "gpt-5.6-luna",
+  "claude-haiku-5-5",
 ];
 
 const REMOVED_TEMPLATE_IDS = new Set(["zai-api", "zai-standard-api", "bigmodel-api", "bigmodel-standard-api", "qwen-alibaba-model-studio-cn", "qwen-alibaba-model-studio-intl"]);
