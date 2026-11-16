@@ -96,7 +96,11 @@ function constructAutoUpdater(): AutoUpdaterInstance {
 }
 
 export const CHECK_FOR_UPDATE_MENU_ID = "check-for-update";
-const AUTO_UPDATE_POLL_INTERVAL_MS = 60 * 60 * 1000;
+// 修复原因（owner 反馈 2026-11-16）：每小时轮询一次时，刚发布的版本最长要等一小时
+// 才出现在用户的应用里（v0.1.7 在上次检查 7 分钟后发布，用户以为没有发布）。
+// 改为 15 分钟轮询，并在窗口重新获得焦点时检查（至少间隔 5 分钟）；manifest 有 60s 缓存，负载很小。
+const AUTO_UPDATE_POLL_INTERVAL_MS = 15 * 60 * 1000;
+const AUTO_UPDATE_FOCUS_MIN_INTERVAL_MS = 5 * 60 * 1000;
 const UPDATE_FEED_URL_ENV = "ZCODE_UPDATE_FEED_URL";
 const UPDATE_FEED_URL_SWITCH = "--zcode-update-feed-url";
 const DEV_AUTO_UPDATE_ENV = "ZCODE_AUTO_UPDATE_DEV";
@@ -1616,7 +1620,7 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
     // 如果 checking / downloading 阶段继续并发触发 checkForUpdates，会把同一轮更新流重复拉起，
     // 造成无效请求、噪音日志，甚至把用户看到的菜单状态来回覆盖，所以自动轮询只在 idle 或
     // update-downloaded 态进入；后者继续轮询是为了发现取代已下载版本的新版本。
-    if (reason === "poll" && !canPollForUpdatesFromState(menuState)) {
+    if ((reason === "poll" || reason === "focus") && !canPollForUpdatesFromState(menuState)) {
       logger.info(`[auto-update] skip ${reason}: state=${menuState.kind}`);
       return;
     }
@@ -1854,11 +1858,20 @@ export async function initAutoUpdater(options: InitAutoUpdaterOptions = {}): Pro
   });
 
   triggerCheckForUpdates("startup");
+  let lastScheduledCheckAt = Date.now();
 
   autoUpdatePollTimer = setInterval(() => {
+    lastScheduledCheckAt = Date.now();
     triggerCheckForUpdates("poll");
   }, AUTO_UPDATE_POLL_INTERVAL_MS);
   autoUpdatePollTimer.unref?.();
+
+  // 用户回到应用时检查一次（节流），新版本不必等到下一次轮询。
+  app.on("browser-window-focus", () => {
+    if (Date.now() - lastScheduledCheckAt < AUTO_UPDATE_FOCUS_MIN_INTERVAL_MS) return;
+    lastScheduledCheckAt = Date.now();
+    triggerCheckForUpdates("focus");
+  });
 }
 
 export function requestForceAutoUpdate(
