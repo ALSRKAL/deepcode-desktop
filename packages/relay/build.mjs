@@ -9,6 +9,9 @@ await build({
   platform: "node",
   target: "node24",
   format: "esm",
-  banner: { js: "#!/usr/bin/env node" },
+  // src/cli.ts already starts with a shebang that esbuild keeps; a banner made it
+  // appear twice and the bundle failed to parse.
+  // ws is CommonJS: give the ESM bundle a real require (esbuild's shim throws).
+  banner: { js: 'import { createRequire as __zcodeCreateRequire } from "node:module"; const require = __zcodeCreateRequire(import.meta.url);' },
   logLevel: "info",
 });

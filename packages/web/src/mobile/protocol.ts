@@ -737,13 +737,22 @@ export class MobileRemoteControlClient {
   }
 }
 
+/**
+ * The WebSocket lives next to the page: "/ws" on the desktop's same-network server,
+ * "/remote/ws" when the page is served by the DeepCode relay under /remote/.
+ */
+export function mobileWsUrl(protocol: string, host: string, pathname: string): string {
+  const dir = pathname.endsWith("/") ? pathname : pathname.slice(0, pathname.lastIndexOf("/") + 1) || "/";
+  return `${protocol}//${host}${dir}ws`;
+}
+
 /** 从二维码 URL 解析配对参数。 */
 export function readPairingParamsFromLocation(): MobilePairingParams & { wsUrl: string } {
   const params = new URLSearchParams(window.location.search);
   const deviceSid = params.get("sid") ?? "";
   const passHash = params.get("hash") ?? "";
   if (!deviceSid || !passHash) {
-    throw new Error("远程控制链接缺少配对参数");
+    throw new Error("The remote-control link is missing its pairing parameters");
   }
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   return {
@@ -752,6 +761,6 @@ export function readPairingParamsFromLocation(): MobilePairingParams & { wsUrl: 
     deviceMid: params.get("mid") ?? undefined,
     deviceName: params.get("name") ?? undefined,
     appVersion: params.get("app_version") ?? undefined,
-    wsUrl: `${protocol}//${window.location.host}/ws`,
+    wsUrl: mobileWsUrl(protocol, window.location.host, window.location.pathname),
   };
 }

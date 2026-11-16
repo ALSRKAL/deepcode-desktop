@@ -395,6 +395,8 @@ export interface AppSettings {
   };
   /** 手机远控端点模式：lan = 仅同网直连（默认）；custom = 用户自备隧道 / relay。 */
   webRemoteControlEndpointMode?: "lan" | "custom";
+  /** How the phone connects: deepcode relay (default), same network, or the user's own relay. */
+  webRemoteControlConnection?: "deepcode" | "lan" | "custom";
   /** 手机远控：custom 模式的用户自备端点地址（如 wss://域名/ws）。 */
   webRemoteControlCustomEndpointUrl?: string;
   /** 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。 */

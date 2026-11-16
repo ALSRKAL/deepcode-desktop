@@ -36,6 +36,8 @@ export interface RelayServerOptions {
   maxPhysicalFrameBytes: number;
   pairTtlMs: number;
   mobileDir: string | null;
+  /** Behind a trusted reverse proxy: rate-limit by the first X-Forwarded-For address. */
+  trustProxy?: boolean;
   logger: RelayLogger;
   rateLimiter: {
     allowConnect(ip: string): boolean;
@@ -68,7 +70,8 @@ export async function startRelayServer(options: RelayServerOptions): Promise<Rel
       return;
     }
     wss.handleUpgrade(req, socket, head, (ws) => {
-      void attachClient(ws, req.socket.remoteAddress ?? "unknown");
+      const forwarded = options.trustProxy ? String(req.headers["x-forwarded-for"] ?? "").split(",")[0]?.trim() : "";
+      void attachClient(ws, forwarded || req.socket.remoteAddress || "unknown");
     });
   });
 

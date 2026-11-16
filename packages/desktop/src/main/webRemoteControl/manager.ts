@@ -10,6 +10,7 @@ import {
   type WebRemoteControlWorkspaceRef,
 } from "@zcode/shared";
 import type { ICredentialService, ISettingService } from "@zcode/services";
+import { DEFAULT_ZCODE_ENDPOINT_ORIGIN, resolveRuntimeZCodeEndpointOrigin } from "@zcode/shared";
 import type { WebRemoteControlLogger } from "./logger.js";
 import { createNodeWebRemoteControlRelayAuthProvider } from "./authProvider.js";
 import { createWebRemoteControlRelayAuthStorageProvider } from "./authStorage.js";
@@ -49,12 +50,28 @@ function isRelayWsUrl(value: string): boolean {
   }
 }
 
-/** relay WS 地址 → 移动页 http(s) base（同 origin 托管）。 */
-function deriveRelayHttpBase(relayWsUrl: string): string {
+/**
+ * The DeepCode server hosts the relay under /remote/ (page at /remote/, socket at
+ * /remote/ws), so the phone opens a normal https link that works on any network.
+ * Null when this build has no real web origin configured.
+ */
+export function deepcodeRelayWsUrl(origin = resolveRuntimeZCodeEndpointOrigin()): string | null {
+  if (!origin || origin === DEFAULT_ZCODE_ENDPOINT_ORIGIN) return null;
+  try {
+    const url = new URL("/remote/ws", origin);
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** relay WS 地址 → 移动页 http(s) base（同 origin 托管，保留路径前缀：/remote/ws → /remote/）。 */
+export function deriveRelayHttpBase(relayWsUrl: string): string {
   try {
     const url = new URL(relayWsUrl);
     url.protocol = url.protocol === "wss:" ? "https:" : "http:";
-    url.pathname = "/";
+    url.pathname = url.pathname.replace(/ws\/?$/u, "") || "/";
     url.search = "";
     url.hash = "";
     return url.toString();
@@ -224,8 +241,14 @@ export function createWebRemoteControlManager(
     const parsed = webRemoteControlStartRequestSchema.parse(target);
     await stopRuntime(windowId, "restart");
     const settings = await deps.settingService.get();
-    const endpointMode = settings.webRemoteControlEndpointMode ?? "lan";
-    if (endpointMode === "custom") {
+    // Missing choice → the DeepCode relay; an endpoint the user saved before stays in use.
+    const connection =
+      settings.webRemoteControlConnection ??
+      (settings.webRemoteControlEndpointMode === "custom" ? "custom" : "deepcode");
+    const deepcodeRelay = connection === "deepcode" ? deepcodeRelayWsUrl() : null;
+    const endpointMode: "lan" | "custom" = connection === "lan" || (connection === "deepcode" && !deepcodeRelay) ? "lan" : "custom";
+    const relayWsUrl = deepcodeRelay ?? (settings.webRemoteControlCustomEndpointUrl ?? "").trim();
+    if (endpointMode === "custom" && !deepcodeRelay) {
       // 跨网端点由用户自备（自己的隧道 / 自托管 relay）；未配置地址直接失败，
       // 不回退 LAN——避免把「跨网失败」伪装成「同网可用」。
       const customUrl = settings.webRemoteControlCustomEndpointUrl?.trim();
@@ -295,7 +318,7 @@ export function createWebRemoteControlManager(
       endpointMode === "custom"
         ? createRelayDeviceTransport({
             logger: deps.logger,
-            relayWsUrl: (settings.webRemoteControlCustomEndpointUrl ?? "").trim(),
+            relayWsUrl,
             deviceMid: deps.deviceMid,
             deviceName: deps.deviceName,
             appVersion: deps.appVersion,
@@ -333,9 +356,7 @@ export function createWebRemoteControlManager(
     }
     if (endpointMode === "custom") {
       // 用户的 relay 同时托管移动页与 WS；QR 指向它的 http(s) base。
-      runtime.qrBaseUrl = deriveRelayHttpBase(
-        (settings.webRemoteControlCustomEndpointUrl ?? "").trim(),
-      );
+      runtime.qrBaseUrl = deriveRelayHttpBase(relayWsUrl);
     } else {
       const baseUrls = lanTransport?.baseUrls() ?? [];
       runtime.qrBaseUrl = baseUrls.find((url) => !url.includes("127.0.0.1")) ?? baseUrls[0] ?? "";

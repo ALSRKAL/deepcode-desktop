@@ -50,6 +50,7 @@ async function main(): Promise<void> {
     host: process.env.ZCODE_RELAY_HOST?.trim() || "0.0.0.0",
     path: process.env.ZCODE_RELAY_PATH?.trim() || "/ws",
     maxPhysicalFrameBytes: envNumber("ZCODE_RELAY_MAX_FRAME_BYTES", 1024 * 1024),
+    trustProxy: process.env.ZCODE_RELAY_TRUST_PROXY === "1",
     pairTtlMs: envNumber("ZCODE_RELAY_PAIR_TTL_HOURS", 24) * 60 * 60 * 1000,
     mobileDir:
       mobileDir && existsSync(mobileDir)

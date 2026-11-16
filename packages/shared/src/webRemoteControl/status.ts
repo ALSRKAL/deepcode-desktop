@@ -125,4 +125,11 @@ export type WebRemoteControlTaskSync = z.infer<typeof webRemoteControlTaskSyncSc
 
 /** 桌面端远控端点配置：默认仅 LAN，跨网由用户显式填写自己的隧道 / relay 地址。 */
 export const webRemoteControlEndpointModeSchema = z.enum(["lan", "custom"]);
+/**
+ * How the phone reaches this computer (DeepCode Studio, 2026-11-16): "deepcode" = through
+ * the DeepCode server relay (works on any network, no firewall change; the default),
+ * "lan" = same Wi-Fi only, "custom" = the user's own relay or tunnel.
+ */
+export const webRemoteControlConnectionSchema = z.enum(["deepcode", "lan", "custom"]);
+export type WebRemoteControlConnection = z.infer<typeof webRemoteControlConnectionSchema>;
 export type WebRemoteControlEndpointMode = z.infer<typeof webRemoteControlEndpointModeSchema>;

@@ -14,7 +14,10 @@ import {
   sourceServerRecordSchema,
   sourceServerWorkspaceHistoryEntrySchema,
 } from "./source-server/index.js";
-import { webRemoteControlEndpointModeSchema } from "./webRemoteControl/index.js";
+import {
+  webRemoteControlConnectionSchema,
+  webRemoteControlEndpointModeSchema,
+} from "./webRemoteControl/index.js";
 
 /** 引导职业枚举；单独导出供 onboarding 记录回填 settings 时做窄化校验。 */
 const appSettingsOccupationSchema = z.enum([
@@ -517,6 +520,7 @@ const appSettingsObjectSchema = z.object({
   // 手机远控：端点模式。默认 lan（仅同网可达）；custom 时读取用户自备隧道 / relay 地址。
   // patch 侧保持 optional：update() 只覆盖调用方显式提供的字段，不把默认值写回每次补丁。
   webRemoteControlEndpointMode: webRemoteControlEndpointModeSchema.optional(),
+  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   // 手机远控：用户自备端点地址（custom 模式必填，如 wss://域名/ws）。
   webRemoteControlCustomEndpointUrl: z.string().trim().optional(),
   // 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。
@@ -628,6 +632,8 @@ export const appSettingsPatchSchema = z.object({
     .optional(),
   // 手机远控：端点模式。默认 lan（仅同网可达）；custom 时读取用户自备隧道 / relay 地址。
   webRemoteControlEndpointMode: webRemoteControlEndpointModeSchema.default("lan"),
+  // No default: missing means the DeepCode relay (legacy "custom" endpoints are kept).
+  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   // 手机远控：用户自备端点地址（custom 模式必填，如 wss://域名/ws）。
   webRemoteControlCustomEndpointUrl: z.string().trim().optional(),
   // 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。
