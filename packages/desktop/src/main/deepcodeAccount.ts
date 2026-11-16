@@ -23,6 +23,9 @@ import {
 } from "@zcode/shared";
 
 /** 非秘密的会话摘要（用户/计划/网关地址），重启后恢复 HUD 用。 */
+/** Last seen plan + models (not secret); a change makes the host refresh the model list. */
+const DEEPCODE_ENTITLEMENT_CREDENTIAL_KEY = "deepcode.entitlement";
+
 export const DEEPCODE_SESSION_CREDENTIAL_KEY = "deepcode.session";
 
 const STATUS_TIMEOUT_MS = 10_000;
@@ -121,9 +124,28 @@ export function createDeepCodeAccount(deps: DeepCodeAccountDeps): DeepCodeAccoun
     deps.broadcast(await currentState());
   }
 
+  /**
+   * 修复原因（2026-11-16 发布前 E2E 发现）：用户升级计划后，宿主的模型清单只在凭据文件
+   * 变化或每 5 分钟刷新时更新，新计划的模型最长 5 分钟仍显示为锁定。这里在订阅状态里的
+   * 计划或可用模型变化时写入一个签名到同一个凭据文件，宿主的文件监听立即刷新模型清单。
+   * 只在变化时写，正常轮询不产生写入。
+   */
+  async function noteEntitlementChange(status: unknown): Promise<void> {
+    const s = status as { plan?: { id?: unknown }; status?: unknown; limits?: { allowedModels?: unknown } } | null;
+    const models = Array.isArray(s?.limits?.allowedModels) ? [...(s!.limits!.allowedModels as string[])].sort() : [];
+    const signature = JSON.stringify([s?.plan?.id ?? null, s?.status ?? null, models]);
+    try {
+      if ((await deps.credentials.load(DEEPCODE_ENTITLEMENT_CREDENTIAL_KEY)) === signature) return;
+      await deps.credentials.save(DEEPCODE_ENTITLEMENT_CREDENTIAL_KEY, signature);
+    } catch (error) {
+      deps.logger.warn("[deepcode] could not record the plan change", error);
+    }
+  }
+
   async function clearLocal(): Promise<void> {
     await deps.credentials.delete(DEEPCODE_DEVICE_CREDENTIAL_KEY);
     await deps.credentials.delete(DEEPCODE_SESSION_CREDENTIAL_KEY);
+    await deps.credentials.delete(DEEPCODE_ENTITLEMENT_CREDENTIAL_KEY).catch(() => undefined);
   }
 
   return {
@@ -191,6 +213,7 @@ export function createDeepCodeAccount(deps: DeepCodeAccountDeps): DeepCodeAccoun
         | { error?: { code?: string; renewUrl?: string } }
         | null;
       if (response.ok && body) {
+        await noteEntitlementChange(body);
         return { ok: true, status: body, receivedAt: Date.now() };
       }
       const code = body?.error?.code ?? `http_${response.status}`;

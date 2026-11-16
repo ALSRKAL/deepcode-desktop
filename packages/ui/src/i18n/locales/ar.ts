@@ -1748,7 +1748,7 @@ const ar: Record<string, string> = {
 
   // DeepCode subscription HUD (docs/plan/01 §7) — 需人工复核的机翻
   "deepcode.hud.credits": "متبقي {remaining} كريدت",
-  "deepcode.hud.expiresIn": "ينتهي بعد {days} يوم",
+  "deepcode.hud.expiresIn": "متبقٍ {days} يوم",
   "deepcode.hud.usedOf": "استُهلك {used} من {limit}",
   "deepcode.models.plan.trial": "تجربة",
   "deepcode.models.plan.starter": "Starter",
@@ -1763,6 +1763,8 @@ const ar: Record<string, string> = {
   "deepcode.quota.critical": "اقترب رصيدك من النفاد ({percent}% مستخدم) — جدّد قريباً.",
   "deepcode.lock.quota.title": "نفدت الكريدتس",
   "deepcode.lock.quota.body": "استخدمت كريدتس هذه الفترة بالكامل. جدّد للمتابعة — لا يُخصم شيء تلقائياً.",
+  "deepcode.lock.trialEnded.title": "انتهت تجربتك المجانية",
+  "deepcode.lock.trialEnded.body": "اختر خطة من الموقع لمتابعة استخدام نماذج DeepCode.",
   "deepcode.lock.noPlan.title": "اختر خطة للبدء",
   "deepcode.lock.noPlan.body": "حسابك في DeepCode مرتبط. اختر خطة من الموقع لاستخدام النماذج.",
   "deepcode.lock.action.choosePlan": "عرض الخطط",

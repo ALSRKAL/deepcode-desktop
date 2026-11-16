@@ -116,15 +116,22 @@ try {
   await shot("02-signed-in-identity");
   check("sidebar shows the website account name and email", idText.includes("Mohammed Alsrkal") && idText.includes(email), idText.replace(/\n/g, " | "));
 
-  // 5. no plan → lock dialog that sends the user to the website to subscribe
+  // 5. a new account starts the 24-hour free trial; when it ends the app blocks use
+  //    and sends the user to the website to choose a plan.
   const lock = page.getByRole("alertdialog");
+  const hud = page.locator('[data-testid="subscription-hud-chip"]');
+  await refreshStatus();
+  await hud.waitFor({ timeout: 30_000 }).catch(() => {});
+  const trialText = (await hud.innerText().catch(() => "")).replace(/\n/g, " | ");
+  await shot("03-trial");
+  check("a new account starts the free trial", /trial|تجربة/i.test(trialText), trialText);
+  run(`expire ${email}`);
   await refreshStatus();
   await lock.waitFor({ timeout: 30_000 }).catch(() => {});
   const lockText = (await lock.innerText().catch(() => "")).replace(/\n/g, " | ");
-  await shot("03-no-plan-lock");
-  check("no plan: the app blocks use and explains it", (await lock.isVisible().catch(() => false)) && lockText.length > 0, lockText);
-  check("a new account is invited to choose a plan (not told it expired)", /choose a plan/i.test(lockText), lockText);
-  // The primary action (not "Close"): "View plans" for a new account, "Renew" otherwise.
+  await shot("03b-trial-ended-lock");
+  check("trial ended: the app blocks use and explains it", (await lock.isVisible().catch(() => false)) && lockText.length > 0, lockText);
+  // The primary action (not "Close"): "View plans" / "Renew".
   await lock.getByRole("button", { name: /view plans|renew|عرض الخطط|تجديد/i }).first().click().catch(() => {});
   const billingUrl = await waitOpened((u) => /\/(dashboard\/billing|pricing)/.test(u));
   check("its button opens the website billing page", !!billingUrl?.startsWith(web), billingUrl ?? "nothing opened");
@@ -133,7 +140,6 @@ try {
   run(`plan ${email} starter-monthly`);
   await refreshStatus();
   await lock.waitFor({ state: "hidden", timeout: 30_000 }).catch(() => {});
-  const hud = page.locator('[data-testid="subscription-hud-chip"]');
   await hud.waitFor({ timeout: 30_000 }).catch(() => {});
   const hudText = (await hud.innerText().catch(() => "")).replace(/\n/g, " | ");
   await sleep(800);

@@ -160,7 +160,15 @@ export function SubscriptionLockModal() {
   // A brand-new account has never subscribed: invite it to choose a plan instead of
   // telling it that a subscription it never had "expired".
   const neverSubscribed = lock.reason === "expired" && store.snapshot?.plan.id === "none";
-  const copy = neverSubscribed
+  // The 24-hour free trial ended: say so and invite a plan (not "subscription expired").
+  const trialEnded = (lock.reason === "expired" || lock.reason === "quota_exhausted") && store.snapshot?.plan.id === "trial";
+  const copy = trialEnded
+    ? {
+        title: intl.formatMessage({ id: "deepcode.lock.trialEnded.title" }),
+        body: intl.formatMessage({ id: "deepcode.lock.trialEnded.body" }),
+        action: intl.formatMessage({ id: "deepcode.lock.action.choosePlan" }),
+      }
+    : neverSubscribed
     ? {
         title: intl.formatMessage({ id: "deepcode.lock.noPlan.title" }),
         body: intl.formatMessage({ id: "deepcode.lock.noPlan.body" }),

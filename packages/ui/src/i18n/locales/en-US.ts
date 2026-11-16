@@ -1769,7 +1769,7 @@ const enUS: Record<string, string> = {
 
   // DeepCode subscription HUD (docs/plan/01 §7)
   "deepcode.hud.credits": "{remaining} credits left",
-  "deepcode.hud.expiresIn": "expires in {days} days",
+  "deepcode.hud.expiresIn": "{days}d left",
   "deepcode.hud.usedOf": "{used} of {limit} used",
   "deepcode.models.plan.trial": "Trial",
   "deepcode.models.plan.starter": "Starter",
@@ -1784,6 +1784,8 @@ const enUS: Record<string, string> = {
   "deepcode.quota.critical": "Almost out of credits ({percent}% used) — renew soon.",
   "deepcode.lock.quota.title": "Out of credits",
   "deepcode.lock.quota.body": "You used all credits for this period. Renew to keep going — nothing was auto-charged.",
+  "deepcode.lock.trialEnded.title": "Your free trial has ended",
+  "deepcode.lock.trialEnded.body": "Choose a plan on the website to keep using DeepCode models.",
   "deepcode.lock.noPlan.title": "Choose a plan to start",
   "deepcode.lock.noPlan.body": "Your DeepCode account is connected. Pick a plan on the website to use the models.",
   "deepcode.lock.action.choosePlan": "View plans",
