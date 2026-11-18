@@ -144,6 +144,10 @@ export async function startRelayServer(options: RelayServerOptions): Promise<Rel
         // 通知桌面：手机已离开，回到 waiting。
         send(entry.device, { type: "pair_status_ack", pair_status: "waiting" });
       }
+      if (unbound === "device" && entry.mobile) {
+        // 通知手机：桌面已离开，回到 waiting（不再假装已连接）。
+        send(entry.mobile, { type: "pair_status_ack", pair_status: "waiting" });
+      }
     });
     ws.on("error", () => ws.close(1011, "internal"));
 
@@ -195,6 +199,10 @@ export async function startRelayServer(options: RelayServerOptions): Promise<Rel
           });
           if (role === "mobile" && entry.device) {
             send(entry.device, { type: "pair_status_ack", pair_status: "matched" });
+          }
+          // 桌面晚于手机连上（或重连）时，通知已在等待的手机进入 matched。
+          if (role === "device" && entry.mobile) {
+            send(entry.mobile, { type: "pair_status_ack", pair_status: registry.pairStatusOf(entry) });
           }
           options.logger.info("relay: authenticated", {
             role,

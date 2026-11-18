@@ -17,8 +17,10 @@ import {
   type WebRemoteControlRpcAssemblyEvent,
   type WebRemoteControlRpcMessageFrame,
   type WebRemoteControlRpcTransportFrame,
+  type ZCodeConfigOption,
   type ZCodeMessageWithParts,
   type ZCodeStreamEvent,
+  type ZCodeTaskMeta,
 } from "@zcode/shared";
 
 /**
@@ -399,6 +401,57 @@ export class MobileRemoteControlClient {
       content: params.content,
       clientMode: "web-remote-replayable",
       remoteSessionId: params.remoteSessionId,
+    });
+  }
+
+  /**
+   * 读某个项目根的任务清单（DeepCode Studio，2026-11-18）。
+   * 修复原因：手机首页此前只显示桌面弹层打开期间、当前 workspace 推送的任务，
+   * 关掉弹层或换项目后手机就「看不到对话」。现在经同一条 bridge 直接读 Host 的
+   * task service（与桌面侧栏同一真相源），覆盖窗口内所有本地项目。
+   */
+  async listTasks(params: {
+    bridgeKey: string;
+    workspacePath: string;
+    workspaceIdentity?: string;
+  }): Promise<ZCodeTaskMeta[]> {
+    await this.ensureWorkspaceBridge({ workspaceKey: params.bridgeKey });
+    const { zcodeTaskService } = this.createServiceAccessor(params.bridgeKey);
+    return zcodeTaskService.listTasks({
+      workspacePath: params.workspacePath,
+      ...(params.workspaceIdentity ? { workspaceIdentity: params.workspaceIdentity } : {}),
+    });
+  }
+
+  /** 停止当前生成；与桌面「停止」按钮同一个 Host 入口。 */
+  async stopTask(params: TaskAccessParams): Promise<void> {
+    await this.ensureWorkspaceBridge({ workspaceKey: params.workspaceKey, taskId: params.taskId });
+    const { zcodeTaskService } = this.createServiceAccessor(params.workspaceKey);
+    await zcodeTaskService.stopGeneration({
+      taskId: params.taskId,
+      ...(params.workspacePath ? { workspacePath: params.workspacePath } : {}),
+      ...(params.workspaceIdentity ? { workspaceIdentity: params.workspaceIdentity } : {}),
+    });
+  }
+
+  /** 读 task 的 configOptions（模型、思考等级等），与桌面模型选择器同源。 */
+  async readTaskConfigOptions(params: TaskAccessParams): Promise<ZCodeConfigOption[]> {
+    await this.ensureWorkspaceBridge({ workspaceKey: params.workspaceKey, taskId: params.taskId });
+    const { zcodeTaskService } = this.createServiceAccessor(params.workspaceKey);
+    return zcodeTaskService.getTaskConfigOptions({ taskId: params.taskId });
+  }
+
+  /** 切换一个 configOption（模型 / 思考等级）；返回 Host 权威的完整列表。 */
+  async setTaskConfigOption(
+    params: TaskAccessParams & { configId: string; value: string },
+  ): Promise<ZCodeConfigOption[]> {
+    await this.ensureWorkspaceBridge({ workspaceKey: params.workspaceKey, taskId: params.taskId });
+    const { zcodeTaskService } = this.createServiceAccessor(params.workspaceKey);
+    return zcodeTaskService.setConfigOption({
+      taskId: params.taskId,
+      traceId: generateTraceId(params.taskId),
+      configId: params.configId,
+      value: params.value,
     });
   }
 

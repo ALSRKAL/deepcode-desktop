@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ZCodeStreamEvent } from "@zcode/shared";
 import {
   conversationReducer,
+  conversationMessagesFromSnapshot,
   initialConversationState,
   isSameConversationScope,
   type ConversationAction,
@@ -9,6 +10,11 @@ import {
   type ConversationScope,
   type ConversationState,
 } from "./conversationReducer.js";
+
+/** 只比较气泡身份与正文；结构化 parts 由专门用例覆盖。 */
+function bubbles(messages: ConversationMessage[]) {
+  return messages.map(({ id, role, text }) => ({ id, role, text }));
+}
 
 const scopeA: ConversationScope = { workspaceKey: "ws-a", taskId: "task-1" };
 const scopeB: ConversationScope = { workspaceKey: "ws-a", taskId: "task-2" };
@@ -72,15 +78,15 @@ describe("conversationReducer scope", () => {
     state = applySnapshot(state, [{ id: "u1", role: "user", text: "旧任务历史" }]);
     state = conversationReducer(state, { type: "beginScope", scope: scopeB });
     expect(state.scope).toEqual(scopeB);
-    expect(state.messages).toEqual([]);
+    expect(bubbles(state.messages)).toEqual([]);
 
     // 旧 scope 的迟到 chunk 不能污染新任务。
     state = stream(state, chunk({ messageId: "late", content: "旧任务迟到碎片" }), scopeA);
-    expect(state.messages).toEqual([]);
+    expect(bubbles(state.messages)).toEqual([]);
 
     // 旧 scope 的迟到快照同样被丢弃。
     state = applySnapshot(state, [{ id: "u2", role: "user", text: "旧快照" }], scopeA);
-    expect(state.messages).toEqual([]);
+    expect(bubbles(state.messages)).toEqual([]);
   });
 });
 
@@ -90,13 +96,13 @@ describe("conversationReducer stream chunks", () => {
     expect(state.awaitingSnapshot).toBe(true);
 
     state = stream(state, chunk({ messageId: "m1", content: "早到增量" }));
-    expect(state.messages).toEqual([]);
+    expect(bubbles(state.messages)).toEqual([]);
 
     state = applySnapshot(state, [{ id: "u1", role: "user", text: "你好" }]);
     expect(state.awaitingSnapshot).toBe(false);
 
     state = stream(state, chunk({ messageId: "m1", content: "屏障后增量" }));
-    expect(state.messages).toEqual([
+    expect(bubbles(state.messages)).toEqual([
       { id: "u1", role: "user", text: "你好" },
       { id: "m1", role: "assistant", text: "屏障后增量" },
     ]);
@@ -109,7 +115,7 @@ describe("conversationReducer stream chunks", () => {
     state = stream(state, chunk({ messageId: "m1", content: "A2" }));
     state = stream(state, chunk({ messageId: "m2", content: "B2" }));
 
-    expect(state.messages).toEqual([
+    expect(bubbles(state.messages)).toEqual([
       { id: "m1", role: "assistant", text: "A1A2" },
       { id: "m2", role: "assistant", text: "B1B2" },
     ]);
@@ -122,14 +128,14 @@ describe("conversationReducer stream chunks", () => {
     let state = applySnapshot(begin(), []);
     state = stream(state, chunk({ messageId: "m1", inputId: "input-1", content: first }));
     state = stream(state, chunk({ messageId: "m1", inputId: "input-1", content: second }));
-    expect(state.messages).toEqual([{ id: "m1", role: "assistant", text }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "m1", role: "assistant", text }]);
   });
 
   it("缺 messageId 时按 traceId 归并", () => {
     let state = applySnapshot(begin(), []);
     state = stream(state, chunk({ traceId: "trace-9", content: "foo" }));
     state = stream(state, chunk({ traceId: "trace-9", content: "bar" }));
-    expect(state.messages).toEqual([{ id: "trace-9", role: "assistant", text: "foobar" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "trace-9", role: "assistant", text: "foobar" }]);
   });
 });
 
@@ -141,7 +147,7 @@ describe("conversationReducer resync", () => {
     expect(state.needsResync).toBe(true);
 
     state = stream(state, chunk({ messageId: "m1", content: "屏障期碎片" }));
-    expect(state.messages).toEqual([{ id: "m1", role: "assistant", text: "已渲染" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "m1", role: "assistant", text: "已渲染" }]);
   });
 
   it("bridge-degraded/断档置 resync 标志并要求重读快照", () => {
@@ -154,12 +160,12 @@ describe("conversationReducer resync", () => {
   it("重读快照清空 resync 与屏障，并覆盖本地增量", () => {
     let state = applySnapshot(begin(), []);
     state = stream(state, chunk({ messageId: "m1", content: "本地增量" }));
-    expect(state.messages).toEqual([{ id: "m1", role: "assistant", text: "本地增量" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "m1", role: "assistant", text: "本地增量" }]);
     state = conversationReducer(state, { type: "resync", scope: scopeA });
     state = applySnapshot(state, [{ id: "m1", role: "assistant", text: "权威快照" }]);
     expect(state.needsResync).toBe(false);
     expect(state.awaitingSnapshot).toBe(false);
-    expect(state.messages).toEqual([{ id: "m1", role: "assistant", text: "权威快照" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "m1", role: "assistant", text: "权威快照" }]);
   });
 
   it("终态事件触发一次最终对账", () => {
@@ -185,7 +191,7 @@ describe("conversationReducer optimistic user message", () => {
       id: "local-1",
       text: "先显示这条",
     });
-    expect(state.messages).toEqual([{ id: "local-1", role: "user", text: "先显示这条" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "local-1", role: "user", text: "先显示这条" }]);
 
     const action: ConversationAction = {
       type: "appendOptimisticUserMessage",
@@ -194,6 +200,102 @@ describe("conversationReducer optimistic user message", () => {
       text: "不应进入",
     };
     state = conversationReducer(state, action);
-    expect(state.messages).toEqual([{ id: "local-1", role: "user", text: "先显示这条" }]);
+    expect(bubbles(state.messages)).toEqual([{ id: "local-1", role: "user", text: "先显示这条" }]);
+  });
+});
+
+describe("conversationReducer structured parts", () => {
+  function ready(): ConversationState {
+    return applySnapshot(begin(), []);
+  }
+
+  it("思考、工具与正文按到达顺序并入同一轮 live 气泡", () => {
+    let state = ready();
+    state = stream(state, { type: "task_run_started", taskId: "task-1", traceId: "t1", startedAt: 1 });
+    expect(state.running).toBe(true);
+    state = stream(state, { type: "agent_thought_chunk", taskId: "task-1", traceId: "t1", content: "想" });
+    state = stream(state, { type: "agent_thought_chunk", taskId: "task-1", traceId: "t1", content: "一下" });
+    state = stream(state, {
+      type: "tool_call",
+      taskId: "task-1",
+      traceId: "t1",
+      toolId: "call-1",
+      toolName: "Bash",
+      kind: "Bash",
+      title: "Run tests",
+      input: { command: "pnpm test" },
+      raw: {},
+    });
+    state = stream(state, {
+      type: "tool_call_update",
+      taskId: "task-1",
+      traceId: "t1",
+      toolId: "call-1",
+      status: "completed",
+      raw: {},
+    });
+    state = stream(state, chunk({ content: "完成", traceId: "t1" }));
+    expect(state.messages).toHaveLength(1);
+    expect(state.messages[0]?.parts).toEqual([
+      { kind: "reasoning", text: "想一下" },
+      { kind: "tool", id: "call-1", tool: "Bash", title: "Run tests", status: "completed", detail: "pnpm test" },
+      { kind: "text", text: "完成" },
+    ]);
+    expect(state.messages[0]?.text).toBe("完成");
+  });
+
+  it("子代理增量不混进主对话", () => {
+    let state = ready();
+    state = stream(state, {
+      type: "agent_message_chunk",
+      taskId: "task-1",
+      traceId: "t1",
+      parentToolUseId: "call-9",
+      content: "子代理正文",
+    });
+    expect(state.messages).toEqual([]);
+  });
+
+  it("task_error 记录原因、结束运行态并要求对账", () => {
+    let state = ready();
+    state = stream(state, { type: "task_run_started", taskId: "task-1", traceId: "t1", startedAt: 1 });
+    state = stream(state, { type: "task_error", taskId: "task-1", traceId: "t1", error: "boom" });
+    expect(state.running).toBe(false);
+    expect(state.lastError).toBe("boom");
+    expect(state.needsResync).toBe(true);
+  });
+
+  it("快照映射文本、思考、工具状态，跳过 synthetic 文本", () => {
+    const messages = conversationMessagesFromSnapshot([
+      {
+        info: { messageId: "m1", sessionId: "s", role: "assistant" },
+        parts: [
+          { id: "p0", sessionId: "s", messageId: "m1", type: "text", text: "<system>", synthetic: true },
+          { id: "p1", sessionId: "s", messageId: "m1", type: "reasoning", text: "plan" },
+          {
+            id: "p2",
+            sessionId: "s",
+            messageId: "m1",
+            type: "tool",
+            callId: "c1",
+            tool: "Read",
+            state: { status: "error", input: { file_path: "/a.ts" }, error: "ENOENT", startedAt: 1, completedAt: 2 },
+          },
+          { id: "p3", sessionId: "s", messageId: "m1", type: "text", text: "答案" },
+        ],
+      },
+    ] as never);
+    expect(messages).toEqual([
+      {
+        id: "m1",
+        role: "assistant",
+        text: "答案",
+        parts: [
+          { kind: "reasoning", text: "plan" },
+          { kind: "tool", id: "c1", tool: "Read", title: "Read", status: "error", detail: "/a.ts", output: "ENOENT" },
+          { kind: "text", text: "答案" },
+        ],
+      },
+    ]);
   });
 });

@@ -12,6 +12,7 @@ import {
 import type { ICredentialService, ISettingService } from "@zcode/services";
 import { DEFAULT_ZCODE_ENDPOINT_ORIGIN, resolveRuntimeZCodeEndpointOrigin } from "@zcode/shared";
 import type { WebRemoteControlLogger } from "./logger.js";
+import { seedWorkspaceRef } from "./workspaceSeed.js";
 import { createNodeWebRemoteControlRelayAuthProvider } from "./authProvider.js";
 import { createWebRemoteControlRelayAuthStorageProvider } from "./authStorage.js";
 import { buildWebRemoteControlQrUrl } from "./qrUrl.js";
@@ -283,7 +284,10 @@ export function createWebRemoteControlManager(
       hasEverPaired: false,
       mobileDeviceSeenAt: 0,
       pendingOutbound: [],
-      workspaces: [],
+      // 修复（DeepCode Studio，2026-11-18）：清单此前只靠弹层打开期间的 5s 同步填充，
+      // 运行时重启 / 同步未跑时手机拿到「0 个工作区」，既看不到对话也打不开 bridge。
+      // 启动目标本身就是这个窗口里已打开的工作区：先以它为种子，弹层同步再覆盖为完整清单。
+      workspaces: [seedWorkspaceRef(parsed, deps.resolveRemoteWorkspaceConnectionState)],
       tasks: [],
     };
     const events: WebRemoteControlDeviceTransportEvents = {

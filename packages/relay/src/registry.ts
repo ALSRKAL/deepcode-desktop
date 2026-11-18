@@ -155,9 +155,14 @@ export class RelayPairingRegistry {
     return true;
   }
 
-  /** 心跳/查询：返回当前 pair_status。 */
+  /**
+   * 心跳/查询：返回当前 pair_status。
+   * 修复（DeepCode Studio，2026-11-18）：只有桌面与手机都连在「这个」relay 上才算 matched。
+   * 此前手机一鉴权就报 matched，即使桌面不在本实例（多实例 / 桌面断线后条目残留），
+   * 手机显示「已连接」但所有请求被 forward 静默丢弃，页面一直是 0 个对话。
+   */
   pairStatusOf(entry: RelayPairEntry): "waiting" | "matched" {
-    return entry.pairStatus;
+    return entry.pairStatus === "matched" && entry.device && entry.mobile ? "matched" : "waiting";
   }
 
   touch(entry: RelayPairEntry): void {
