@@ -8,7 +8,8 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import type { DeepCodeAccountBridge, DeepCodeAuthState } from "@zcode/shared";
-import { SubscriptionStatusResponseSchema } from "@zcode/deepcode";
+// 浏览器安全子入口：根入口含 node:crypto 的登录代码，手机工作台在浏览器里加载会崩。
+import { SubscriptionStatusResponseSchema } from "@zcode/deepcode/contracts";
 import { ExternalLink, LogIn, LogOut } from "lucide-react";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { usePlatform } from "@/hooks/usePlatform.js";

@@ -23,6 +23,7 @@ import {
 import type { ConversationDropTargetController } from "@/v4/composer/conversationDropTarget.js";
 import type { WorkbenchSessionBinding } from "@/v4/workbenchGroupStore.js";
 import { useWorkbenchPaneCount } from "@/app-shell/useWorkbenchPaneCount.js";
+import { useNarrowViewport } from "@/hooks/useNarrowViewport.js";
 import {
   canPlaceWorkbenchSessionInSplit,
   placeWorkbenchSessionInSplit,
@@ -1639,6 +1640,24 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
     [workspaceKey, isSidebarVisible],
   );
 
+  // 窄屏（手机远控）：侧栏是覆盖式抽屉。进入窄屏时收起；选中会话后自动收起，
+  // 与官方手机端一致——会话占满屏幕，侧栏按需滑出。
+  const isNarrowViewport = useNarrowViewport();
+  const narrowSidebarRef = useRef({ entered: false, taskId: activeTaskId });
+  useEffect(() => {
+    const state = narrowSidebarRef.current;
+    if (!isNarrowViewport) {
+      state.entered = false;
+      state.taskId = activeTaskId;
+      return;
+    }
+    const taskChanged = state.taskId !== activeTaskId;
+    const firstNarrowFrame = !state.entered;
+    state.entered = true;
+    state.taskId = activeTaskId;
+    if (isSidebarVisible && (firstNarrowFrame || taskChanged)) handleToggleSidebar();
+  }, [isNarrowViewport, activeTaskId, isSidebarVisible, handleToggleSidebar]);
+
   return (
     <DesktopWindowFrame
       title={`ZCode / ${getPathLeaf(workspaceAbsPath)}`}
@@ -1665,10 +1684,18 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
           data-workspace-sidebar-panel="true"
           id="sidebar"
           className={cn(
-            "w-[var(--workspace-sidebar-panel-width)] max-w-[50%] flex-none overflow-hidden duration-200 ease-out transition-[width,opacity] data-[workspace-sidebar-resizing=true]:transition-opacity",
+            isNarrowViewport
+              ? "fixed inset-y-0 start-0 z-50 w-[min(85vw,340px)] overflow-hidden bg-background shadow-xl duration-200 ease-out transition-transform"
+              : "w-[var(--workspace-sidebar-panel-width)] max-w-[50%] flex-none overflow-hidden duration-200 ease-out transition-[width,opacity] data-[workspace-sidebar-resizing=true]:transition-opacity",
             // 拖动侧栏宽度时如果继续过渡 width，会让指针移动和实际宽度之间产生滞后。
             // 拖拽 active 通过 DOM 标记切 transition，避免 pointerdown/up 为了切 class 重渲染整棵 workspace。
-            isSidebarPanelVisible ? "opacity-100" : "pointer-events-none opacity-0",
+            isNarrowViewport
+              ? isSidebarPanelVisible
+                ? "translate-x-0"
+                : "pointer-events-none -translate-x-full rtl:translate-x-full"
+              : isSidebarPanelVisible
+                ? "opacity-100"
+                : "pointer-events-none opacity-0",
           )}
         >
           <aside
@@ -1733,7 +1760,15 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
           </aside>
         </div>
 
-        {isSidebarVisible ? (
+        {isNarrowViewport && isSidebarVisible ? (
+          <button
+            type="button"
+            aria-label={intl.formatMessage({ id: "workspaceSidebar.toggleSidebar" })}
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={handleToggleSidebar}
+          />
+        ) : null}
+        {isSidebarVisible && !isNarrowViewport ? (
           <div
             role="separator"
             tabIndex={0}
@@ -1761,7 +1796,8 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
           data-panel=""
           id="content"
           className={cn(
-            "flex min-w-[320px] flex-1 flex-col",
+            "flex flex-1 flex-col",
+            isNarrowViewport ? "min-w-0" : "min-w-[320px]",
             hasDesktopPanelInset ? "p-1 ps-0 pt-0" : "p-0",
           )}
         >

@@ -10,7 +10,7 @@
  */
 import { create } from "zustand";
 import type { DeepCodeUsageUpdated } from "@zcode/shared";
-import type { SubscriptionStatusResponse } from "@zcode/deepcode";
+import type { SubscriptionStatusResponse } from "@zcode/deepcode/contracts";
 
 export type SubscriptionSeverity = "ok" | "warn" | "critical" | "locked";
 export type LockReason = NonNullable<SubscriptionStatusResponse["lock"]>["reason"] | "signed_out";

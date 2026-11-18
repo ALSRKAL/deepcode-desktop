@@ -1,4 +1,5 @@
 import type { IPlatformService, UpdateStatePayload } from "@zcode/shared";
+import { useNarrowViewport } from "@/hooks/useNarrowViewport.js";
 import { cn } from "@/components/lib/utils.js";
 import {
   ArrowLeftIcon,
@@ -78,6 +79,9 @@ export function DesktopTopOverlay({
   const SidebarToggleIcon = isSidebarVisible ? PanelLeftClose : PanelLeftOpen;
   const isLinuxDesktop = Boolean(isDesktop && !isMacDesktop && !isWindowsDesktop);
   const usesCustomCaptionArea = isWindowsDesktop || isLinuxDesktop;
+  // 窄屏（手机远控工作台）侧栏是抽屉，必须有可见的展开按钮（桌面 Win/Linux 同款）。
+  const isNarrowViewport = useNarrowViewport();
+  const showsSidebarToggle = usesCustomCaptionArea || isNarrowViewport;
   const toggleSidebarTitle = intl.formatMessage({
     id: "workspaceSidebar.toggleSidebar",
   });
@@ -131,7 +135,7 @@ export function DesktopTopOverlay({
             "pointer-events-auto flex items-center gap-1 shrink-0 [app-region:no-drag]",
           )}
         >
-          {usesCustomCaptionArea && (
+          {showsSidebarToggle && (
             <DesktopTopOverlayActionButton
               title={toggleSidebarTitle}
               shortcut={toggleSidebarShortcutLabel}

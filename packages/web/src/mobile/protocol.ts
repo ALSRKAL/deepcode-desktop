@@ -423,6 +423,19 @@ export class MobileRemoteControlClient {
     });
   }
 
+  /**
+   * 手机工作台：打开（或复用）bridge，返回桌面同款 <Root> 使用的服务访问器（2026-11-18）。
+   * 与 ZCode 官方 /remote/v4 一致，手机直接跑桌面 UI；连接是 replayable 由 Host 在
+   * v4 hello 里裁定（`hello.clientMode`），UI 不自行声明。`generation` 变化即旧访问器作废，
+   * 调用方需以新访问器重新挂载 <Root>。
+   */
+  async openWorkbenchServices(
+    workspaceKey: string,
+  ): Promise<{ services: RemoteServiceAccess; generation: number }> {
+    await this.ensureWorkspaceBridge({ workspaceKey });
+    return { services: this.createServiceAccessor(workspaceKey), generation: this.bridge.version };
+  }
+
   /** 停止当前生成；与桌面「停止」按钮同一个 Host 入口。 */
   async stopTask(params: TaskAccessParams): Promise<void> {
     await this.ensureWorkspaceBridge({ workspaceKey: params.workspaceKey, taskId: params.taskId });

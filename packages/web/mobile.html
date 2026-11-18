@@ -28,6 +28,16 @@
         document.documentElement.classList.toggle("theme-zai-dark", resolved !== "light");
       })();
     </script>
+    <style>
+      /* 桌面工作台 <Root> 依赖整页高度（与 index.html 的 #root 一致）。 */
+      html,
+      body,
+      #mobile-root {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="mobile-root"></div>

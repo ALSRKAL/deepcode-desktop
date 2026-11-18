@@ -8,6 +8,11 @@
       "@deepcode/source": "./src/index.ts",
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./contracts": {
+      "@deepcode/source": "./src/contracts.ts",
+      "types": "./src/contracts.ts",
+      "default": "./src/contracts.ts"
     }
   },
   "scripts": {
