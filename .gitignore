@@ -105,3 +105,6 @@ packages/desktop/bundled-remote-assets/
 
 # upstream sync report (scripts/upstream/sync.mjs)
 upstream-sync-report.md
+
+# Phone remote bundle (scripts/ci/build-remote-web.mjs)
+dist-remote-web/

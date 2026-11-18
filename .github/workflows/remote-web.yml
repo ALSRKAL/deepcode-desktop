@@ -1,0 +1,74 @@
+name: Phone remote bundle
+
+# Builds the phone remote-control bundle (the desktop workbench for the browser + the
+# pairing relay) and publishes it as a GitHub Release asset. The server repo pins one
+# release by URL + sha256 (infra/render/remote/bundle.env) and its Docker build
+# downloads and verifies it. See scripts/ci/build-remote-web.mjs for why.
+#
+# Releases are tagged remote-web-<short sha>, marked prerelease and never "latest",
+# so they do not interfere with the desktop installer releases (v*).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/web/**"
+      - "packages/ui/**"
+      - "packages/relay/**"
+      - "packages/shared/**"
+      - "packages/client/**"
+      - "packages/rpc/**"
+      - "packages/deepcode/**"
+      - "scripts/ci/build-remote-web.mjs"
+      - ".github/workflows/remote-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: remote-web-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HUSKY: "0"
+
+jobs:
+  build:
+    name: Build and publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-workspace
+      - name: Build bundle
+        run: node scripts/ci/build-remote-web.mjs dist-remote-web
+      - name: Publish release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="remote-web-${GITHUB_SHA::8}"
+          sha="$(cut -d' ' -f1 dist-remote-web/remote-web.tar.gz.sha256)"
+          gh release delete "$tag" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Phone remote bundle ${GITHUB_SHA::8}" \
+            --notes "Phone remote-control bundle built from ${GITHUB_SHA}. sha256: ${sha}" \
+            --prerelease \
+            --latest=false \
+            dist-remote-web/remote-web.tar.gz \
+            dist-remote-web/remote-web.tar.gz.sha256
+          {
+            echo "### Phone remote bundle"
+            echo ""
+            echo "Pin in the server repo (infra/render/remote/bundle.env):"
+            echo '```'
+            echo "REMOTE_WEB_URL=https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/remote-web.tar.gz"
+            echo "REMOTE_WEB_SHA256=${sha}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
