@@ -78,10 +78,27 @@ function findModelOption(options: ZCodeConfigOption[] | null): ZCodeConfigOption
   );
 }
 
+/**
+ * 当前值可能带思考等级后缀（`provider/model$max`），选项值不带；按去后缀比较。
+ * 修复原因：真机上模型按钮显示原始值 `account:deepcode/deepcode-default$max`。
+ */
+function baseModelValue(value: unknown): string {
+  return typeof value === "string" ? (value.split("$")[0] ?? value) : "";
+}
+
+function isCurrentModel(option: ZCodeConfigOption, value: string): boolean {
+  return value === option.currentValue || baseModelValue(value) === baseModelValue(option.currentValue);
+}
+
 function modelLabel(option: ZCodeConfigOption | undefined): string | null {
   if (!option) return null;
-  const current = option.options?.find((item) => item.value === option.currentValue);
-  return current?.name ?? (typeof option.currentValue === "string" ? option.currentValue : null);
+  const current =
+    option.options?.find((item) => item.value === option.currentValue) ??
+    option.options?.find((item) => isCurrentModel(option, item.value));
+  if (current) return current.name;
+  const raw = baseModelValue(option.currentValue);
+  // 兜底：去掉账户前缀，只显示 provider/model 的最后一段。
+  return raw ? (raw.split("/").pop() ?? raw) : null;
 }
 
 export function MobileApp() {
@@ -919,7 +936,7 @@ function ModelList({
           ) : null}
           <ul>
             {items.map((item) => {
-              const selected = item.value === option.currentValue;
+              const selected = isCurrentModel(option, item.value);
               return (
                 <li key={item.value}>
                   <button

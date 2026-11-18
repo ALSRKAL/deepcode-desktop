@@ -233,6 +233,10 @@ export function createRelayDeviceTransport(
       }
       case "auth_ack":
       case "pair_status_ack": {
+        // 修复（2026-11-18）：鉴权成功后恢复「失效配对自动重注册」的一次机会。
+        // 此前整个运行时只重试一次；服务端部署会多次重启 relay（内存里的配对随之丢失），
+        // 第二次 AUTH_FAILED 就停在错误态，用户只能手动「刷新二维码」。
+        if (inbound.type === "auth_ack") invalidPersistedRetryUsed = false;
         applyPairStatus(inbound.pair_status === "matched" ? "matched" : "waiting");
         return;
       }
