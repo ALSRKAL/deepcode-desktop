@@ -1,5 +1,6 @@
 /* eslint-disable max-lines -- ZCode Protocol 的 session/workspace 方法共享同一个 server context 与 snapshot helpers，迁移期先集中维护。 */
 import { observeSessionDebug } from "./session-debug.js";
+import { mapMessageWithParts } from "./message-mapper.js";
 import { resolveDynamicWorkflowRuntimeGate } from "./dynamic-workflow-policy.js";
 import {
   TASK_LIST_SESSION_TYPES,
@@ -1932,8 +1933,11 @@ export async function readMessages(context: ZCodeProtocolAgentServerContext, raw
     ? allMessages.findIndex((message) => String(message.info.id) === params.afterMessageId)
     : -1;
   const messages = afterMessageIndex >= 0 ? allMessages.slice(afterMessageIndex + 1) : allMessages;
+  // The protocol answers in ZCodeMessageWithParts (messageId/sessionId/partId…), as the
+  // snapshot path does. Returning the stored shape (id/sessionID/messageID…) failed the
+  // caller's schema, so the phone remote control showed no conversation (2026-11-18).
   return {
-    messages: params.limit ? messages.slice(-params.limit) : messages,
+    messages: (params.limit ? messages.slice(-params.limit) : messages).map(mapMessageWithParts),
   };
 }
 
