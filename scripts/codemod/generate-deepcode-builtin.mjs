@@ -50,16 +50,21 @@ const DEEPCODE_MODELS = [
  * context_length、max_output_length、input_modalities、reasoning_parameters.efforts。
  * 修复原因：此前全部落到通配规则（200K 窗口、仅 开/关 思考、无图片），导致
  * gpt-oss（128K）在自动压缩前就超窗，DeepSeek/Kimi 的 512K 被浪费，且思考强度无法选择。
+ *
+ * 运行预算（docs/plan/06 §4，2026-11-20）：上游确实支持 512K，但实测平均请求
+ * 253K、p90 434K，原因是自动压缩阈值被绑在 490K。产品统一下调到 256K：
+ * 压缩阈值 228K，请求更短、首字更快、上下文注意力更稳。不要按上游能力改回去，
+ * 除非同时更新 docs/plan/06 的验收标准。
  */
 const DEEPCODE_MODEL_FACTS = {
-  "deepcode-architect": { contextWindow: 524288, image: true, efforts: ["low", "high", "max"] },
-  "deepcode-coder-pro": { contextWindow: 524288, image: false, efforts: ["low", "high", "max"] },
-  "deepcode-default": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
-  "deepcode-fast-agent": { contextWindow: 524288, image: true, efforts: ["low", "high", "max"] },
+  "deepcode-architect": { contextWindow: 262144, image: true, efforts: ["low", "high", "max"] },
+  "deepcode-coder-pro": { contextWindow: 262144, image: false, efforts: ["low", "high", "max"] },
+  "deepcode-default": { contextWindow: 262144, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
+  "deepcode-fast-agent": { contextWindow: 262144, image: true, efforts: ["low", "high", "max"] },
   "deepcode-mid": { contextWindow: 262144, image: true, efforts: ["low", "medium", "xhigh"] },
   "deepcode-lite": { contextWindow: 196608, image: false, efforts: ["none", "low", "medium", "high"] },
   "deepcode-general": { contextWindow: 131072, image: false, efforts: ["none", "low", "medium", "high"] },
-  "deepcode-background": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
+  "deepcode-background": { contextWindow: 262144, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
 };
 
 /** 追加在上游规则之后（后者覆盖前者）：DeepCode 模型的属性与思考强度。 */

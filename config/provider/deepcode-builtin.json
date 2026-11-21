@@ -2476,7 +2476,7 @@
           "config": {
             "enabled": true,
             "properties": {
-              "contextWindow": 524288,
+              "contextWindow": 262144,
               "inputFormat": {
                 "supportsText": true,
                 "supportsImage": true,
@@ -2509,7 +2509,7 @@
           "config": {
             "enabled": true,
             "properties": {
-              "contextWindow": 524288,
+              "contextWindow": 262144,
               "inputFormat": {
                 "supportsText": true,
                 "supportsImage": false,
@@ -2542,7 +2542,7 @@
           "config": {
             "enabled": true,
             "properties": {
-              "contextWindow": 524288,
+              "contextWindow": 262144,
               "inputFormat": {
                 "supportsText": true,
                 "supportsImage": true,
@@ -2577,7 +2577,7 @@
           "config": {
             "enabled": true,
             "properties": {
-              "contextWindow": 524288,
+              "contextWindow": 262144,
               "inputFormat": {
                 "supportsText": true,
                 "supportsImage": true,
@@ -2711,7 +2711,7 @@
           "config": {
             "enabled": true,
             "properties": {
-              "contextWindow": 524288,
+              "contextWindow": 262144,
               "inputFormat": {
                 "supportsText": true,
                 "supportsImage": true,
