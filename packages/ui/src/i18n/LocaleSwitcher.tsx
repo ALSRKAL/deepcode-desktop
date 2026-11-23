@@ -8,7 +8,11 @@ const LOCALE_CYCLE: Locale[] = ["ar", "en-US"];
 
 const LOCALE_LABELS: Record<Locale, string> = {
   ar: "ع",
+  "zh-CN": "中",
   "en-US": "En",
+  "ja-JP": "日",
+  "ru-RU": "Ру",
+  "ko-KR": "한",
 };
 
 /**

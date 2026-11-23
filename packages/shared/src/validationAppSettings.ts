@@ -1,5 +1,7 @@
 /* oxlint-disable eslint(max-lines) -- AppSettings schema 聚合历史迁移、默认值和 patch 校验，拆分会削弱设置迁移的单一入口。 */
 import { z } from "zod";
+import { SUPPORTED_LOCALES } from "./protocol.js";
+import { resolvePersistedUiLocale, resolvePersistedUiLocalePreference } from "./locale.js";
 import { appToolSearchModeSchema } from "./app-runtime-preferences.js";
 import { DYNAMIC_WORKFLOW_MODES } from "./dynamic-workflow-feature.js";
 import { isKnownRemoteResourcePackageId } from "./remoteResourcePackages.js";
@@ -9,6 +11,7 @@ import {
   DEFAULT_EMBEDDED_BROWSER_VIEWPORT_PREFERENCE,
   embeddedBrowserViewportPreferenceSchema,
 } from "./browser-use/command-metadata.js";
+import { providerFamilyConnectionSelectionSettingsSchema } from "./provider-family-connection-selection.js";
 import {
   connectionProfileSchema,
   sourceServerRecordSchema,
@@ -40,8 +43,8 @@ export const appSettingsOccupationEnum = appSettingsOccupationSchema;
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 
-export const localeSchema = z.enum(["ar", "en-US"]);
-const localePreferenceSchema = z.enum(["system", "ar", "en-US"]);
+export const localeSchema = z.enum(SUPPORTED_LOCALES);
+const localePreferenceSchema = z.enum(["system", ...SUPPORTED_LOCALES]);
 const zcodeInteractionBehaviorSchema = z.enum(["queue", "guide"]);
 // launch.md「The user's choice」：读文件时未知取值（降级后读到新版本写的值）按「跟随」处理，
 // 不能让一个偏好字段把整份设置读坏。
@@ -65,6 +68,8 @@ export const integratedTerminalShellSelectionSchema = z.discriminatedUnion("mode
     path: nonEmptyStringSchema,
   }),
 ]);
+const providerFamilyDomainSchema = z.enum(["zai", "bigmodel"]);
+
 export const postUpdateReleaseNotesPayloadSchema = z.object({
   version: nonEmptyStringSchema,
   title: nonEmptyStringSchema,
@@ -445,7 +450,7 @@ function migrateLegacyWorkspaceSession(value: unknown): unknown {
 
 const appSettingsObjectSchema = z.object({
   recentProjects: z.array(z.string()).default([]),
-  locale: localeSchema.default("ar"),
+  locale: localeSchema.default("zh-CN"),
   // 快捷键用户覆盖（语义校验在 ui/src/shortcuts 生效表阶段容错，schema 只管形状）
   shortcutBindings: z.record(z.string(), z.array(z.string())).optional(),
   localePreference: localePreferenceSchema.default("system"),
@@ -469,7 +474,9 @@ const appSettingsObjectSchema = z.object({
   closeToTrayOnWindows: z.boolean().default(true),
   closeToTrayOnWindowsMigrationInitialized: z.boolean().default(true),
   keepAwakeWhileRunning: z.boolean().default(false),
+  fileTreeHtmlClickOpensBrowser: z.boolean().default(false),
   desktopZoomLevel: desktopZoomLevelSchema.optional(),
+  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   desktopWindowSize: desktopWindowSizeSchema.optional(),
   desktopChromiumHardwareAccelerationEnabled: z.boolean().default(true),
   messageStreamShowReasoning: z.boolean().default(true),
@@ -482,6 +489,10 @@ const appSettingsObjectSchema = z.object({
   askUserQuestionAutoResolutionEnabled: z.boolean().default(true),
   /** 用户选的动态工作流模式；缺席 = 跟随服务端提供的模式（`""` 哨兵在 patch 侧归一成删除）。 */
   dynamicWorkflowMode: dynamicWorkflowModeSettingSchema,
+  providerFamilyConnectionSelections: providerFamilyConnectionSelectionSettingsSchema.default({}),
+  providerFamilyDomain: providerFamilyDomainSchema.optional(),
+  providerFamilyDomainUpdatedAt: z.number().int().nonnegative().optional(),
+  providerFamilyDomainMigrated: z.boolean().default(false),
   nativeSearchEnhancementsEnabled: z.boolean().default(true),
   // 缺省 Off 不覆盖用户已保存的 Auto/Local；旧设置缺字段即 Off。
   toolSearchMode: appToolSearchModeSchema.default("off"),
@@ -520,30 +531,35 @@ const appSettingsObjectSchema = z.object({
   // 手机远控：端点模式。默认 lan（仅同网可达）；custom 时读取用户自备隧道 / relay 地址。
   // patch 侧保持 optional：update() 只覆盖调用方显式提供的字段，不把默认值写回每次补丁。
   webRemoteControlEndpointMode: webRemoteControlEndpointModeSchema.optional(),
-  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   // 手机远控：用户自备端点地址（custom 模式必填，如 wss://域名/ws）。
   webRemoteControlCustomEndpointUrl: z.string().trim().optional(),
   // 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。
   webRemoteControlDeviceMid: nonEmptyStringSchema.optional(),
 });
 
-export const appSettingsSchema = z.preprocess(
-  (value) =>
-    sanitizeEmbeddedBrowserViewportPreference(
-      sanitizeDesktopWindowSize(
-        migrateMessageStreamShowReasoningDefault(
-          migrateCloseToTrayOnWindowsDefault(
-            migrateLegacyLocalePreference(
-              sanitizeZCodeEndpointOrigin(
-                migrateLegacyWorkspaceSession(migrateTaskAutoArchiveReset(value)),
-              ),
+export const appSettingsSchema = z.preprocess((value) => {
+  const localeNormalized =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? {
+          ...value,
+          locale: resolvePersistedUiLocale(value as Record<string, unknown>),
+          localePreference: resolvePersistedUiLocalePreference(value as Record<string, unknown>),
+        }
+      : value;
+  return sanitizeEmbeddedBrowserViewportPreference(
+    sanitizeDesktopWindowSize(
+      migrateMessageStreamShowReasoningDefault(
+        migrateCloseToTrayOnWindowsDefault(
+          migrateLegacyLocalePreference(
+            sanitizeZCodeEndpointOrigin(
+              migrateLegacyWorkspaceSession(migrateTaskAutoArchiveReset(localeNormalized)),
             ),
           ),
         ),
       ),
     ),
-  appSettingsObjectSchema,
-);
+  );
+}, appSettingsObjectSchema);
 
 export const appSettingsPatchSchema = z.object({
   recentProjects: z.array(z.string()).optional(),
@@ -564,8 +580,10 @@ export const appSettingsPatchSchema = z.object({
   taskAutoArchiveOlderThanDays: z.number().int().positive().max(365).optional(),
   closeToTrayOnWindows: z.boolean().optional(),
   keepAwakeWhileRunning: z.boolean().optional(),
+  fileTreeHtmlClickOpensBrowser: z.boolean().optional(),
   closeToTrayOnWindowsMigrationInitialized: z.boolean().optional(),
   desktopZoomLevel: desktopZoomLevelSchema.optional(),
+  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   desktopWindowSize: desktopWindowSizeSchema.optional(),
   desktopChromiumHardwareAccelerationEnabled: z.boolean().optional(),
   messageStreamShowReasoning: z.boolean().optional(),
@@ -578,6 +596,10 @@ export const appSettingsPatchSchema = z.object({
   askUserQuestionAutoResolutionEnabled: z.boolean().optional(),
   // 空串哨兵 = 删除选择（跟随服务端提供）；normalizeSettingsPatch 负责把 "" 折成 undefined。
   dynamicWorkflowMode: z.union([z.enum(DYNAMIC_WORKFLOW_MODES), z.literal("")]).optional(),
+  providerFamilyConnectionSelections: providerFamilyConnectionSelectionSettingsSchema.optional(),
+  providerFamilyDomain: z.union([providerFamilyDomainSchema, z.literal("")]).optional(),
+  providerFamilyDomainUpdatedAt: z.number().int().nonnegative().optional(),
+  providerFamilyDomainMigrated: z.boolean().optional(),
   nativeSearchEnhancementsEnabled: z.boolean().optional(),
   toolSearchMode: appToolSearchModeSchema.optional(),
   onboardingOccupation: z
@@ -632,8 +654,6 @@ export const appSettingsPatchSchema = z.object({
     .optional(),
   // 手机远控：端点模式。默认 lan（仅同网可达）；custom 时读取用户自备隧道 / relay 地址。
   webRemoteControlEndpointMode: webRemoteControlEndpointModeSchema.default("lan"),
-  // No default: missing means the DeepCode relay (legacy "custom" endpoints are kept).
-  webRemoteControlConnection: webRemoteControlConnectionSchema.optional(),
   // 手机远控：用户自备端点地址（custom 模式必填，如 wss://域名/ws）。
   webRemoteControlCustomEndpointUrl: z.string().trim().optional(),
   // 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。

@@ -1,4 +1,5 @@
 import type { Locale } from "@zcode/shared";
+import ar from "./locales/ar.js";
 import zhCN from "./locales/zh-CN.js";
 import enUS from "./locales/en-US.js";
 import jaJP from "./locales/ja-JP.js";
@@ -7,6 +8,7 @@ import koKR from "./locales/ko-KR.js";
 
 /** English is the fallback for partial official locale overlays. */
 export const LOCALE_MESSAGES: Record<Locale, Record<string, string>> = {
+  ar,
   "zh-CN": zhCN,
   "en-US": enUS,
   "ja-JP": { ...enUS, ...jaJP },

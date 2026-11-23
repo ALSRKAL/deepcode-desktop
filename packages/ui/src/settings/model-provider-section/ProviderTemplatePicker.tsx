@@ -117,7 +117,7 @@ export function ProviderTemplatePicker({
                   const label = resolveProviderTemplateName(
                     template.templateId,
                     template,
-                    toZhOrEnLocale(locale),
+                    toZhOrEnLocale(locale) === "ar" ? "ar" : "en-US",
                   );
                   return (
                     <ProviderTemplateCard

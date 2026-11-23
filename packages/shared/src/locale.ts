@@ -2,6 +2,7 @@ import { SUPPORTED_LOCALES, type Locale, type LocalePreference } from "./protoco
 
 /** 本名不随界面语言变化，供语言选择控件显示。 */
 export const LOCALE_NATIVE_NAMES: Record<Locale, string> = {
+  ar: "العربية",
   "zh-CN": "中文简体",
   "en-US": "English",
   "ja-JP": "日本語",
@@ -21,6 +22,8 @@ export function isLocalePreference(value: unknown): value is LocalePreference {
 export function resolveLocaleFromLanguageTag(tag: string | null | undefined): Locale {
   const primary = tag?.trim().toLowerCase().replaceAll("_", "-").split("-")[0] ?? "";
   switch (primary) {
+    case "ar":
+      return "ar";
     case "zh":
       return "zh-CN";
     case "ja":
@@ -34,12 +37,13 @@ export function resolveLocaleFromLanguageTag(tag: string | null | undefined): Lo
   }
 }
 
-/** 只有中英内容的契约使用此降级；请求语言 header 必须保留真实 Locale。 */
-export function toZhOrEnLocale(locale: Locale | null | undefined): "zh-CN" | "en-US" {
+/** 分享等内容契约的 locale 收敛；DeepCode serves ar, en and zh. */
+export function toZhOrEnLocale(locale: Locale | null | undefined): "ar" | "zh-CN" | "en-US" {
+  if (locale === "ar") return "ar";
   return locale === "zh-CN" ? "zh-CN" : "en-US";
 }
 
-type LegacyPersistedLocale = "zh-CN" | "en-US";
+type LegacyPersistedLocale = "ar" | "zh-CN" | "en-US";
 type LegacyPersistedLocalePreference = "system" | LegacyPersistedLocale;
 
 interface PersistedSettingsLocaleFields {

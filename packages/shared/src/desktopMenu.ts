@@ -58,7 +58,7 @@ export type DesktopMenuMessageId =
 
 type DesktopMenuLocaleMessages = Record<DesktopMenuMessageId, string>;
 
-export const desktopMenuMessages: Record<Locale, DesktopMenuLocaleMessages> = {
+export const desktopMenuMessages: Partial<Record<Locale, DesktopMenuLocaleMessages>> = {
   ar: {
     "titleBar.menu.file": "ملف",
     "titleBar.menu.edit": "تحرير",
@@ -166,7 +166,8 @@ export const desktopMenuMessages: Record<Locale, DesktopMenuLocaleMessages> = {
 };
 
 export function getDesktopMenuMessage(locale: Locale, id: DesktopMenuMessageId): string {
-  const messages = desktopMenuMessages[locale] ?? desktopMenuMessages[DEFAULT_LOCALE];
+  const messages =
+    desktopMenuMessages[locale] ?? desktopMenuMessages[DEFAULT_LOCALE] ?? desktopMenuMessages["en-US"]!;
   return messages[id];
 }
 

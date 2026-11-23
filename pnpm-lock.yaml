@@ -492,6 +492,8 @@ importers:
         specifier: ^7.2.6
         version: 7.3.3(@types/node@24.12.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.9.0)
 
+  apps/zcode-cli/packages/deepcode-essentials-plugin: {}
+
   apps/zcode-cli/packages/design-plugin: {}
 
   apps/zcode-cli/packages/documents-plugin:

@@ -13,7 +13,11 @@ import type { Locale } from "./protocol.js";
  */
 const CONVERSATION_SHARE_LOCALE_PATH_PREFIX: Readonly<Record<Locale, string>> = {
   ar: "/ar",
+  "zh-CN": "/cn",
   "en-US": "",
+  "ja-JP": "/ja",
+  "ru-RU": "/ru",
+  "ko-KR": "/ko",
 };
 
 const CONVERSATION_SHARE_PATHNAME_RE = /^\/(ar\/)?share\/([^/]+)\/?$/u;

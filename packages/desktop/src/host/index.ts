@@ -1646,6 +1646,20 @@ function registerSourceServerManagementService(services: ServiceCollection): voi
         ...(version ? { version } : {}),
       };
     },
+    cancelUpdate() {
+      // Updates run through the registry adapter; this build has no local cancel hook.
+      return false;
+    },
+    async stopSource() {
+      throw new Error("Stopping a source server is not supported in this build");
+    },
+    async restartSource() {
+      throw new Error("Restarting a source server is not supported in this build");
+    },
+    async getSourceRunningTasks() {
+      // No trusted task inventory is available; UI must show "unknown", not "none".
+      return { available: false } as const;
+    },
     async disconnect(sourceServerId) {
       await windowRemoteConnectionRegistry.disposeSource(sourceServerId);
     },

@@ -958,13 +958,6 @@ interface CreateZCodeAgentServiceOptions extends Omit<
   resolveAppControlService?: () =>
     | import("#src/app-control/contract.js").AppControlService
     | undefined;
-  /**
-   * 话题资源读取：只有持有 bot 接纳事实的 Host 注入（本进程 bots 服务）。
-   * 缺省即本 Host 没有话题资源能力，CLI 侧不注册 ReadTopicResource。
-   */
-  resolveBotsService?: () =>
-    | Pick<import("#src/bots/bots.js").IBotsService, "validateTopicResource" | "readTopicResource">
-    | undefined;
   /** App control 调用方所属窗口；由 Host 装配按窗口注入，模型不能提供。 */
   resolveAppControlUiTarget?: () => string | undefined;
   /** 本 Host 的稳定来源 id（缺省 local）；跨来源的 App 引用一律拒绝。 */
@@ -1790,42 +1783,13 @@ export function createZCodeAgentService(
       onResponseError: (error) =>
         logger.warn(undefined, "App control response failed", { error: String(error) }),
     });
-    // 话题资源：本连接唯一的取消域与回传通道。只有真正持有 bot 接纳事实的 Host 才提供服务。
-    const topicResourceScope = () => ({
-      workspacePath: workspace.workspacePath,
-      ...(workspace.workspaceIdentity ? { workspaceIdentity: workspace.workspaceIdentity } : {}),
-      ...(workspace.remoteSessionId ? { remoteSessionId: workspace.remoteSessionId } : {}),
-    });
-    const activeTopicResourceClient = () => {
-      // 同一 workspace 可能已被新连接接管：旧连接的迟到请求不能再读资源。
-      if (client.isDisposed) throw new Error("Topic resource connection is no longer active");
-      const active = activeClientsByWorkspaceKey.get(resolveWorkspaceKey(workspace));
-      if (active?.client !== client)
-        throw new Error("Topic resource connection is no longer active");
-      const bots = options?.resolveBotsService?.();
-      if (!bots) throw new Error("Topic resource service is unavailable");
-      return bots;
+    // 话题资源来自 bot 接纳快照；DeepCode 不随包发布 bot 服务，因此按不可用收口。
+    const topicResourceUnavailable = (): never => {
+      throw new Error("Topic resource service is unavailable");
     };
     const topicResourceBridge = createTopicResourceBridge({
-      validate: async (request, signal) => {
-        await activeTopicResourceClient().validateTopicResource({
-          ...request,
-          ...topicResourceScope(),
-          signal,
-        });
-      },
-      read: async (request, signal) => {
-        const result = await activeTopicResourceClient().readTopicResource({
-          ...request,
-          ...topicResourceScope(),
-          signal,
-        });
-        return {
-          fileName: result.attachment.filename,
-          mime: result.attachment.mimeType,
-          bytes: result.data,
-        };
-      },
+      validate: async () => topicResourceUnavailable(),
+      read: async () => topicResourceUnavailable(),
       upload: (request, payload, signal, trace) =>
         uploadTopicResourceToClient(client, v4ConnectionId, request, payload, signal, trace),
     });

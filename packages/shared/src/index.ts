@@ -37,6 +37,9 @@ export {
   ZCODE_WORKSPACE_IGNORE_FILE_NAME,
 } from "./appDirNames.js";
 export { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./protocol.js";
+export * from "./model-provider-family.js";
+export * from "./provider-family-connection-selection.js";
+export * from "./usage-stats.js";
 export {
   LOCALE_NATIVE_NAMES,
   hasLegacyIncompatiblePersistedLocale,

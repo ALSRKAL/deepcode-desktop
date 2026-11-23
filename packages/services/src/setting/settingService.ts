@@ -1,4 +1,4 @@
-import { access, readFile, mkdir, rename } from "node:fs/promises";
+import { access, open, readFile, mkdir, rename, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import type { AppSettings } from "@zcode/shared";
@@ -8,15 +8,32 @@ import {
   appSettingsSchema,
   formatLogPrefix,
   formatZodError,
+  hasLegacyIncompatiblePersistedLocale,
+  toPersistedSettingsLocaleFields,
+  USER_INSTRUCTIONS_MAX_BYTES,
+  USER_INSTRUCTIONS_TOO_LARGE_ERROR_CODE,
 } from "@zcode/shared";
-import type { ISettingService } from "./setting.js";
+import type { ISettingService, UserInstructionsSnapshot } from "./setting.js";
 import { normalizeSettingsPatch } from "#src/setting/normalizeSettingsPatch.js";
-import { copyDataDirectory, getDataBaseDir, validateDataBaseDirTarget } from "../paths.js";
+import {
+  copyDataDirectory,
+  getAgentUserInstructionsFilePath,
+  getDataBaseDir,
+  validateDataBaseDirTarget,
+} from "../paths.js";
 import { isEffectiveDevelopmentNodeEnv } from "../runtime-tools/nodeEnv.js";
 import { maybeThrowInjectedFsFault } from "../fs/fsFaultInjection.js";
 import { atomicWriteText } from "../fs/atomicFileUtils.js";
-import { withFileLock } from "@zcode/shared/node";
+import { atomicWritePrivateTextFile, withFileLock } from "@zcode/shared/node";
 import { withSettingsWriteQueueTimeout } from "./settingsWriteQueue.js";
+import { getErrorCode } from "./getErrorCode.js";
+import {
+  migrateLegacyAccountConnectionSettings,
+  needsLegacyAccountConnectionMigration,
+  readLegacyAccountConnectionSettingsFile,
+  readIncompleteLegacyTeamConnections,
+  retainLegacyAccountConnectionFields,
+} from "#src/setting/legacyAccountConnectionSettings.js";
 const MAX_RECENT_PROJECTS = 10;
 const DEFAULT_PROJECT_NAME = "ZCodeProject";
 const SETTINGS_PARSE_RETRY_DELAY_MS = 300;
@@ -31,6 +48,32 @@ const debugLog = (...args: unknown[]) => {
   }
   console.debug(formatLogPrefix("settingService", process.pid), ...args);
 };
+
+/**
+ * 有界读取用户指令：最多 `USER_INSTRUCTIONS_MAX_BYTES`，TC 结尾不保留半个 UTF-8 字符。
+ * 读取上限是安全边界（W5），不能在 UI 或调用方依赖“先读全量再切片”。
+ */
+async function readUserInstructionsBounded(
+  filePath: string,
+): Promise<{ content: string; truncated: boolean }> {
+  const handle = await open(filePath, "r");
+  try {
+    const info = await handle.stat();
+    const length = Math.min(info.size, USER_INSTRUCTIONS_MAX_BYTES);
+    const buffer = Buffer.alloc(length);
+    let offset = 0;
+    while (offset < length) {
+      const { bytesRead } = await handle.read(buffer, offset, length - offset, offset);
+      if (bytesRead === 0) break;
+      offset += bytesRead;
+    }
+    const truncated = info.size > USER_INSTRUCTIONS_MAX_BYTES;
+    const content = buffer.subarray(0, offset).toString("utf8");
+    return { content: truncated ? content.replace(/\uFFFD$/u, "") : content, truncated };
+  } finally {
+    await handle.close();
+  }
+}
 
 function resolveUserHomeDir() {
   // 独立桌面 Dev 实例已设置自己的 home，设置服务却仍写真实 HOME，
@@ -91,11 +134,14 @@ function shouldPersistSettingsMigrations(rawValue: unknown): boolean {
   if (!rawValue || typeof rawValue !== "object" || Array.isArray(rawValue)) return false;
   const raw = rawValue as Record<string, unknown>;
   return (
+    (needsLegacyAccountConnectionMigration(rawValue) &&
+      readIncompleteLegacyTeamConnections(rawValue).length === 0) ||
     raw.closeToTrayOnWindowsMigrationInitialized !== true ||
     raw.messageStreamShowReasoningMigrationInitialized !== true ||
     // 自动归档重置迁移：首读在内存里关掉旧开关后必须落盘，否则用户重新开启后
     // 下一次启动又会因为磁盘上仍缺标记而再关一次。
-    raw.taskAutoArchiveResetVersion !== 1
+    raw.taskAutoArchiveResetVersion !== 1 ||
+    hasLegacyIncompatiblePersistedLocale(raw)
   );
 }
 
@@ -135,7 +181,7 @@ async function readSettingsWithMeta(): Promise<ReadSettingsResult> {
         };
       }
     }
-    const result = appSettingsSchema.safeParse(rawValue);
+    const result = appSettingsSchema.safeParse(migrateLegacyAccountConnectionSettings(rawValue));
     if (!result.success) {
       log(
         "read failed schema validation, returning defaults. error:",
@@ -183,6 +229,7 @@ async function writeSettings(
   shouldCommit: () => boolean = () => true,
   runExclusiveCommit: (commit: () => Promise<void>) => Promise<void> = (commit) => commit(),
   enterCommitPhase: () => void = () => undefined,
+  commitAccountSelection = false,
 ): Promise<void> {
   const settingsDir = getSettingsDir();
   const settingsFile = getSettingsFile();
@@ -193,7 +240,19 @@ async function writeSettings(
   await mkdir(settingsDir, { recursive: true });
   if (!shouldCommit()) return;
   maybeThrowInjectedFsFault({ operation: "writeFile", path: settingsFile });
-  await atomicWriteText(settingsFile, JSON.stringify(settings, null, 2), {
+  const raw = await readLegacyAccountConnectionSettingsFile(settingsFile);
+  const rollbackFields = retainLegacyAccountConnectionFields(raw);
+  const persisted = {
+    ...rollbackFields,
+    ...settings,
+    ...toPersistedSettingsLocaleFields(settings),
+  };
+  // 旧 Team 缺少组织信息，schema 的默认 {} 不是用户的新选择。
+  // 联网补全已移除；普通偏好保存仍保留原字段，不伪造或覆盖历史连接。
+  if (!commitAccountSelection && readIncompleteLegacyTeamConnections(raw).length > 0) {
+    delete persisted.providerFamilyConnectionSelections;
+  }
+  await atomicWriteText(settingsFile, JSON.stringify(persisted, null, 2), {
     // 调用方 withFileLock 已持有 setting.json 的跨进程锁，这里再加锁会自我等待到超时。
     useFileLock: false,
     beforeRename: () => {
@@ -216,6 +275,14 @@ export function createSettingService(): ISettingService {
   let updateQueue = Promise.resolve();
   let commitQueue = Promise.resolve();
   let writeQueueGeneration = 0;
+  // 用户指令写入串行：保存后立即重新读取不能读到旧内容；跨进程互斥由 atomicWriteText 的同目录锁负责，本队列只排同实例内读写。
+  let userInstructionsWriteQueue = Promise.resolve();
+
+  const enqueueUserInstructionsWrite = async (run: () => Promise<void>): Promise<void> => {
+    const queued = userInstructionsWriteQueue.then(run, run);
+    userInstructionsWriteQueue = queued.catch(() => {});
+    await queued;
+  };
 
   const runSettingsCommit = async (commit: () => Promise<void>) => {
     const queued = commitQueue.then(commit, commit);
@@ -254,8 +321,7 @@ export function createSettingService(): ISettingService {
 
   const service: ISettingService = {
     async get(): Promise<AppSettings> {
-      // 设置切换后可能立即创建或冷恢复 Session；读取若越过已入队写入，
-      // runtime 会固定旧开关值。先等待现有写队列，保证启动偏好读取到已提交的选择。
+      // 设置切换后可能立即创建或冷恢复 Session；读取若越过已入队写入，runtime 会固定旧开关值，因此等待现有写队列读取已提交选择。
       await updateQueue;
       const result = await readSettingsWithMeta();
       if (!result.needsMigrationPersist) {
@@ -276,10 +342,21 @@ export function createSettingService(): ISettingService {
       return readSettings();
     },
 
-    async update(patch: Partial<AppSettings>): Promise<void> {
+    async update(patch: Partial<AppSettings>, expectedAccountSettings): Promise<void> {
       const runUpdate = async (shouldCommit: () => boolean, enterCommitPhase: () => void) => {
         const validatedPatch = appSettingsPatchSchema.parse(normalizeSettingsPatch(patch));
         const current = await readSettings();
+        if (expectedAccountSettings) {
+          // 账号查询期间用户可能已手动切换。必须在同一写队列内校验，不能靠调用方先读再写。
+          const expected = appSettingsPatchSchema.parse(expectedAccountSettings);
+          if (
+            current.providerFamilyDomain !== expected.providerFamilyDomain ||
+            JSON.stringify(current.providerFamilyConnectionSelections ?? {}) !==
+              JSON.stringify(expected.providerFamilyConnectionSelections ?? {})
+          ) {
+            throw new Error("Account connection settings changed");
+          }
+        }
         const merged = appSettingsSchema.parse({
           ...current,
           ...validatedPatch,
@@ -293,7 +370,13 @@ export function createSettingService(): ISettingService {
           merged.recentProjects = [...new Set(merged.recentProjects)].slice(0, MAX_RECENT_PROJECTS);
         }
 
-        await writeSettings(merged, shouldCommit, runSettingsCommit, enterCommitPhase);
+        await writeSettings(
+          merged,
+          shouldCommit,
+          runSettingsCommit,
+          enterCommitPhase,
+          Object.hasOwn(patch, "providerFamilyConnectionSelections"),
+        );
       };
 
       await enqueueSettingsWrite(runUpdate);
@@ -318,6 +401,64 @@ export function createSettingService(): ISettingService {
       }
 
       await this.update({ dataBaseDir: newDir });
+    },
+
+    async getUserInstructions(): Promise<UserInstructionsSnapshot> {
+      // 读取等待已接纳的写入排空：保存后立即重进分区时不能把旧内容当基线。
+      await userInstructionsWriteQueue;
+      const filePath = getAgentUserInstructionsFilePath();
+      try {
+        // Bug 原因：旧实现 readFile 整份读入，超大文件会把内存/网络打满；且截断草稿保存后
+        // 会静默丢掉后半段。修复依据见安全 spec（W5）：只读前 100KiB 并标记 truncated，
+        // UI 据此禁用保存；UTF-8 末尾不保留半个字符。
+        const bounded = await readUserInstructionsBounded(filePath);
+        return {
+          content: bounded.content,
+          filePath,
+          ...(bounded.truncated ? { truncated: true } : {}),
+        };
+      } catch (error) {
+        if (getErrorCode(error) === "ENOENT") {
+          // 文件不存在等价于未配置个性化指令：不报错，也不创建文件。
+          return { content: "", filePath };
+        }
+        throw error;
+      }
+    },
+
+    async saveUserInstructions(content: string): Promise<{ filePath: string }> {
+      // 最终校验用与 CLI 读取一致的共享常量，防止其他 RPC 调用方绕过 UI 写入超限内容
+      // （Agent 只读前 100KB，超限保存会让用户误以为全部生效）。
+      if (Buffer.byteLength(content, "utf8") > USER_INSTRUCTIONS_MAX_BYTES) {
+        const error = new Error(`user instructions exceed ${USER_INSTRUCTIONS_MAX_BYTES} bytes`);
+        (error as Error & { code: string }).code = USER_INSTRUCTIONS_TOO_LARGE_ERROR_CODE;
+        throw error;
+      }
+      const filePath = getAgentUserInstructionsFilePath();
+      await enqueueUserInstructionsWrite(async () => {
+        // 复用共享的私有文本原子写入（临时文件固定 0600，rename 不会把已有 0600 放宽），
+        // withFileLock 先建目录再取同目录跨进程锁，多个窗口/Host 会串行覆盖同一个文件。
+        await withFileLock(filePath, async () => {
+          // Bug 原因：超大文件被有界读取成截断草稿后，直接保存会覆盖完整文件、静默丢掉后半段。
+          // 修复依据见安全 spec（W5）：在写锁内再次确认现有文件未超限，拒绝覆盖超限基线。
+          const currentSize = await stat(filePath).then(
+            (info) => info.size,
+            (error: unknown) => {
+              if (getErrorCode(error) === "ENOENT") return 0;
+              throw error;
+            },
+          );
+          if (currentSize > USER_INSTRUCTIONS_MAX_BYTES) {
+            const error = new Error(
+              `refusing to overwrite user instructions larger than ${USER_INSTRUCTIONS_MAX_BYTES} bytes`,
+            );
+            (error as Error & { code: string }).code = USER_INSTRUCTIONS_TOO_LARGE_ERROR_CODE;
+            throw error;
+          }
+          await atomicWritePrivateTextFile(filePath, content);
+        });
+      });
+      return { filePath };
     },
 
     async ensureDefaultProject(userHomeDir: string): Promise<{ path: string; created: boolean }> {

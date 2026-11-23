@@ -239,7 +239,9 @@ function format(
 export function useProjectSidebarIntl(): ProjectSidebarIntl {
   const { intl, locale } = useZCodeIntl();
   return useMemo(() => {
-    const messages = MESSAGES[toZhOrEnLocale(locale)] as Record<string, string> | undefined;
+    const messages = (MESSAGES as Record<string, Record<string, string> | undefined>)[
+      toZhOrEnLocale(locale)
+    ];
     return {
       formatMessage(descriptor, values) {
         if (messages && descriptor.id in messages) {

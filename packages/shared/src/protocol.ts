@@ -1,4 +1,6 @@
 import type { RemoteResourcePackageSelection } from "./remoteResourcePackages.js";
+import type { ProviderFamilyDomain } from "./model-provider-family.js";
+import type { ProviderFamilyConnectionSelectionSettings } from "./provider-family-connection-selection.js";
 import type { WorkspacePurpose } from "./workspacePurpose.js";
 import type { DynamicWorkflowMode } from "./dynamic-workflow-feature.js";
 import type { EmbeddedBrowserViewportPreference } from "./browser-use/command-metadata.js";
@@ -69,14 +71,9 @@ export interface SystemInfo {
   platform: string;
 }
 
-/**
- * 支持的语言（docs/plan/01 §5.2）：阿拉伯语（默认，RTL）与英语。
- * zh-CN 保留在源码树里作为上游合并锚点，但从切换器与发行包中移除。
- */
-export type Locale = "ar" | "en-US";
-
-/** 默认语言：阿拉伯语是产品默认界面语言（docs/plan/04 Phase 2a/3）。 */
-export const DEFAULT_LOCALE: Locale = "ar";
+/** 支持的界面语言；共享协议是 locale identity 的唯一类型 owner。DeepCode adds ar. */
+export const SUPPORTED_LOCALES = ["ar", "zh-CN", "en-US", "ja-JP", "ru-RU", "ko-KR"] as const;
+export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 /** 界面语言偏好；system 表示跟随当前运行端系统语言。 */
 export type LocalePreference = "system" | Locale;
@@ -110,7 +107,8 @@ export interface IntegratedTerminalShellOption {
   source: "system" | "path";
 }
 
-// 默认语言（DEFAULT_LOCALE）见上方 Locale 定义处。
+/** 默认语言（DeepCode: Arabic, RTL） */
+export const DEFAULT_LOCALE: Locale = "ar";
 
 // ── Workspace / Tab ──
 
@@ -296,10 +294,17 @@ export interface AppSettings {
   closeToTrayOnWindows?: boolean;
   /** 存在执行中的闲时任务时阻止系统闲置休眠（手动开关，防不了合盖）。 */
   keepAwakeWhileRunning?: boolean;
+  /**
+   * 文件树单击 HTML 文件时用内置浏览器打开（右键「打开」仍为源码预览）。
+   * 本机界面偏好：始终读写本机 base Host，远端 workspace 不继承。
+   */
+  fileTreeHtmlClickOpensBrowser?: boolean;
   /** Windows 关闭到托盘默认值是否已执行过一次性迁移；只用于设置迁移，不参与业务判断。 */
   closeToTrayOnWindowsMigrationInitialized?: boolean;
   /** 桌面端全局页面缩放档位；用于重启后恢复界面缩放，Web/手机端忽略。 */
   desktopZoomLevel?: number;
+  /** 手机远控连接方式（DeepCode Cloud / LAN / custom）。 */
+  webRemoteControlConnection?: "deepcode" | "lan" | "custom";
   /** 桌面主窗口最近一次非最大化宽高及最大化状态；Web/手机端忽略。 */
   desktopWindowSize?: {
     width: number;
@@ -325,6 +330,15 @@ export interface AppSettings {
   zcodeInteractionBehavior?: ZCodeInteractionBehavior;
   /** Agent 提问五分钟无人回答时是否允许自动继续；缺失按开启兼容旧配置。 */
   askUserQuestionAutoResolutionEnabled?: boolean;
+  /** 是否完整保留 Model I/O；开启后不轮转、不限额重置、不压缩或裁剪，鉴权信息仍会脱敏。 */
+  /** 设置页中每个 Provider Family 当前唯一的结构化连接选择。 */
+  providerFamilyConnectionSelections?: ProviderFamilyConnectionSelectionSettings;
+  /** ZAI / BigModel 账号 provider family 运行域。 */
+  providerFamilyDomain?: ProviderFamilyDomain;
+  /** 最近一次设置或清空 providerFamilyDomain 的时间。 */
+  providerFamilyDomainUpdatedAt?: number;
+  /** 旧 oauth/provider 状态是否已经尝试迁移到 providerFamilyDomain。 */
+  providerFamilyDomainMigrated?: boolean;
   /** 新建或冷恢复 Session 是否为 Bash 注入 bfs/ugrep 增强；默认启用。 */
   nativeSearchEnhancementsEnabled?: boolean;
   /** 新建或冷恢复 Session 的工具搜索模式；缺省 Off，热 resume 保持原值。 */
@@ -395,8 +409,6 @@ export interface AppSettings {
   };
   /** 手机远控端点模式：lan = 仅同网直连（默认）；custom = 用户自备隧道 / relay。 */
   webRemoteControlEndpointMode?: "lan" | "custom";
-  /** How the phone connects: deepcode relay (default), same network, or the user's own relay. */
-  webRemoteControlConnection?: "deepcode" | "lan" | "custom";
   /** 手机远控：custom 模式的用户自备端点地址（如 wss://域名/ws）。 */
   webRemoteControlCustomEndpointUrl?: string;
   /** 手机远控：本机设备标识（首次开启时生成，写入 QR 的 mid 参数）。 */

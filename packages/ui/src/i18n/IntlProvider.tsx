@@ -16,17 +16,7 @@ import {
   readSafeLocalStorage,
   writeSafeLocalStorage,
 } from "@/lib/browserEnvironment.js";
-import ar from "./locales/ar.js";
-import enUS from "./locales/en-US.js";
-
-/**
- * 语言 → 翻译消息映射（docs/plan/01 §5.2）。zh-CN 留在源码树作为上游合并锚点，
- * 但不再进入发行包（不被 import 即不打包）。
- */
-const MESSAGES: Record<Locale, Record<string, string>> = {
-  ar,
-  "en-US": enUS,
-};
+import { LOCALE_MESSAGES as MESSAGES } from "./localeMessages.js";
 
 /** 每个语言的文字方向（docs/plan/01 §5.3）：阿拉伯语 RTL，其余 LTR。 */
 export function localeDirection(locale: Locale): "rtl" | "ltr" {
