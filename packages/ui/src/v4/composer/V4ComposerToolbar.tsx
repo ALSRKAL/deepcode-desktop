@@ -170,7 +170,7 @@ function HighspeedCountdown({ expiresAt }: { expiresAt: number }) {
         data-highspeed-countdown-value="true"
         className="relative h-[18px] w-[54px] shrink-0 leading-4 tabular-nums @max-xl/composer:hidden"
       >
-        <span className="absolute left-0 top-0.5">{remainingTime}</span>
+        <span className="absolute start-0 top-0.5">{remainingTime}</span>
       </span>
     </span>
   );
@@ -1396,7 +1396,7 @@ function V4ComposerModelControlsImpl({
           openRequestKey={modelMenuOpenRequestKey}
           labelVisibilityClassName="hidden @sm/composer:inline-flex"
           indicatorClassName="block group-data-[composer-model-icon=true]/toolbar:hidden"
-          triggerLabelClassName="block min-w-0 text-left group-data-[composer-model-icon=true]/toolbar:hidden [&>span]:max-w-full [&>span>span]:block [&>span>span]:truncate"
+          triggerLabelClassName="block min-w-0 text-start group-data-[composer-model-icon=true]/toolbar:hidden [&>span]:max-w-full [&>span>span]:block [&>span>span]:truncate"
           triggerClassName="composer-model-trigger group-data-[composer-model-icon=true]/toolbar:px-1.5 group-data-[composer-model-icon=true]/toolbar:justify-center"
           triggerIconClassName="hidden group-data-[composer-model-icon=true]/toolbar:inline-flex"
           focusSelectorOnClose={V4_COMPOSER_INPUT_SELECTOR}

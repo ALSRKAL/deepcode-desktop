@@ -85,7 +85,7 @@ export function RemovedProjects({
                     <Button
                       data-testid="project-management-restore"
                       variant="secondary"
-                      className="ml-auto shrink-0"
+                      className="ms-auto shrink-0"
                       disabled={disabled}
                       onClick={() => onRestore(project)}
                     >

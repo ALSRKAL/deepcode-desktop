@@ -97,7 +97,7 @@ export function RemoteProjectDetailsPopover({
             { device: deviceName },
           )}
           className={cn(
-            "ml-auto flex h-6 min-w-0 max-w-24 items-center rounded-sm px-1 text-ui-xs",
+            "ms-auto flex h-6 min-w-0 max-w-24 items-center rounded-sm px-1 text-ui-xs",
             presentation.status === "online"
               ? "text-remote-foreground-muted"
               : [presentation.foreground, presentation.surface],

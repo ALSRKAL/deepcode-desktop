@@ -18,7 +18,7 @@ import { clampWorkflowRunSettingsBound } from "./workflowRunSettings.js";
 
 /** 句中的值画成一枚芯片：平时是一小块 surface，悬停才出边框与输入底色（composer 模型触发器的语汇）。 */
 export const WORKFLOW_ASK_CHIP_CLASS_NAME =
-  "h-6 min-w-0 max-w-[260px] gap-1 rounded-md border border-transparent bg-surface pl-[7px] pr-1 text-ui-sm text-foreground hover:border-border-hover hover:bg-input focus-visible:border-input-border-focused data-[state=open]:border-border-hover data-[state=open]:bg-input [&_svg]:size-3";
+  "h-6 min-w-0 max-w-[260px] gap-1 rounded-md border border-transparent bg-surface ps-[7px] pe-1 text-ui-sm text-foreground hover:border-border-hover hover:bg-input focus-visible:border-input-border-focused data-[state=open]:border-border-hover data-[state=open]:bg-input [&_svg]:size-3";
 export const WORKFLOW_ASK_LINE_CLASS_NAME =
   "flex min-h-6 min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-ui-sm text-foreground-subtle";
 export const WORKFLOW_ASK_TAIL_CLASS_NAME = "text-foreground-subtlest";

@@ -54,7 +54,7 @@ function SelectionRow({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-hover focus-visible:bg-hover disabled:opacity-50"
+      className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-start hover:bg-hover focus-visible:bg-hover disabled:opacity-50"
     >
       <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-surface text-remote-foreground-muted">
         <Icon className="size-4" />
@@ -126,7 +126,7 @@ export function RemoteConnectionSelection({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-remote-foreground-muted" />
+        <SearchIcon className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-remote-foreground-muted" />
         <Input
           autoFocus
           type="search"
@@ -134,7 +134,7 @@ export function RemoteConnectionSelection({
           placeholder={intl.formatMessage({ id: "remote.selection.search" })}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="h-9 pl-9"
+          className="h-9 ps-9"
         />
       </div>
       <div
@@ -184,7 +184,7 @@ export function RemoteConnectionSelection({
                       />
                     }
                   />
-                  <div className="ml-13 flex flex-wrap gap-1">
+                  <div className="ms-13 flex flex-wrap gap-1">
                     {history.map((entry) => {
                       const historyProfile =
                         snapshot.profiles.find(
@@ -216,7 +216,7 @@ export function RemoteConnectionSelection({
           <section aria-label={intl.formatMessage({ id: "remote.selection.aliases" })}>
             <p className="text-pretty mb-2 text-ui-sm text-remote-foreground-muted">
               {intl.formatMessage({ id: "remote.selection.aliases" })}{" "}
-              <span className="ml-2 font-mono text-ui-xs text-remote-foreground-muted">
+              <span className="ms-2 font-mono text-ui-xs text-remote-foreground-muted">
                 ~/.ssh/config
               </span>
             </p>

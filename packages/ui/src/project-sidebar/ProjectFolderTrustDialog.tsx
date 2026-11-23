@@ -49,7 +49,7 @@ export function ProjectFolderTrustDialog({
           onClosed();
         }}
       >
-        <DialogTitle className="pr-8 text-ui-lg font-semibold">
+        <DialogTitle className="pe-8 text-ui-lg font-semibold">
           {msg(request.roots.length === 1 ? "trustFolderTitle" : "trustFoldersTitle")}
         </DialogTitle>
         <div className="grid min-w-0 gap-2">

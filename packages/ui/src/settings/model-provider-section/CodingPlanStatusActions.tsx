@@ -88,7 +88,7 @@ export function CodingPlanUpgradeAction({
       size="lg"
       className={cn(
         billingDiscountButtonActive &&
-          "button-gradient dark:bg-[#484A58] text-white hover:bg-transparent hover:opacity-90 dark:hover:bg-[#484A58] pr-[5px] rounded-full",
+          "button-gradient dark:bg-[#484A58] text-white hover:bg-transparent hover:opacity-90 dark:hover:bg-[#484A58] pe-[5px] rounded-full",
       )}
       onClick={() => {
         // 购买/升级入口必须先打开面板，OAuth 失效恢复由面板在用户选择

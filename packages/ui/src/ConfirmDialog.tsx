@@ -319,7 +319,7 @@ export function ConfirmDialogHost() {
           )}
         >
           {displayedRequest?.checkbox ? (
-            <label className="mr-auto flex min-w-0 items-center gap-2 text-ui-base text-foreground-subtle">
+            <label className="me-auto flex min-w-0 items-center gap-2 text-ui-base text-foreground-subtle">
               <Checkbox
                 checked={checkboxChecked}
                 onCheckedChange={(value) => {
@@ -331,7 +331,7 @@ export function ConfirmDialogHost() {
             </label>
           ) : null}
           <div
-            className={displayedRequest?.checkbox ? "ml-auto flex items-center gap-2" : "contents"}
+            className={displayedRequest?.checkbox ? "ms-auto flex items-center gap-2" : "contents"}
           >
             {requiredAcknowledgement ? null : (
               <Button
@@ -387,7 +387,7 @@ export function ConfirmDialogHost() {
               variant="ghost"
               size="icon-sm"
               aria-label={intl.formatMessage({ id: "common.close" })}
-              className="absolute right-5 top-5 z-20 text-foreground-subtle hover:bg-surface-hover hover:text-foreground [app-region:no-drag]"
+              className="absolute end-5 top-5 z-20 text-foreground-subtle hover:bg-surface-hover hover:text-foreground [app-region:no-drag]"
             >
               <XIcon className="size-4" strokeWidth={4 / 3} />
             </Button>

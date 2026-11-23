@@ -58,7 +58,7 @@ export function ProjectSections({
       }
       tasks={
         // 原因：任务分区遗漏项目内列表的左侧留白，导致整行背景和文字贴左；统一内缩 8px。
-        <div className="pl-2">
+        <div className="ps-2">
           <ProjectTaskRows
             tasks={localTasks}
             onSelect={onSelect}

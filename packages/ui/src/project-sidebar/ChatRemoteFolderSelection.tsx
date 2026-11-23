@@ -257,7 +257,7 @@ export function ChatRemoteFolderSelection({
                   <Button
                     key={project.id}
                     variant="ghost"
-                    className="h-auto min-h-12 justify-start whitespace-normal text-left"
+                    className="h-auto min-h-12 justify-start whitespace-normal text-start"
                     data-testid="chat-remote-project-pick"
                     data-project-id={project.id}
                     disabled={busy}

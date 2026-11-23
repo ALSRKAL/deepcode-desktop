@@ -141,7 +141,7 @@ export function InstalledPluginDetailPanel({
 
   return (
     <div className="max-h-[calc(100vh-3rem)] overflow-y-auto text-ui-base text-foreground">
-      <div className="border-b border-border px-5 pb-4 pt-5 pr-12">
+      <div className="border-b border-border px-5 pb-4 pt-5 pe-12">
         <div className="flex min-w-0 items-start gap-3">
           <div
             className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground-subtle"

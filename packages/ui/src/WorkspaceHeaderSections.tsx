@@ -393,7 +393,7 @@ export function WorkspaceHeaderTitleSection({
           title={
             <span
               data-workspace-header-context-info=""
-              className="flex w-full min-w-0 flex-col gap-3 text-left"
+              className="flex w-full min-w-0 flex-col gap-3 text-start"
             >
               <span className="flex min-w-0 items-start gap-2">
                 {isRemoteWorkspace ? (
@@ -408,7 +408,7 @@ export function WorkspaceHeaderTitleSection({
                     {workspaceContextLabel}
                   </span>
                   {isRemoteWorkspace ? (
-                    <span className="inline-flex w-fit min-w-0 max-w-full items-center gap-1 rounded-full bg-surface py-px pl-1.5 pr-2 text-ui-sm font-normal text-foreground-subtle">
+                    <span className="inline-flex w-fit min-w-0 max-w-full items-center gap-1 rounded-full bg-surface py-px ps-1.5 pe-2 text-ui-sm font-normal text-foreground-subtle">
                       <span className={cn("size-1.5 shrink-0 rounded-full", presentation.dot)} />
                       <span className="truncate">{remoteDeviceName}</span>
                       {presentation.status !== "online" ? (

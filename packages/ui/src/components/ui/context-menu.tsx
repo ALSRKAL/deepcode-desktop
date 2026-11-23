@@ -93,7 +93,7 @@ function ContextMenuSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto size-4 text-foreground-subtle group-data-[highlighted]/context-menu-sub-trigger:text-foreground-subtle" />
+      <ChevronRightIcon className="ms-auto size-4 text-foreground-subtle group-data-[highlighted]/context-menu-sub-trigger:text-foreground-subtle" />
     </ContextMenuPrimitive.SubTrigger>
   );
 }

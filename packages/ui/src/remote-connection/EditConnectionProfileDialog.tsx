@@ -225,7 +225,7 @@ function EditConnectionProfileForm({
             void handleSave();
           }}
         >
-          <DialogHeader className="border-b border-border px-5 py-4 pr-14">
+          <DialogHeader className="border-b border-border px-5 py-4 pe-14">
             <div className="flex items-center gap-2">
               <DialogTitle className="text-ui-lg font-semibold">
                 {intl.formatMessage({ id: "settings.source.editConnectionTitle" })}

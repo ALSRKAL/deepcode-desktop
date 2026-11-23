@@ -106,7 +106,7 @@ export function DesktopTopOverlay({
       <div
         style={topOverlayWidthStyle}
         className={cn(
-          "@container/topoverlayer pointer-events-none absolute h-14 flex left-0 top-0 z-20 w-fit",
+          "@container/topoverlayer pointer-events-none absolute h-14 flex start-0 top-0 z-20 w-fit",
           // 工具组计入各平台顶部留白和 1px 边框，与 Header 中心线对齐。
           usesCustomCaptionArea && "mt-px",
           isWindowsDesktop ? "top-1.5" : isLinuxDesktop && "top-1",
@@ -122,9 +122,9 @@ export function DesktopTopOverlay({
             isMacDesktop && "h-14",
             usesCustomCaptionArea && "h-12",
             // Windows/Linux 工具组计入 4px 外沿留白和 1px 边框，较 8px 左边距右移 5px。
-            usesCustomCaptionArea && "pl-3 ml-px",
+            usesCustomCaptionArea && "ps-3 ms-px",
             isMacDesktop &&
-              (isMacFullscreen ? (!isSidebarVisible ? "pl-5 pt-1" : "pl-3 pt-1") : "pt-1"),
+              (isMacFullscreen ? (!isSidebarVisible ? "ps-5 pt-1" : "ps-3 pt-1") : "pt-1"),
           )}
         >
           <div

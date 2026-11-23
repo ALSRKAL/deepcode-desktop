@@ -7101,7 +7101,7 @@ const jaJP: Record<string, string> = {
   "chat.toolCall.workflow.saveRun.lead.unsupported": "このエージェントは直接保存できません。",
   "chat.toolCall.workflow.saveRun.or": "またはそのまま保存",
   "chat.toolCall.workflow.saveRun.name": "名前",
-  "chat.toolCall.workflow.saveRun.name.placeholder": "pr-layered-review",
+  "chat.toolCall.workflow.saveRun.name.placeholder": "pe-layered-review",
   "chat.toolCall.workflow.saveRun.name.helper": "英字、数字、- _ . のみ、最大 64 文字",
   "chat.toolCall.workflow.saveRun.name.invalid": "英字、数字、- _ . のみ使用できます",
   "chat.toolCall.workflow.saveRun.scope.remoteOnly":

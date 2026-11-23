@@ -128,7 +128,7 @@ export function ArchiveGroupCard({
                       {dateFormat.format(sort === "created" ? task.createdAt : task.updatedAt)}
                     </time>
                   </div>
-                  <div className="ml-auto flex shrink-0 items-center gap-2">
+                  <div className="ms-auto flex shrink-0 items-center gap-2">
                     <Button
                       data-testid="archive-delete"
                       size="icon-sm"

@@ -35,10 +35,10 @@ export function resolveTopOverlayLeadingPaddingClass({
 }): string | false {
   if (isSidebarVisible) return false;
   if (isMacDesktop) {
-    if (hasUpdateReady) return isMacFullscreen ? "pl-48" : "pl-66";
-    return isMacFullscreen ? "pl-38" : "pl-58";
+    if (hasUpdateReady) return isMacFullscreen ? "ps-48" : "ps-66";
+    return isMacFullscreen ? "ps-38" : "ps-58";
   }
-  return hasUpdateReady ? "pl-44" : "pl-38";
+  return hasUpdateReady ? "ps-44" : "ps-38";
 }
 
 export function WorkspaceHeader({

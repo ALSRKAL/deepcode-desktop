@@ -492,7 +492,7 @@ export const TaskList = memo(function TaskList({
           )}
         </div>
         {hasMore && onShowMore ? (
-          <div className="pl-8.5">
+          <div className="ps-8.5">
             <button
               type="button"
               data-task-list-show-more="true"

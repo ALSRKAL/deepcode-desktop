@@ -28,7 +28,7 @@ export function SpineHoleLamp({
     <span
       aria-hidden
       className={cn(
-        "wf-lamp absolute left-4 top-[13px] size-2.5 rounded-full border-[1.5px] border-dashed bg-background",
+        "wf-lamp absolute start-4 top-[13px] size-2.5 rounded-full border-[1.5px] border-dashed bg-background",
         hole.state === "waiting"
           ? "wf-lamp-hole-waiting border-warning"
           : "border-foreground-subtlest",
@@ -48,7 +48,7 @@ export function HoleWaitingBody({ hole, now }: { hole: TimelineHole; now: number
   );
   return (
     <div
-      className="flex flex-col gap-1 pb-3 pr-3 text-ui-sm text-foreground-subtle"
+      className="flex flex-col gap-1 pb-3 pe-3 text-ui-sm text-foreground-subtle"
       data-testid="workflow-run-hole-waiting"
     >
       <span className="text-warning">
@@ -104,17 +104,17 @@ export function FillHeadingRow({
     <>
       <span
         aria-hidden
-        className="absolute left-[14px] top-[5px] grid size-3.5 place-items-center bg-background"
+        className="absolute start-[14px] top-[5px] grid size-3.5 place-items-center bg-background"
       >
         <PenIcon className="size-3.5" />
       </span>
-      <span className="min-w-0 truncate bg-background pr-1.5 text-ui-sm font-medium">
+      <span className="min-w-0 truncate bg-background pe-1.5 text-ui-sm font-medium">
         {fill.name}
       </span>
     </>
   );
   const className = cn(
-    "wf-fill-head relative flex h-6 w-full items-center gap-1.5 pl-[39px] pr-3 text-left outline-none",
+    "wf-fill-head relative flex h-6 w-full items-center gap-1.5 ps-[39px] pe-3 text-start outline-none",
     fresh ? "text-warning" : on ? "text-foreground" : "text-foreground-subtle",
   );
   const shared = {

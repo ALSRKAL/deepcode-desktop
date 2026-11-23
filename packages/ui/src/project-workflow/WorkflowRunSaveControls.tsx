@@ -336,7 +336,7 @@ function WorkflowRunSavedChip({
     </>
   );
   const className =
-    "group/saved-chip flex shrink-0 items-center gap-1 rounded-full bg-surface py-0.5 pl-1.5 pr-2 text-ui-xs font-medium text-foreground-subtle";
+    "group/saved-chip flex shrink-0 items-center gap-1 rounded-full bg-surface py-0.5 ps-1.5 pe-2 text-ui-xs font-medium text-foreground-subtle";
   if (onOpen === undefined) {
     return (
       <span className={className} data-testid="workflow-saved-chip">

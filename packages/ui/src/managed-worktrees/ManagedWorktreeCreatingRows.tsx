@@ -53,7 +53,7 @@ function CreatingRow({ creation }: { creation: ManagedWorktreeCreation }) {
         data-phase={creation.phase}
         onClick={open}
         className={cn(
-          "flex h-8 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-left text-ui-base",
+          "flex h-8 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-start text-ui-base",
           active ? "bg-selected" : "hover:bg-surface-hover",
         )}
       >

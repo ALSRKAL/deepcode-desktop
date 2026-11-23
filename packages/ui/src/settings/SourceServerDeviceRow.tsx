@@ -55,7 +55,7 @@ export function SourceServerDeviceRow({
       <div
         data-source-server-row
         className={cn(
-          "relative flex min-h-12 cursor-pointer items-center gap-2.5 py-2 pl-4 pr-2 hover:bg-hover",
+          "relative flex min-h-12 cursor-pointer items-center gap-2.5 py-2 ps-4 pe-2 hover:bg-hover",
           highlighted && "bg-selected hover:bg-selected",
         )}
         onClick={(event) => {
@@ -67,7 +67,7 @@ export function SourceServerDeviceRow({
         }}
       >
         {highlighted ? (
-          <span aria-hidden="true" className="absolute inset-y-0 left-0 w-0.5 bg-brand" />
+          <span aria-hidden="true" className="absolute inset-y-0 start-0 w-0.5 bg-brand" />
         ) : null}
         {progress && !expanded ? (
           <span
@@ -95,7 +95,7 @@ export function SourceServerDeviceRow({
           data-source-server-toggle
           aria-expanded={expanded}
           aria-controls={expanded ? detailsId : undefined}
-          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md text-start outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span
             className={cn(

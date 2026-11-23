@@ -90,7 +90,7 @@ export function ComposerThoughtIndicator({
         className="relative hidden h-4 w-1 shrink-0 overflow-hidden rounded-full bg-foreground/10 group-data-[composer-compact=true]/combined:block"
       >
         <span
-          className="composer-thought-meter-fill absolute bottom-0 left-0 w-full rounded-full bg-success"
+          className="composer-thought-meter-fill absolute bottom-0 start-0 w-full rounded-full bg-success"
           style={{ height: `${progress}%` }}
         />
       </span>
@@ -196,7 +196,7 @@ export function ComposerModelMenu({
       >
         <div role="separator" className="-mx-1 my-1 h-px shrink-0 bg-border/50" />
         {/* 搜索栏重复的右内边距会比模型行多缩进 8px；右侧直接复用面板内边距。 */}
-        <div className="flex items-center gap-2 pl-2 py-1">
+        <div className="flex items-center gap-2 ps-2 py-1">
           <span
             data-composer-model-heading
             className="shrink-0 py-1.5 text-ui-sm font-normal text-foreground-subtle"
@@ -206,7 +206,7 @@ export function ComposerModelMenu({
           <div className="relative min-w-0 flex-1">
             <SearchIcon
               aria-hidden="true"
-              className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-foreground-subtlest"
+              className="pointer-events-none absolute start-2 top-1/2 size-3.5 -translate-y-1/2 text-foreground-subtlest"
             />
             <Input
               size="sm"
@@ -218,7 +218,7 @@ export function ComposerModelMenu({
               data-testid="composer-model-search"
               aria-label={intl.formatMessage({ id: "chat.toolbar.model.searchPlaceholder" })}
               placeholder={intl.formatMessage({ id: "chat.toolbar.model.searchPlaceholder" })}
-              className="rounded-full border-transparent bg-transparent pl-7 pr-7 text-ui-sm hover:border-border focus-visible:border-border focus-visible:bg-transparent compact-web:text-mobile-input-safe"
+              className="rounded-full border-transparent bg-transparent ps-7 pe-7 text-ui-sm hover:border-border focus-visible:border-border focus-visible:bg-transparent compact-web:text-mobile-input-safe"
               onChange={(event) => setSearch({ groupKey: group?.key, query: event.target.value })}
               onKeyDown={(event) => {
                 if (event.key === "ArrowDown" && !event.nativeEvent.isComposing) {
@@ -236,7 +236,7 @@ export function ComposerModelMenu({
                 size="icon-xs"
                 data-testid="composer-model-search-clear"
                 aria-label={intl.formatMessage({ id: "chat.toolbar.model.clearSearch" })}
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full text-foreground-subtlest hover:bg-transparent hover:text-foreground-subtle focus-visible:border-border"
+                className="absolute end-1 top-1/2 -translate-y-1/2 rounded-full text-foreground-subtlest hover:bg-transparent hover:text-foreground-subtle focus-visible:border-border"
                 onClick={() => {
                   setSearch({ groupKey: group?.key, query: "" });
                   searchRef.current?.focus();
@@ -302,7 +302,7 @@ export function ComposerModelMenu({
                       {/* 外层 border 会包住绿色填充；描边放到底层，让选中区域完全覆盖它。 */}
                       <div className="absolute inset-0 rounded-full border border-foreground/10" />
                       <div
-                        className="composer-thought-slider-fill absolute inset-y-0 left-0 overflow-hidden rounded-full"
+                        className="composer-thought-slider-fill absolute inset-y-0 start-0 overflow-hidden rounded-full"
                         data-max={sliderFilled && currentIndex === options.levels.length - 1}
                         data-highspeed={highspeed && currentGroupSelected}
                         style={{

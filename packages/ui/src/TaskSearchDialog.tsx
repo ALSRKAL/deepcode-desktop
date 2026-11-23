@@ -298,10 +298,10 @@ export function TaskSearchDialog({
         className="w-full justify-start gap-2 text-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <Search className="size-4" />
-        <span className="min-w-0 flex-1 truncate text-left">
+        <span className="min-w-0 flex-1 truncate text-start">
           {intl.formatMessage({ id: "taskSearch.button" })}
         </span>
-        <span className="ml-auto shrink-0 text-ui-xs font-normal text-foreground-subtlest">
+        <span className="ms-auto shrink-0 text-ui-xs font-normal text-foreground-subtlest">
           {shortcutLabel}
         </span>
       </Button>
@@ -348,7 +348,7 @@ export function TaskSearchDialog({
                     {showTaskHeader && searchSnippet ? (
                       <button
                         type="button"
-                        className="mt-1 flex min-w-0 w-full cursor-default items-center gap-2 rounded-md px-2.5 pb-0.5 pt-1 text-left outline-hidden first:mt-0 hover:bg-menu-hover focus-visible:bg-menu-hover"
+                        className="mt-1 flex min-w-0 w-full cursor-default items-center gap-2 rounded-md px-2.5 pb-0.5 pt-1 text-start outline-hidden first:mt-0 hover:bg-menu-hover focus-visible:bg-menu-hover"
                         onClick={() => selectTaskHeader(task)}
                       >
                         <span className="min-w-0 flex-1 truncate text-ui-base leading-5 font-normal text-foreground">

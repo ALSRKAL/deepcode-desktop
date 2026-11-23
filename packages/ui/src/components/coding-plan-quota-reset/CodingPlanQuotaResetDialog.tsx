@@ -269,7 +269,7 @@ export function CodingPlanQuotaResetDialog({
           }
         }}
       >
-        <div className="flex min-w-0 items-center gap-1.5 pr-8">
+        <div className="flex min-w-0 items-center gap-1.5 pe-8">
           {confirmingItem ? (
             <Button
               type="button"
@@ -388,7 +388,7 @@ export function CodingPlanQuotaResetDialog({
                 <div className="relative">
                   <div
                     ref={resetListRef}
-                    className="max-h-[262px] overflow-y-auto overscroll-contain pr-1"
+                    className="max-h-[262px] overflow-y-auto overscroll-contain pe-1"
                     onScroll={updateScrollMasks}
                   >
                     {visibleResetItems.map((item) => {

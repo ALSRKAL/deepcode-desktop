@@ -352,7 +352,7 @@ export function CommandCenterSearchHistory({
         <button
           type="button"
           aria-label={clearLabel}
-          className="ml-auto inline-grid size-6 place-items-center rounded-md text-foreground-subtlest hover:bg-surface-hover hover:text-foreground"
+          className="ms-auto inline-grid size-6 place-items-center rounded-md text-foreground-subtlest hover:bg-surface-hover hover:text-foreground"
           onClick={onClear}
         >
           <Trash2Icon className="size-3.5" />
@@ -360,7 +360,7 @@ export function CommandCenterSearchHistory({
       </div>
       <div
         className={cn(
-          "relative flex flex-wrap gap-1.5 overflow-hidden px-3 pt-1 pb-2 pr-11",
+          "relative flex flex-wrap gap-1.5 overflow-hidden px-3 pt-1 pb-2 pe-11",
           expanded ? "" : "max-h-[34px]",
         )}
       >
@@ -386,7 +386,7 @@ export function CommandCenterSearchHistory({
           <button
             type="button"
             aria-label={expanded ? collapseLabel : expandLabel}
-            className="absolute top-1 right-3 inline-grid size-6 place-items-center rounded-md text-foreground-subtle hover:bg-surface-hover hover:text-foreground"
+            className="absolute top-1 end-3 inline-grid size-6 place-items-center rounded-md text-foreground-subtle hover:bg-surface-hover hover:text-foreground"
             onClick={onToggleExpanded}
           >
             <ChevronDownIcon
@@ -730,7 +730,7 @@ export const CommandCenterDialog = memo(function CommandCenterDialogComponent({
     return (
       <button
         type="button"
-        className="mt-0.5 flex min-h-7 w-full items-center gap-1.5 rounded-xl px-2.5 pl-8 text-left text-ui-base text-foreground-subtle hover:bg-menu-hover hover:text-foreground"
+        className="mt-0.5 flex min-h-7 w-full items-center gap-1.5 rounded-xl px-2.5 ps-8 text-start text-ui-base text-foreground-subtle hover:bg-menu-hover hover:text-foreground"
         onClick={() => setExpandedSections((current) => new Set(current).add(sectionId))}
       >
         {intl.formatMessage({ id: "commandCenter.moreResults" })}

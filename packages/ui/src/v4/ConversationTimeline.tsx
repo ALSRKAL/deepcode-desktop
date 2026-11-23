@@ -2112,7 +2112,7 @@ function ConversationTimelineImpl({
                       data-turn-id={unit.turnId}
                       // virtual history 的子项通过 absolute 定位，父级 padding 不会缩小
                       // 它们的 containing block；正文响应式内边距必须落在 turn wrapper 自身。
-                      className="absolute left-0 top-0 w-full"
+                      className="absolute start-0 top-0 w-full"
                       style={{ transform: `translateY(${virtualRow.start - headerSlotHeight}px)` }}
                     >
                       <ConversationTurnGroup
@@ -2209,7 +2209,7 @@ function ConversationTimelineImpl({
                       //
                       // 圆钮采用自己的居中定位；`pointer-events-auto` 保留：
                       // 它是"按钮点得动"唯一可断言的契约。
-                      className="pointer-events-auto absolute bottom-full left-1/2 z-30 mb-4 -translate-x-1/2"
+                      className="pointer-events-auto absolute bottom-full start-1/2 z-30 mb-4 -translate-x-1/2"
                       label={intl.formatMessage({ id: "chat.scrollToBottom" })}
                       onClick={handleBackToBottom}
                     />
@@ -2223,7 +2223,7 @@ function ConversationTimelineImpl({
       </div>
       {backToBottomVisible && !bottomDock ? (
         <ConversationBackToBottomButton
-          className="absolute bottom-3 left-1/2 -translate-x-1/2"
+          className="absolute bottom-3 start-1/2 -translate-x-1/2"
           label={intl.formatMessage({ id: "chat.scrollToBottom" })}
           onClick={handleBackToBottom}
         />

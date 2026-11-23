@@ -206,7 +206,7 @@ export function ProjectIdentityHoverCard({
               type="button"
               data-testid="remote-identity-device-settings"
               className={cn(
-                "mt-3 flex w-full items-center gap-1.5 border-t border-border pt-3 text-left hover:underline",
+                "mt-3 flex w-full items-center gap-1.5 border-t border-border pt-3 text-start hover:underline",
                 presentation.foreground,
               )}
               onClick={() => {

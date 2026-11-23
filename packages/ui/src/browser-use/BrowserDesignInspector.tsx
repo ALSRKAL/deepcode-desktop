@@ -377,13 +377,13 @@ export function BrowserDesignInspector({ design }: { design: BrowserDesignModeCo
     <aside
       aria-label={t("browser.design.inspector.title")}
       // 半屏等窄画布（< 720px）面板收窄到 192px，少挡画板（11-05 反馈）
-      className="absolute top-3 right-3 z-20 flex max-h-[calc(100%-1.5rem)] w-64 flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg @max-[720px]/browser-canvas:w-48"
+      className="absolute top-3 end-3 z-20 flex max-h-[calc(100%-1.5rem)] w-64 flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg @max-[720px]/browser-canvas:w-48"
       data-testid={TID_BROWSER_DESIGN_INSPECTOR}
       data-selected-count={selections.length}
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
-      <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border pr-1.5 pl-3 @max-[720px]/browser-canvas:pl-2">
+      <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border pe-1.5 ps-3 @max-[720px]/browser-canvas:pl-2">
         <span className="min-w-0 flex-1 truncate text-ui-base font-semibold" title={titleHint}>
           {title}
         </span>

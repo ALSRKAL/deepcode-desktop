@@ -207,7 +207,7 @@ export const CodeBlockHeader = ({
               </CodeBlockFilename>
             </CodeBlockTitle>
           )}
-          <CodeBlockActions className="ml-auto">
+          <CodeBlockActions className="ms-auto">
             {isMermaidLanguage(languageLabel) ? (
               <CodeBlockMermaidPreviewButton />
             ) : showWrapButton ? (

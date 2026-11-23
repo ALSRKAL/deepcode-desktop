@@ -217,7 +217,7 @@ export function WebRemoteControlMobileShell({
                     />
                     <div
                       className={[
-                        "absolute top-0 right-0 h-full w-[min(88vw,28rem)] max-w-full border-l border-border bg-background shadow-2xl transition-transform duration-200 ease-out",
+                        "absolute top-0 end-0 h-full w-[min(88vw,28rem)] max-w-full border-s border-border bg-background shadow-2xl transition-transform duration-200 ease-out",
                         isSidePaneOpen ? "translate-x-0" : "translate-x-full",
                       ].join(" ")}
                     >
@@ -256,7 +256,7 @@ export function WebRemoteControlMobileShell({
           ) : null}
           {terminalTransportState === "reconnecting" ? (
             <div
-              className="pointer-events-none absolute top-3 left-1/2 z-50 flex -translate-x-1/2 justify-center px-3"
+              className="pointer-events-none absolute top-3 start-1/2 z-50 flex -translate-x-1/2 justify-center px-3"
               aria-live="polite"
               aria-busy="true"
               data-web-remote-control-reconnect-notice="true"

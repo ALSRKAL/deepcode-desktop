@@ -78,7 +78,7 @@ export function HolesWaitingChip({
     { count },
   );
   const face =
-    "wf-arrive flex shrink-0 items-center gap-1 rounded-full bg-[color-mix(in_oklab,var(--color-warning)_12%,transparent)] py-0.5 pl-1.5 pr-2 text-ui-xs font-medium text-warning";
+    "wf-arrive flex shrink-0 items-center gap-1 rounded-full bg-[color-mix(in_oklab,var(--color-warning)_12%,transparent)] py-0.5 ps-1.5 pe-2 text-ui-xs font-medium text-warning";
   return onOpen === undefined ? (
     <span className={face} data-testid={testId}>
       <PenIcon aria-hidden className="size-3" />

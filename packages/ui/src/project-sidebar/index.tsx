@@ -350,7 +350,7 @@ export const ProjectSidebar = memo(function ProjectSidebar(props: ProjectSidebar
                 </div>
               </div>
               <WorkspaceSidebarFooter
-                className="pr-3"
+                className="pe-3"
                 theme={props.theme}
                 localeMenuValue={localePreference}
                 onLocaleChange={changeLocale}

@@ -136,7 +136,7 @@ export function NumberField({
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={onKeyDown}
       />
-      {suffix ? <span className="shrink-0 pr-2 text-foreground-subtle">{suffix}</span> : null}
+      {suffix ? <span className="shrink-0 pe-2 text-foreground-subtle">{suffix}</span> : null}
     </label>
   );
 }
@@ -321,7 +321,7 @@ export function ColorField({
           dataAttribute["data-design-field"] ?? dataAttribute["data-design-variable"]
         }
         data-design-draft={alphaDraft !== null}
-        className="h-full w-9 shrink-0 bg-transparent pl-1.5 text-right tabular-nums outline-none disabled:cursor-not-allowed"
+        className="h-full w-9 shrink-0 bg-transparent ps-1.5 text-end tabular-nums outline-none disabled:cursor-not-allowed"
         disabled={disabled}
         inputMode="numeric"
         value={alphaDraft ?? String(alpha)}
@@ -346,7 +346,7 @@ export function ColorField({
           }
         }}
       />
-      <span className="shrink-0 pr-2 pl-0.5 text-foreground-subtle">%</span>
+      <span className="shrink-0 pe-2 ps-0.5 text-foreground-subtle">%</span>
     </div>
   );
 }

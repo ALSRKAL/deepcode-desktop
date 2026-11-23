@@ -99,7 +99,7 @@ function MarketingBannerContent(props: MarketingBannerProps) {
         // 原 bg-card 让关闭/loading 带上常驻底色；两种状态都保持透明。
         <span
           role="status"
-          className="absolute right-2.5 top-2.5 flex size-5 items-center justify-center rounded-full text-foreground"
+          className="absolute end-2.5 top-2.5 flex size-5 items-center justify-center rounded-full text-foreground"
         >
           <LoaderCircle
             className="size-3.5 animate-spin motion-reduce:animate-none"
@@ -117,7 +117,7 @@ function MarketingBannerContent(props: MarketingBannerProps) {
             event.stopPropagation();
             props.onClose();
           }}
-          className="absolute right-2.5 top-2.5 rounded-full text-foreground-subtle hover:bg-hover hover:text-foreground focus-visible:ring-foreground/50"
+          className="absolute end-2.5 top-2.5 rounded-full text-foreground-subtle hover:bg-hover hover:text-foreground focus-visible:ring-foreground/50"
         >
           <XIcon aria-hidden="true" />
         </Button>

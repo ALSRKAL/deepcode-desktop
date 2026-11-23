@@ -89,7 +89,7 @@ export function HomeOnlyWorkspaceRows({
                 pendingKey !== null || busy || (!bridgeable && !switcher.reconnectWorkspace)
               }
               onClick={() => void run(workspace)}
-              className="flex h-8 w-full min-w-0 items-center gap-2 rounded-lg px-2.5 text-left text-ui-base text-foreground-subtle hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30 disabled:cursor-wait"
+              className="flex h-8 w-full min-w-0 items-center gap-2 rounded-lg px-2.5 text-start text-ui-base text-foreground-subtle hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30 disabled:cursor-wait"
             >
               {remote ? (
                 <RemoteConnectionStateIcon presentation={presentation} project />

@@ -120,7 +120,7 @@ export function RemoteProjectList({
     <>
       {/* 内嵌页的返回入口原在列表底部，列表变长后会被挤到下方；放到标题左侧与目录浏览器的返回习惯一致。 */}
       {embedded ? (
-        <div className="flex min-w-0 items-center gap-1.5 pr-8">
+        <div className="flex min-w-0 items-center gap-1.5 pe-8">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -148,7 +148,7 @@ export function RemoteProjectList({
             <Button
               key={project.id}
               variant="ghost"
-              className="h-auto min-h-12 justify-start whitespace-normal text-left"
+              className="h-auto min-h-12 justify-start whitespace-normal text-start"
               data-project-id={project.id}
               disabled={saving}
               data-testid="remote-project-pick"

@@ -28,7 +28,7 @@ export function WebRemoteControlDeviceHeader({
         onClick={navigation.chooseOtherDevice}
       >
         <DevicePlatformIcon platform={navigation.devicePlatform} className="size-4" />
-        <span className="min-w-0 flex-1 truncate text-left font-medium">{deviceName}</span>
+        <span className="min-w-0 flex-1 truncate text-start font-medium">{deviceName}</span>
         <ChevronsUpDownIcon className="size-4 shrink-0 text-foreground-subtle" />
       </Button>
     </SidebarNativeTooltip>

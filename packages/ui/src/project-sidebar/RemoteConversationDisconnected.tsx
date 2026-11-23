@@ -58,7 +58,7 @@ export function RemoteConversationBanner(scope: Scope) {
         </p>
         <p>{intl.formatMessage({ id: "remote.conversation.tasksContinue" })}</p>
       </div>
-      <div className="ml-auto flex gap-2">
+      <div className="ms-auto flex gap-2">
         <Button variant="outline" size="sm" onClick={() => setDetailsOpen(true)}>
           {intl.formatMessage({ id: "remote.error.details" })}
         </Button>

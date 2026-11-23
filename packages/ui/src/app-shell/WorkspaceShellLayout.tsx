@@ -1972,10 +1972,10 @@ const WorkspaceShellLayoutContent = memo(function WorkspaceShellLayoutComponent(
           ) : null}
         </ProjectComposerMenu>
         {/* worktree 复选框固定贴在头部最右端（docs/git/worktree.md §3.2）：渲染在项目菜单之后，
-            ml-auto 吃掉中间剩余空间。高度跟随其他胶囊的 h-7，避免三个 hover 容器高度不一致。 */}
+            ms-auto 吃掉中间剩余空间。高度跟随其他胶囊的 h-7，避免三个 hover 容器高度不一致。 */}
         {worktreeEligible && worktreeSupport.visible ? (
           <WorktreeToggle
-            className="ml-auto"
+            className="ms-auto"
             checked={Boolean(draftWorktree)}
             disabled={!worktreeSupport.available}
             onCheckedChange={draftWorktreeCallbacks.onCheckedChange}
@@ -2759,7 +2759,7 @@ const WorkspaceShellLayoutContent = memo(function WorkspaceShellLayoutComponent(
           id="content"
           className={cn(
             "flex min-w-[320px] flex-1 flex-col",
-            hasDesktopPanelInset ? (isWindowsDesktop ? "pr-1.5 pb-1.5" : "pr-1 pb-1") : "p-0",
+            hasDesktopPanelInset ? (isWindowsDesktop ? "pe-1.5 pb-1.5" : "pe-1 pb-1") : "p-0",
             isWebRemoteControlShell &&
               "max-md:!w-full max-md:!min-w-0 max-md:!flex-1 max-md:!basis-0",
           )}
@@ -2910,7 +2910,7 @@ const WorkspaceShellLayoutContent = memo(function WorkspaceShellLayoutComponent(
                           size="icon-md"
                           data-web-remote-navigation-resize-handle="true"
                           className={cn(
-                            "absolute left-1/2 z-30 hidden -translate-x-1/2 -translate-y-1/2 touch-none cursor-ns-resize border-border bg-surface text-foreground-subtle shadow-sm hover:bg-surface-hover hover:text-foreground max-md:inline-flex [app-region:no-drag]",
+                            "absolute start-1/2 z-30 hidden -translate-x-1/2 -translate-y-1/2 touch-none cursor-ns-resize border-border bg-surface text-foreground-subtle shadow-sm hover:bg-surface-hover hover:text-foreground max-md:inline-flex [app-region:no-drag]",
                             shouldRenderWorkspaceHeader ? "top-12" : "top-0",
                             isWebRemoteControlNavigationDragging &&
                               "border-border-hover bg-surface-hover text-foreground",

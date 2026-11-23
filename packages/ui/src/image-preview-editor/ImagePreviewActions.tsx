@@ -234,7 +234,7 @@ export function ImagePreviewActions({
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
         <ContextMenuContent>{actionItems(true)}</ContextMenuContent>
       </ContextMenu>
-      <div className="absolute right-16 top-4 z-20 flex max-w-[calc(100%-5rem)] items-center gap-1 rounded-xl border border-popover-border bg-popover p-1.5 shadow-sm platform-mac-desktop:top-12 platform-windows-desktop:top-[calc(env(titlebar-area-height,48px)_+_0.5rem)] platform-windows-desktop:right-20 platform-linux-desktop:right-20">
+      <div className="absolute end-16 top-4 z-20 flex max-w-[calc(100%-5rem)] items-center gap-1 rounded-xl border border-popover-border bg-popover p-1.5 shadow-sm platform-mac-desktop:top-12 platform-windows-desktop:top-[calc(env(titlebar-area-height,48px)_+_0.5rem)] platform-windows-desktop:right-20 platform-linux-desktop:right-20">
         {zoomControls}
         {native ? (
           <DropdownMenu open={appsOpen} onOpenChange={setAppsOpen}>

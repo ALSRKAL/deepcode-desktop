@@ -833,7 +833,7 @@ export function AnimatedSidePanePanel({
       {/* 对齐原型：顶部对齐滚动、左对齐标题；内置应用与 UI 插件同为横向行，短分割线分区。 */}
       <div className="min-h-0 flex-1 overflow-y-auto px-7 py-6">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-          <h2 className="pl-2 text-ui-xl font-semibold text-foreground">
+          <h2 className="ps-2 text-ui-xl font-semibold text-foreground">
             {intl.formatMessage({ id: "sidePane.openTab" })}
           </h2>
           <div className="grid min-w-0 grid-cols-1 gap-x-8 gap-y-1 @min-[36rem]/launcher:grid-cols-2">
@@ -854,7 +854,7 @@ export function AnimatedSidePanePanel({
               <div aria-hidden="true" className="my-4 h-px w-24 self-center bg-border" />
               <section className="min-w-0" data-testid="side-pane-ui-recommendations">
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
-                  <h2 className="pl-2 text-ui-lg font-semibold text-foreground">
+                  <h2 className="ps-2 text-ui-lg font-semibold text-foreground">
                     {intl.formatMessage({ id: "settings.plugins.store.ui.title" })}
                   </h2>
                   <Button
@@ -1034,7 +1034,7 @@ export function AnimatedSidePanePanel({
                       {sidePaneTabOverview}
                     </div>
                     {fullView ? (
-                      <div className="flex h-full shrink-0 items-center pr-1">
+                      <div className="flex h-full shrink-0 items-center pe-1">
                         <SidePaneFullViewConversationTab
                           title={fullView.conversationTitle}
                           isActive={fullView.surface === "conversation"}
@@ -1124,13 +1124,13 @@ export function AnimatedSidePanePanel({
                       </DragOverlay>
                     </DndContext>
 
-                    <div className="ml-auto flex h-full shrink-0 items-center gap-1 px-2">
+                    <div className="ms-auto flex h-full shrink-0 items-center gap-1 px-2">
                       {isTabsOverflowing ? addTabButton : null}
                       {closeSidePaneButton}
                     </div>
                   </div>
                   {/* Expand Panel 按钮按要求先注释保留，相关逻辑已删除。
-                <div className="flex h-full shrink-0 items-center pl-1.5 pr-2">
+                <div className="flex h-full shrink-0 items-center ps-1.5 pe-2">
                   <ControlHintTooltip title="" side="bottom" align="end">
                     <Button type="button" variant="ghost" size="icon-sm" aria-label="">
                       Expand Panel
@@ -1517,7 +1517,7 @@ export function AnimatedSidePanePanel({
           ref={panelElementRef}
           aria-hidden={!isVisible}
           className={cn(
-            "h-full w-full min-w-0 border-l border-border bg-background transition-opacity duration-200 ease-out",
+            "h-full w-full min-w-0 border-s border-border bg-background transition-opacity duration-200 ease-out",
             isVisible || isScreenshotSurfaceActive
               ? "opacity-100"
               : "pointer-events-none opacity-0",

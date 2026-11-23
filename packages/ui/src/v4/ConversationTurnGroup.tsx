@@ -588,7 +588,7 @@ function AssistantHistoryStatus({
     <div
       className={cn(
         "flex w-full flex-wrap items-center justify-between gap-2 border-b",
-        highspeed ? "border-icon-purple/30 pb-3 pl-1" : "border-[var(--color-border)]/50 pb-2",
+        highspeed ? "border-icon-purple/30 pb-3 ps-1" : "border-[var(--color-border)]/50 pb-2",
       )}
     >
       <Status
@@ -596,7 +596,7 @@ function AssistantHistoryStatus({
           collapsible ? testId(TID_CHAT_ASSISTANT_HISTORY_TRIGGER, segment.key) : undefined
         }
         data-history-open={collapsible ? String(open) : undefined}
-        className="group/history-message inline-flex max-w-full items-center gap-2 text-left text-ui-base text-foreground-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-input-border-focused)]"
+        className="group/history-message inline-flex max-w-full items-center gap-2 text-start text-ui-base text-foreground-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-input-border-focused)]"
       >
         <span
           className={cn("truncate", highspeed && "font-medium leading-5 text-icon-purple")}
@@ -615,7 +615,7 @@ function AssistantHistoryStatus({
         ) : null}
       </Status>
       {highspeed ? (
-        <div className="ml-auto flex shrink-0 items-center gap-2 text-icon-purple">
+        <div className="ms-auto flex shrink-0 items-center gap-2 text-icon-purple">
           {savedDurationLabel ? (
             <span className="text-ui-sm font-medium leading-4" data-highspeed-saved-duration="true">
               {intl.formatMessage(
@@ -1172,7 +1172,7 @@ function ConversationBackgroundResultWork({
         <div className="flex w-full">
           <div
             data-testid={testId(TID_CHAT_BACKGROUND_RESULT_TITLE, unit.key)}
-            className="min-w-0 whitespace-pre-wrap break-words text-left text-ui-base text-[var(--color-foreground-subtle)]"
+            className="min-w-0 whitespace-pre-wrap break-words text-start text-ui-base text-[var(--color-foreground-subtle)]"
           >
             {title}
           </div>

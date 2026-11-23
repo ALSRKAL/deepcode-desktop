@@ -285,7 +285,7 @@ export function DataSyncDialog(props: DataSyncDialogProps) {
               data-testid="remote-sync-dialog-main"
               className="flex min-h-0 min-w-0 flex-1 flex-col gap-5 overflow-hidden p-4 md:p-6"
             >
-              <div className="shrink-0 pr-8">
+              <div className="shrink-0 pe-8">
                 <h3 className="text-ui-lg font-medium text-foreground">
                   {intl.formatMessage({ id: `remoteSync.category.${activeTab}` })}
                 </h3>
@@ -440,7 +440,7 @@ function OverviewPanel(props: {
                   type="button"
                   data-testid={`remote-sync-overview-${category.id}`}
                   onClick={() => props.onNavigate(category.id)}
-                  className="grid w-full grid-cols-[minmax(0,1fr)_64px_64px_minmax(120px,220px)] items-center gap-4 py-3 text-left text-ui-base"
+                  className="grid w-full grid-cols-[minmax(0,1fr)_64px_64px_minmax(120px,220px)] items-center gap-4 py-3 text-start text-ui-base"
                 >
                   <span className="truncate font-medium text-foreground">{label}</span>
                   <span
@@ -456,7 +456,7 @@ function OverviewPanel(props: {
                     {view.phase === "ready" ? view.remoteCount : "–"}
                   </span>
                   <span className="flex min-w-0 items-center justify-end gap-2 text-foreground-subtle">
-                    <span className="truncate text-right">
+                    <span className="truncate text-end">
                       {view.phase === "loading"
                         ? formatMessage({ id: "remoteSync.overview.loading" })
                         : view.phase === "error"
@@ -608,7 +608,7 @@ function CategoryPanel(props: {
                     else next.add(row.key);
                     props.onSelectionChange(next);
                   }}
-                  className="flex w-full cursor-pointer gap-3 rounded-lg bg-background p-3 text-left transition-colors hover:bg-surface-hover/50 disabled:cursor-default disabled:hover:bg-background"
+                  className="flex w-full cursor-pointer gap-3 rounded-lg bg-background p-3 text-start transition-colors hover:bg-surface-hover/50 disabled:cursor-default disabled:hover:bg-background"
                 >
                   <SelectionBox checked={checked} disabled={!row.selectable} />
                   <span className={cn("min-w-0 flex-1", !row.selectable && "opacity-60")}>
@@ -684,7 +684,7 @@ function CategoryPanel(props: {
                     data-testid={`remote-sync-row-stop-${row.key}`}
                     variant="secondary"
                     size="sm"
-                    className="mr-2 shrink-0"
+                    className="me-2 shrink-0"
                     onClick={() => props.onStop(row.key)}
                   >
                     <CircleStop aria-hidden="true" />

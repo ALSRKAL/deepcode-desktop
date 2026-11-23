@@ -34,7 +34,7 @@ export function ConversationShareMenu({
       size="icon-md"
       className={cn(
         "text-foreground hover:bg-hover hover:text-foreground [app-region:no-drag]",
-        useWindowsCaptionSpacing ? "ml-3" : "ml-2.5",
+        useWindowsCaptionSpacing ? "ms-3" : "ms-2.5",
         useWindowsCaptionSpacing && WINDOWS_CAPTION_CONTROL_CLASS,
         active && "bg-selected",
       )}

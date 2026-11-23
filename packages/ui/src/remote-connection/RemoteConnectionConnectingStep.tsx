@@ -776,7 +776,7 @@ export function RemoteConnectionConnectingStep({
                 {phaseIndex < phases.length - 1 ? (
                   <span
                     aria-hidden="true"
-                    className="absolute left-5 top-8 bottom-0 border-l border-border"
+                    className="absolute start-5 top-8 bottom-0 border-s border-border"
                   />
                 ) : null}
                 <span
@@ -887,7 +887,7 @@ export function RemoteConnectionConnectingStep({
                               className="break-all text-ui-sm"
                             >
                               <span>{task.sessionId}</span>
-                              <span className="ml-2 font-mono">{task.workspacePath}</span>
+                              <span className="ms-2 font-mono">{task.workspacePath}</span>
                             </li>
                           ))}
                         </ul>

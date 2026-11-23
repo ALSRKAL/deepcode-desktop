@@ -46,7 +46,7 @@ export function PluginUiFollowUpDialogHost() {
         data-testid={TID_PLUGIN_UI_FOLLOW_UP_DIALOG}
       >
         <div className="flex min-w-0 flex-col gap-3 p-5">
-          <DialogHeader className="gap-1 pr-7">
+          <DialogHeader className="gap-1 pe-7">
             <DialogTitle>{intl.formatMessage({ id: "pluginUi.followUp.title" })}</DialogTitle>
             <DialogDescription className="text-ui-caption leading-relaxed">
               {intl.formatMessage({ id: "pluginUi.followUp.description" }, { name })}

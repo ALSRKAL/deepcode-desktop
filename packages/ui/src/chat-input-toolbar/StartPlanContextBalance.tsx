@@ -153,7 +153,7 @@ export function ChatStartPlanBalancePanel({
               className={cn(
                 "h-6 shrink-0 gap-1 px-2 text-ui-sm",
                 upgradeButtonHighlighted &&
-                  "button-gradient rounded-full pr-[5px] text-white hover:bg-transparent hover:opacity-90 dark:bg-[#484A58] dark:hover:bg-[#484A58]",
+                  "button-gradient rounded-full pe-[5px] text-white hover:bg-transparent hover:opacity-90 dark:bg-[#484A58] dark:hover:bg-[#484A58]",
               )}
               onClick={(event) => {
                 event.preventDefault();

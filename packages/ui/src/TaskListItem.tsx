@@ -486,7 +486,7 @@ export const MemoTaskItem = memo(function TaskListItem({
           <span className="text-diff-added">+{taskChangeSummary.added}</span>
         ) : null}
         {taskChangeSummary.removed > 0 ? (
-          <span className="ml-1 text-diff-removed">-{taskChangeSummary.removed}</span>
+          <span className="ms-1 text-diff-removed">-{taskChangeSummary.removed}</span>
         ) : null}
       </span>
     ) : null;
@@ -627,7 +627,7 @@ export const MemoTaskItem = memo(function TaskListItem({
         }
       }}
       className={cn(
-        "group/task-item flex cursor-pointer gap-2 rounded-lg pl-2.5 pr-1 py-1 transition-[background-color,border-color,box-shadow]",
+        "group/task-item flex cursor-pointer gap-2 rounded-lg ps-2.5 pe-1 py-1 transition-[background-color,border-color,box-shadow]",
         // 默认行 32px 时前置槽整行居中；长出工作流运行行后行体是两行的纵向列，槽改为对齐首行。
         variant === "timeline"
           ? "items-start py-1.5"
@@ -739,7 +739,7 @@ export const MemoTaskItem = memo(function TaskListItem({
                 </>
               ) : null}
             </div>
-            <div className="ml-auto flex shrink-0 items-center justify-end gap-1.5">
+            <div className="ms-auto flex shrink-0 items-center justify-end gap-1.5">
               {!hasPendingInteraction ? (
                 <span
                   data-task-row-metadata="true"
@@ -776,7 +776,7 @@ export const MemoTaskItem = memo(function TaskListItem({
                     />
                   ) : null}
                   {worktreeIcon}
-                  <span className="mr-1">{taskTimeLabel}</span>
+                  <span className="me-1">{taskTimeLabel}</span>
                 </span>
               ) : null}
               {taskActionGroupNode}
@@ -849,7 +849,7 @@ export const MemoTaskItem = memo(function TaskListItem({
               <span
                 data-task-row-metadata="true"
                 className={cn(
-                  "mr-0.5 flex shrink-0 items-center gap-1 text-ui-sm text-foreground-subtle",
+                  "me-0.5 flex shrink-0 items-center gap-1 text-ui-sm text-foreground-subtle",
                   isArchiveConfirming || shouldSuppressWorkspaceTaskMetadata ? "hidden" : undefined,
                 )}
               >

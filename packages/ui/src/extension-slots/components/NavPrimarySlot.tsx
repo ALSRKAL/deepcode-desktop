@@ -59,7 +59,7 @@ export const NavPrimarySlot = memo(function NavPrimarySlot(props: NavPrimarySlot
             onClick={() => model.open(item)}
           >
             <Icon className="size-4 shrink-0" aria-hidden />
-            <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
+            <span className="min-w-0 flex-1 truncate text-start">{item.label}</span>
             {badge === "dot" ? (
               <span aria-hidden className="size-[7px] shrink-0 rounded-full bg-icon-blue" />
             ) : badge !== undefined ? (

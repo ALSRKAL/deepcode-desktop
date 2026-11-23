@@ -287,7 +287,7 @@ function SettingsSidebarButton({
         type={buttonProps.type ?? "button"}
         aria-label={label}
         className={cn(
-          "flex h-8 w-full items-center gap-2 rounded-xl px-2.5 text-left transition-colors",
+          "flex h-8 w-full items-center gap-2 rounded-xl px-2.5 text-start transition-colors",
           "max-lg:mx-auto max-lg:size-10 max-lg:justify-center max-lg:px-0",
           "compact-web:mx-0 compact-web:h-8 compact-web:w-auto compact-web:shrink-0 compact-web:px-2.5",
           active
@@ -1540,9 +1540,9 @@ export function SettingsPage({
           {usesInlineWindowControls ? (
             <div
               className={cn(
-                "absolute z-30 mt-px mr-px flex h-12 items-center gap-0.5 px-2 pointer-events-auto [app-region:no-drag]",
+                "absolute z-30 mt-px me-px flex h-12 items-center gap-0.5 px-2 pointer-events-auto [app-region:no-drag]",
                 // 外沿留白变化后，悬浮操作组也必须同步，否则与内容 Header 错位。
-                isWindowsDesktop ? "right-1.5 top-1.5" : "right-1 top-1",
+                isWindowsDesktop ? "end-1.5 top-1.5" : "end-1 top-1",
               )}
             >
               {/* Bug 原因：Windows/Linux 设置页仍保留旧 caption 下箭头，与主界面和 macOS 的帮助入口不一致。
@@ -1723,7 +1723,7 @@ export function SettingsPage({
             className={cn(
               "flex min-h-0 flex-col",
               // 桌面平台统一复用主工作区的面板 inset；左侧仍与导航相接，顶部由独立拖拽留白承接。
-              isDesktop ? (isWindowsDesktop ? "pr-1.5 pb-1.5" : "pr-1 pb-1") : "p-0",
+              isDesktop ? (isWindowsDesktop ? "pe-1.5 pb-1.5" : "pe-1 pb-1") : "p-0",
             )}
           >
             <div
@@ -1748,10 +1748,10 @@ export function SettingsPage({
                   className={cn(
                     // Settings 使用和 new task 一致的问号定位：在内容面板内定位，外层让出自绘窗口按钮区，内层保持 top-2.5/right-2.5。
                     "absolute top-0 z-50 h-10 w-10 pointer-events-auto [app-region:no-drag]",
-                    "right-0",
+                    "end-0",
                   )}
                 >
-                  <div className="absolute right-2.5 top-2.5 pointer-events-auto [app-region:no-drag]">
+                  <div className="absolute end-2.5 top-2.5 pointer-events-auto [app-region:no-drag]">
                     <WorkspaceHelpMenuButton
                       className="relative z-50 [app-region:no-drag]"
                       isDesktop={Boolean(isDesktop)}
@@ -1775,7 +1775,7 @@ export function SettingsPage({
                       className={cn(
                         "min-w-0 flex-1 [app-region:drag]",
                         // 四个 28px 按钮、组内 2px 间距和左右 8px padding，共 134px。
-                        usesInlineWindowControls ? "mr-[134px]" : "mr-12",
+                        usesInlineWindowControls ? "me-[134px]" : "me-12",
                       )}
                     >
                       <SettingsHeaderBreadcrumb

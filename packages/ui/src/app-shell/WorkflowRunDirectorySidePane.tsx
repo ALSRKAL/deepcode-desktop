@@ -80,7 +80,7 @@ const DirectoryRow = memo(function DirectoryRow({
       data-run-status={row.status}
       aria-label={intl.formatMessage({ id: "chat.toolCall.workflow.openRunDetails" })}
       onClick={() => onOpen(row)}
-      className="flex w-full min-w-0 items-start gap-3 rounded-lg px-3 py-2 text-left text-ui-base transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+      className="flex w-full min-w-0 items-start gap-3 rounded-lg px-3 py-2 text-start text-ui-base transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
     >
       <span className="flex h-[1lh] w-5 shrink-0 items-center justify-center">
         <span

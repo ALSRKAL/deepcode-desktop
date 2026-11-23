@@ -77,7 +77,7 @@ export function WorkflowSaveFields({
         <div className="relative">
           <Input
             aria-invalid={nameInvalid}
-            className="pr-16 font-mono"
+            className="pe-16 font-mono"
             data-testid="workflow-save-name"
             disabled={saving}
             id="workflow-save-name"
@@ -88,7 +88,7 @@ export function WorkflowSaveFields({
             value={draft.name}
           />
           {/* 后缀是**事实**不是输入：名字是文件名，扩展名由保存路径决定，用户不该也不能改它。 */}
-          <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center font-mono text-ui-xs text-foreground-subtlest">
+          <span className="pointer-events-none absolute inset-y-0 end-2 flex items-center font-mono text-ui-xs text-foreground-subtlest">
             .dwf.ts
           </span>
         </div>

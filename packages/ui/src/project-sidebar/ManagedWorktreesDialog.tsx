@@ -473,7 +473,7 @@ export function ManagedWorktreesDialog({
         data-testid="managed-worktrees-dialog"
         className="flex max-h-[85vh] flex-col gap-4 sm:max-w-2xl"
       >
-        <DialogHeader className="pr-8">
+        <DialogHeader className="pe-8">
           <DialogTitle>{msg("title")}</DialogTitle>
           <DialogDescription className="break-words">
             {msg("description", { project: project.name })}
@@ -561,7 +561,7 @@ export function ManagedWorktreesDialog({
                   {msg("confirm.title", { name: worktreeName(confirming) })}
                 </AlertDialogTitle>
                 <AlertDialogDescription asChild>
-                  <ul className="list-disc space-y-1 pl-5">
+                  <ul className="list-disc space-y-1 ps-5">
                     <li>{msg("confirm.directory")}</li>
                     <li>{msg("confirm.ignored")}</li>
                     {confirming.dirty && confirming.tasks.length === 0 ? (

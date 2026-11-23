@@ -122,7 +122,7 @@ export function MessageChangeSummaryPanel({
             type="button"
             aria-label={panelToggleLabel}
             title={panelToggleLabel}
-            className="flex h-full min-w-0 flex-1 items-center gap-2 px-1 text-left"
+            className="flex h-full min-w-0 flex-1 items-center gap-2 px-1 text-start"
           >
             <ChevronRightIcon
               className={`size-3.5 shrink-0 text-foreground-subtlest transition-transform ${
@@ -197,7 +197,7 @@ export function MessageChangeSummaryPanel({
               <div
                 aria-disabled={!canOpenDiff}
                 className={cn(
-                  "flex w-full items-center gap-1 px-2 py-2 text-left transition-colors",
+                  "flex w-full items-center gap-1 px-2 py-2 text-start transition-colors",
                   canOpenDiff ? "cursor-pointer hover:bg-hover/30" : "cursor-default",
                 )}
                 onClick={openDiffViewer}

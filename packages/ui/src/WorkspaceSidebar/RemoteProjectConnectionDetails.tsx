@@ -39,7 +39,7 @@ export function RemoteProjectConnectionDetails({
         <strong className="min-w-0 flex-1 break-words font-medium">
           {formatRemoteWorkspaceDisplayLabel(tab.label, tab.remoteTarget)}
         </strong>
-        <RemoteConnectionStatusTag presentation={presentation} className="ml-auto" />
+        <RemoteConnectionStatusTag presentation={presentation} className="ms-auto" />
       </div>
       {presentation.recovery ? (
         <p className={presentation.foreground}>

@@ -104,8 +104,8 @@ export function SelectionCommentEditor({
           className={cn(
             "pointer-events-none absolute size-2.5 rotate-45 border-popover-border bg-menu",
             placement.side === "above"
-              ? "-bottom-[5.5px] border-b border-r"
-              : "-top-[5.5px] border-l border-t",
+              ? "-bottom-[5.5px] border-b border-e"
+              : "-top-[5.5px] border-s border-t",
           )}
         />
       ) : null}
@@ -116,7 +116,7 @@ export function SelectionCommentEditor({
         </span>
       </div>
       {quote ? (
-        <div className="mx-1 line-clamp-2 min-w-0 break-words border-l-2 border-border pl-2 text-ui-sm text-foreground-subtle">
+        <div className="mx-1 line-clamp-2 min-w-0 break-words border-s-2 border-border ps-2 text-ui-sm text-foreground-subtle">
           {quote}
         </div>
       ) : null}
@@ -156,7 +156,7 @@ export function SelectionCommentEditor({
           {msg("chat.selections.commentEditHint")}
         </span>
       ) : null}
-      <div className="flex items-center justify-between gap-2 pl-1">
+      <div className="flex items-center justify-between gap-2 ps-1">
         {editing ? (
           <Button
             type="button"

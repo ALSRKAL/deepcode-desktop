@@ -124,7 +124,7 @@ export function FileManagerPane({
     >
       <div className="flex h-10 shrink-0 items-center border-b border-border bg-surface/30">
         {canNavigate ? (
-          <div className="flex shrink-0 items-center border-r border-border px-1.5">
+          <div className="flex shrink-0 items-center border-e border-border px-1.5">
             <Button
               variant="ghost"
               size="icon-sm"

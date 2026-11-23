@@ -229,7 +229,7 @@ export const ProjectNodeContent = memo(function ProjectNodeContent({
                   );
                 }
               }}
-              className="group/project-row ml-2 flex h-8 min-w-0 items-center gap-1 rounded-lg pr-1 hover:bg-surface-hover"
+              className="group/project-row ms-2 flex h-8 min-w-0 items-center gap-1 rounded-lg pe-1 hover:bg-surface-hover"
             >
               {/* 标题仍可展开历史；失效提示仅绑定禁用的操作按钮，避免悬停整行也弹出。 */}
               <span className="flex min-w-0 flex-1 shrink-0">
@@ -241,7 +241,7 @@ export const ProjectNodeContent = memo(function ProjectNodeContent({
                     variant="ghost"
                     className={cn(
                       dragEnabled ? "touch-none" : "touch-pan-y",
-                      "flex h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg pl-2.5 pr-1 text-left text-foreground hover:bg-transparent hover:text-foreground aria-expanded:bg-transparent aria-expanded:text-foreground",
+                      "flex h-8 min-w-0 flex-1 justify-start gap-2 rounded-lg ps-2.5 pe-1 text-start text-foreground hover:bg-transparent hover:text-foreground aria-expanded:bg-transparent aria-expanded:text-foreground",
                       primaryRootDisabledReason && "opacity-50",
                     )}
                     data-testid="virtual-project-toggle"
@@ -416,7 +416,7 @@ export const ProjectNodeContent = memo(function ProjectNodeContent({
       {/* 直接条件卸载曾跳过收起动画；复用旧侧栏的受控高度/透明度生命周期。 */}
       <CollapsibleContent data-testid="virtual-project-tasks">
         {/* 原因：旧任务文字的 34px 缩进外只需 8px 留白，空态与项目名称保持对齐。 */}
-        <div className="pl-2 pt-1">
+        <div className="ps-2 pt-1">
           {/* 正在新 worktree 中启动的任务排在真实任务前面（docs/git/worktree.md §3.3）。 */}
           <ManagedWorktreeCreatingRows projectId={project.id} />
           <ProjectTaskRows tasks={tasks} onSelect={onSelect} refresh={refresh} />

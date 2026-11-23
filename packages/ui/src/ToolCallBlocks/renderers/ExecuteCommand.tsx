@@ -30,7 +30,7 @@ export function ExecuteCommand({ command }: { command: string | undefined }) {
         data-testid="execute-command"
         tabIndex={expanded ? 0 : undefined}
         // 原滚动条受卡片右侧 16px padding 限制；向右扩展 12px 并补回正文留白，使滚动条距内边缘 4px。
-        className={`col-span-2 -mr-3 pr-3 min-w-0 leading-5 ${expanded ? "max-h-[10lh] overflow-y-auto" : "max-h-[3lh] overflow-hidden"}`}
+        className={`col-span-2 -mr-3 pe-3 min-w-0 leading-5 ${expanded ? "max-h-[10lh] overflow-y-auto" : "max-h-[3lh] overflow-hidden"}`}
       >
         {/* 起始标记此前在滚动容器外，滚到命令中段仍显示；与正文共用视口，保持首行语义。 */}
         <div className="flex items-start gap-2">

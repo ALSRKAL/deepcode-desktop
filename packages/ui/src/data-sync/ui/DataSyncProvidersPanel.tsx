@@ -197,7 +197,7 @@ export function DataSyncProvidersOverviewRow(props: {
         type="button"
         data-testid="remote-sync-overview-providers"
         onClick={props.onNavigate}
-        className="grid w-full grid-cols-[minmax(0,1fr)_64px_64px_minmax(120px,220px)] items-center gap-4 py-3 text-left text-ui-base"
+        className="grid w-full grid-cols-[minmax(0,1fr)_64px_64px_minmax(120px,220px)] items-center gap-4 py-3 text-start text-ui-base"
       >
         <span className="truncate font-medium text-foreground">{props.label}</span>
         <span
@@ -213,7 +213,7 @@ export function DataSyncProvidersOverviewRow(props: {
           –
         </span>
         <span className="flex min-w-0 items-center justify-end gap-2 text-foreground-subtle">
-          <span className={cn("truncate text-right", failed && "text-destructive")}>
+          <span className={cn("truncate text-end", failed && "text-destructive")}>
             {intl.formatMessage({
               id: failed ? "remoteSync.overview.syncFailed" : "remoteSync.overview.autoSync",
             })}

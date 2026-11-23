@@ -229,7 +229,7 @@ const QueueRow = memo(function QueueRow({
       data-edit-pending={editPending ? "true" : "false"}
       data-edit-locked={editLocked ? "true" : "false"}
       className={cn(
-        "relative flex items-center gap-2 rounded-xl px-1.5 py-1 pr-1 transition-colors hover:bg-hover/30",
+        "relative flex items-center gap-2 rounded-xl px-1.5 py-1 pe-1 transition-colors hover:bg-hover/30",
         isDragging ? "bg-hover/40 shadow-sm" : null,
         editPending ? "opacity-60" : null,
       )}

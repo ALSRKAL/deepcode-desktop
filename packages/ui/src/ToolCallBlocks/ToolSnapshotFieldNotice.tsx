@@ -62,7 +62,7 @@ export function ToolSnapshotFieldNotice({
             });
         }}
       >
-        {loading ? <LoaderCircle className="mr-1 size-3 animate-spin" /> : null}
+        {loading ? <LoaderCircle className="me-1 size-3 animate-spin" /> : null}
         {buttonLabel}
       </Button>
     </div>

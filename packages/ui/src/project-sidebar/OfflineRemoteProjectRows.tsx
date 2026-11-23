@@ -21,7 +21,7 @@ function OfflineRemoteProjectRow({
       disabled={busy}
       onClick={() => onReconnect(resolveWorkspaceKey(tab))}
       className={cn(
-        "flex w-full min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-ui-sm hover:bg-surface-hover disabled:cursor-wait",
+        "flex w-full min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-start text-ui-sm hover:bg-surface-hover disabled:cursor-wait",
         presentation.foreground,
       )}
     >

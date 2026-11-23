@@ -423,7 +423,7 @@ function ToolCheckbox({
       disabled={disabled}
       onClick={onToggle}
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-md px-2 py-2 text-left transition-colors",
+        "flex min-w-0 items-center gap-3 rounded-md px-2 py-2 text-start transition-colors",
         disabled ? "cursor-not-allowed opacity-60" : "hover:bg-surface-hover",
       )}
     >
@@ -787,7 +787,7 @@ function SubagentModelOverrideControl({
             focusSelectorOnClose={null}
             labelVisibilityClassName="inline-flex min-w-0"
             triggerClassName="h-8 w-fit max-w-52 min-w-0 justify-between rounded-lg border border-input-border bg-input px-3 py-1.5 text-foreground hover:border-input-border-hover hover:bg-input focus-visible:border-input-border-focused focus-visible:bg-input-focused"
-            triggerLabelClassName="inline-flex min-w-0 truncate text-left"
+            triggerLabelClassName="inline-flex min-w-0 truncate text-start"
             disabled={disabled || pending}
           />
         </span>
@@ -1151,7 +1151,7 @@ function SubagentForm({
               focusSelectorOnClose={null}
               labelVisibilityClassName="inline-flex min-w-0"
               triggerClassName="h-8 w-fit max-w-full min-w-0 justify-between rounded-lg border border-input-border bg-input bg-clip-border px-3 py-1.5 text-foreground hover:border-input-border-hover hover:bg-input focus-visible:border-input-border-focused focus-visible:bg-input-focused"
-              triggerLabelClassName="inline-flex min-w-0 truncate text-left"
+              triggerLabelClassName="inline-flex min-w-0 truncate text-start"
             />
             <SubagentReasoningField
               intl={intl}

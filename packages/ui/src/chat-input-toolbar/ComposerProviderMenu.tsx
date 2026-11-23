@@ -134,7 +134,7 @@ export function ComposerProviderMenu({
                   aria-label={[candidate.label, candidate.labelBadge].filter(Boolean).join(" ")}
                   data-testid={testId(TID_CHAT_MODEL_SELECT_GROUP, candidate.key)}
                   data-model-provider-key={candidate.key}
-                  className="relative flex w-full min-h-8 items-center gap-2 rounded-md py-1.5 pl-2 pr-8 text-left text-ui-base outline-none hover:bg-menu-hover focus-visible:bg-menu-hover disabled:pointer-events-none disabled:text-foreground-subtlest"
+                  className="relative flex w-full min-h-8 items-center gap-2 rounded-md py-1.5 ps-2 pe-8 text-start text-ui-base outline-none hover:bg-menu-hover focus-visible:bg-menu-hover disabled:pointer-events-none disabled:text-foreground-subtlest"
                   onClick={() => {
                     onSelect(candidate);
                     setOpen(false);
@@ -147,7 +147,7 @@ export function ComposerProviderMenu({
                   {candidate.key === group?.key ? (
                     <CheckIcon
                       aria-hidden="true"
-                      className="absolute right-2 size-4 text-foreground-subtle"
+                      className="absolute end-2 size-4 text-foreground-subtle"
                     />
                   ) : null}
                 </button>
@@ -178,7 +178,7 @@ export function ComposerProviderMenu({
       data-testid="composer-provider-loading"
       role="status"
       aria-label={intl.formatMessage({ id: "common.loading" })}
-      className="ml-auto inline-flex size-4 shrink-0 items-center justify-center text-foreground-subtle"
+      className="ms-auto inline-flex size-4 shrink-0 items-center justify-center text-foreground-subtle"
     >
       <LoaderCircle aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />
     </span>
@@ -224,7 +224,7 @@ export function ComposerProviderMenu({
         >
           {title}
           {loadingIndicator ?? (
-            <ChevronRightIcon className="ml-auto size-4 text-foreground-subtle" />
+            <ChevronRightIcon className="ms-auto size-4 text-foreground-subtle" />
           )}
         </Button>
         {children}
@@ -268,7 +268,7 @@ export function ComposerProviderMenu({
           >
             {title}
             {loadingIndicator ?? (
-              <ChevronRightIcon className="ml-auto size-4 text-foreground-subtle" />
+              <ChevronRightIcon className="ms-auto size-4 text-foreground-subtle" />
             )}
           </Button>
         </PopoverTrigger>

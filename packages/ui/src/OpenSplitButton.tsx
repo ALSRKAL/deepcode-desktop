@@ -423,7 +423,7 @@ export function OpenSplitButton({
           type="button"
           variant="ghost"
           size="default"
-          className={`h-7 rounded-none border-0 gap-1 ${hideOpenWithMenu ? "px-2" : "pr-1.5"}`}
+          className={`h-7 rounded-none border-0 gap-1 ${hideOpenWithMenu ? "px-2" : "pe-1.5"}`}
           disabled={!canPreview}
           title={openDefaultOnPrimary ? defaultApplicationTitle : undefined}
           aria-label={openDefaultOnPrimary ? defaultApplicationTitle : undefined}

@@ -148,7 +148,7 @@ export function ImagePreviewDialog({
         <DialogTitle className="sr-only">
           {activeItem?.alt || intl.formatMessage({ id: "chat.attachments.preview.title" })}
         </DialogTitle>
-        <div className="pointer-events-auto absolute right-4 top-4 z-20 flex items-center gap-2 [app-region:no-drag] platform-mac-desktop:top-12 platform-linux-desktop:right-6 platform-linux-desktop:top-4 platform-windows-desktop:right-6 platform-windows-desktop:top-[calc(env(titlebar-area-height,48px)_+_0.5rem)]">
+        <div className="pointer-events-auto absolute end-4 top-4 z-20 flex items-center gap-2 [app-region:no-drag] platform-mac-desktop:top-12 platform-linux-desktop:right-6 platform-linux-desktop:top-4 platform-windows-desktop:right-6 platform-windows-desktop:top-[calc(env(titlebar-area-height,48px)_+_0.5rem)]">
           <DialogClose asChild>
             <Button
               type="button"
@@ -167,7 +167,7 @@ export function ImagePreviewDialog({
             <Button
               type="button"
               aria-label={intl.formatMessage({ id: "markdownImage.previous" })}
-              className="pointer-events-auto absolute bottom-4 left-4 z-20 rounded-full border border-border bg-background text-foreground shadow-md [app-region:no-drag] hover:bg-background/80"
+              className="pointer-events-auto absolute bottom-4 start-4 z-20 rounded-full border border-border bg-background text-foreground shadow-md [app-region:no-drag] hover:bg-background/80"
               onClick={() => navigate(-1)}
               size="icon-md"
               variant="ghost"
@@ -178,7 +178,7 @@ export function ImagePreviewDialog({
               type="button"
               aria-label={intl.formatMessage({ id: "markdownImage.next" })}
               className={cn(
-                "pointer-events-auto absolute bottom-4 right-4 z-20 rounded-full border border-border bg-background text-foreground shadow-md [app-region:no-drag] hover:bg-background/80",
+                "pointer-events-auto absolute bottom-4 end-4 z-20 rounded-full border border-border bg-background text-foreground shadow-md [app-region:no-drag] hover:bg-background/80",
               )}
               onClick={() => navigate(1)}
               size="icon-md"

@@ -85,7 +85,7 @@ export function RemoteConnectionMinimizedProgress(props: RemoteConnectionProgres
         data-testid="remote-connection-minimized"
         onClick={onResume}
         className={cn(
-          "my-2 w-full rounded-lg border border-border p-2 text-left",
+          "my-2 w-full rounded-lg border border-border p-2 text-start",
           error
             ? "bg-destructive-surface text-destructive-surface-foreground"
             : progressing

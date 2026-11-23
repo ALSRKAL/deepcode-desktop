@@ -116,7 +116,7 @@ export function ConversationQuotaBanner({
       className="mb-3 w-full"
       data-testid="v4-session-quota-banner"
     >
-      <div className="flex w-full flex-wrap items-center gap-2 rounded-xl border-[0.5px] border-border bg-surface backdrop-blur-md py-2 pl-3 pr-2">
+      <div className="flex w-full flex-wrap items-center gap-2 rounded-xl border-[0.5px] border-border bg-surface backdrop-blur-md py-2 ps-3 pe-2">
         <div className="flex min-w-0 flex-1 items-center gap-2 text-ui-base text-foreground">
           <InfoIcon className="size-4 shrink-0" />
           <div className="min-w-0 break-words">{message}</div>
@@ -131,7 +131,7 @@ export function ConversationQuotaBanner({
                 // Bugfix：V4 迁移时只带回了白色活动徽标，漏掉同款升级按钮的活动背景，
                 // 导致默认黑底和徽标拼接突兀。这里与 Model Settings / Context 面板统一。
                 showBillingDiscountBadge &&
-                  "button-gradient pr-px text-white hover:bg-transparent hover:opacity-90 dark:bg-[#484A58] dark:hover:bg-[#484A58]",
+                  "button-gradient pe-px text-white hover:bg-transparent hover:opacity-90 dark:bg-[#484A58] dark:hover:bg-[#484A58]",
               )}
               onClick={onUpgrade}
             >

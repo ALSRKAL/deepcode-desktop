@@ -593,7 +593,7 @@ function ExternalAgentImportDialog({
         <div className="flex h-full min-h-0 min-w-0 flex-col">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden p-4 sm:p-5">
             <DialogHeader className="shrink-0 sm:-mt-1">
-              <div className="flex flex-col gap-3 pr-8 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 pe-8 sm:flex-row sm:items-center sm:justify-between">
                 <DialogTitle className="flex min-w-0 items-center text-ui-lg">
                   <span className="min-w-0 truncate">
                     {intl.formatMessage({ id: `settings.${category}.import.title` })}
@@ -853,7 +853,7 @@ function ImportModeSelect({
           size="sm"
           variant="ghost"
           aria-label={intl.formatMessage({ id: `settings.${category}.import.modeLabel` })}
-          className="w-fit shrink-0 justify-end border-border bg-surface text-right font-medium text-foreground hover:bg-surface-hover hover:text-foreground aria-expanded:bg-selected *:data-[slot=select-value]:justify-end"
+          className="w-fit shrink-0 justify-end border-border bg-surface text-end font-medium text-foreground hover:bg-surface-hover hover:text-foreground aria-expanded:bg-selected *:data-[slot=select-value]:justify-end"
         >
           <SelectValue />
         </SelectTrigger>
@@ -917,7 +917,7 @@ function ImportTargetDropdownButton({
         size="lg"
         disabled={disabled || !canImportToTarget}
         aria-label={intl.formatMessage({ id: activeTargetLabelId })}
-        className="rounded-r-none border-r-0"
+        className="rounded-e-none border-e-0"
         onClick={() => onImport(targetScope)}
       >
         {intl.formatMessage({ id: activeTargetLabelId })}
@@ -927,7 +927,7 @@ function ImportTargetDropdownButton({
           <Button
             type="button"
             size="lg"
-            className="rounded-l-none border-l-0 px-2"
+            className="rounded-s-none border-s-0 px-2"
             disabled={disabled}
             aria-label={intl.formatMessage({ id: `settings.${category}.import.targetLabel` })}
           >
@@ -974,7 +974,7 @@ function ImportTargetScopeSelect({
         size="sm"
         variant="ghost"
         aria-label={intl.formatMessage({ id: `settings.${category}.import.targetLabel` })}
-        className="w-fit shrink-0 justify-end border-border bg-surface text-right font-medium text-foreground hover:bg-surface-hover hover:text-foreground aria-expanded:bg-selected *:data-[slot=select-value]:justify-end"
+        className="w-fit shrink-0 justify-end border-border bg-surface text-end font-medium text-foreground hover:bg-surface-hover hover:text-foreground aria-expanded:bg-selected *:data-[slot=select-value]:justify-end"
       >
         <SelectValue />
       </SelectTrigger>
@@ -1149,7 +1149,7 @@ function SourceScopeSelect({
         size="sm"
         variant="ghost"
         aria-label={intl.formatMessage({ id: `settings.${category}.import.scopeLabel` })}
-        className="w-fit shrink-0 justify-end text-right text-foreground-subtle hover:text-foreground *:data-[slot=select-value]:justify-end"
+        className="w-fit shrink-0 justify-end text-end text-foreground-subtle hover:text-foreground *:data-[slot=select-value]:justify-end"
       >
         <SelectValue />
       </SelectTrigger>
@@ -1237,7 +1237,7 @@ function ImportSelectionList({
             aria-checked={partiallyActiveSelected ? "mixed" : allActiveSelected}
             aria-label={toggleAllLabel}
             onClick={() => onSetResourceSelection(activeImportableResourceKeys, !allActiveSelected)}
-            className="flex min-w-0 items-center gap-2 rounded-md py-1 pr-2 text-left text-ui-base text-foreground-subtle transition-colors hover:text-foreground"
+            className="flex min-w-0 items-center gap-2 rounded-md py-1 pe-2 text-start text-ui-base text-foreground-subtle transition-colors hover:text-foreground"
           >
             <span
               className={cn(
@@ -1253,7 +1253,7 @@ function ImportSelectionList({
             </span>
             <span className="shrink-0">{toggleAllLabel}</span>
           </button>
-          <div className="min-w-0 text-right text-ui-xs text-foreground-subtle">
+          <div className="min-w-0 text-end text-ui-xs text-foreground-subtle">
             {intl.formatMessage(
               { id: `settings.${category}.import.selectionCount` },
               {
@@ -1301,7 +1301,7 @@ function ImportSelectionList({
             <div key={sourceKey} className="rounded-lg">
               <div
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-colors",
+                  "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-start transition-colors",
                   disabled ? "opacity-70" : "hover:bg-surface-hover/50",
                 )}
               >
@@ -1334,7 +1334,7 @@ function ImportSelectionList({
                 <button
                   type="button"
                   onClick={() => onToggleExpanded(sourceKey)}
-                  className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 text-left"
+                  className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 text-start"
                 >
                   <span className="text-ui-base font-medium text-foreground">
                     {formatAgentName(agent.agent, intl)}
@@ -1371,7 +1371,7 @@ function ImportSelectionList({
                 </Button>
               </div>
               {isExpanded ? (
-                <div className="ml-9 border-l border-border pl-3">
+                <div className="ms-9 border-s border-border ps-3">
                   {items.map((item) => (
                     <ResourceSelectionRow
                       key={`${sourceKey}:${item.path}`}
@@ -1420,7 +1420,7 @@ function ResourceSelectionRow({
     <button
       type="button"
       onClick={() => onToggleSelection(itemKey)}
-      className="flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-surface-hover/50"
+      className="flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-1.5 text-start transition-colors hover:bg-surface-hover/50"
     >
       <span className="flex min-w-0 items-center gap-2">
         <span

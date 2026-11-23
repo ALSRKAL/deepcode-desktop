@@ -6936,7 +6936,7 @@ const koKR: Record<string, string> = {
   "chat.toolCall.workflow.saveRun.lead.unsupported": "이 에이전트는 직접 저장할 수 없습니다.",
   "chat.toolCall.workflow.saveRun.or": "또는 그대로 저장",
   "chat.toolCall.workflow.saveRun.name": "이름",
-  "chat.toolCall.workflow.saveRun.name.placeholder": "pr-layered-review",
+  "chat.toolCall.workflow.saveRun.name.placeholder": "pe-layered-review",
   "chat.toolCall.workflow.saveRun.name.helper": "문자, 숫자, - _ . 사용 가능, 최대 64자",
   "chat.toolCall.workflow.saveRun.name.invalid": "문자, 숫자, - _ .만 사용할 수 있습니다",
   "chat.toolCall.workflow.saveRun.scope.remoteOnly":

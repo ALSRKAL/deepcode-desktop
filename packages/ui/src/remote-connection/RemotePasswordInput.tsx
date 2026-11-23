@@ -14,12 +14,12 @@ export function RemotePasswordInput({
   const { intl } = useZCodeIntl();
   return (
     <div className="relative">
-      <Input {...props} type={visible ? "text" : "password"} className={cn(className, "pr-10")} />
+      <Input {...props} type={visible ? "text" : "password"} className={cn(className, "pe-10")} />
       <Button
         type="button"
         variant="ghost"
         size="icon-sm"
-        className="absolute right-1 top-1/2 -translate-y-1/2"
+        className="absolute end-1 top-1/2 -translate-y-1/2"
         aria-label={intl.formatMessage({ id: visible ? "ssh.hidePassword" : "ssh.showPassword" })}
         onClick={() => setVisible((value) => !value)}
       >

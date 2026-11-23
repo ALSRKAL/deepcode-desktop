@@ -279,7 +279,7 @@ function GitBranchSwitcherView({
                 className={cn(
                   "min-w-0 rounded-full text-ui-base/relaxed",
                   // Bugfix: 手机远控聊天页底部空间很窄，分支名会挤压输入工具栏；远控模式只保留图标入口。
-                  compactForRemoteControl ? "size-8 px-0" : "max-w-full pl-3 pr-2",
+                  compactForRemoteControl ? "size-8 px-0" : "max-w-full ps-3 pe-2",
                   triggerClassName,
                 )}
               >
@@ -292,7 +292,7 @@ function GitBranchSwitcherView({
                     {renderTriggerLabel ? (
                       renderTriggerLabel(triggerLabel)
                     ) : (
-                      <span className="min-w-0 max-w-25 truncate text-left">{triggerLabel}</span>
+                      <span className="min-w-0 max-w-25 truncate text-start">{triggerLabel}</span>
                     )}
                     {loadingBranches || mutationPending ? (
                       <LoaderCircle
@@ -384,7 +384,7 @@ function GitBranchSwitcherView({
                           }}
                         >
                           <GitBranchIcon className="mt-0.5 size-4 text-foreground-subtle" />
-                          <div className="min-w-0 flex-1 flex flex-col gap-1 text-left">
+                          <div className="min-w-0 flex-1 flex flex-col gap-1 text-start">
                             <div className="truncate text-ui-base font-medium text-foreground">
                               {branch.name}
                             </div>

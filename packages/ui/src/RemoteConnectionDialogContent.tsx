@@ -271,7 +271,7 @@ export function RemoteConnectionSettingsStep({
         data-testid="remote-connection-settings-scroll"
         // SSH 配置项增多时，表单内容以前没有自己的滚动边界，会继续绘制到下方按钮区域。
         // 这里把中间内容区限定为可滚动区域，让 footer 始终占据独立空间，不遮挡最后几项配置。
-        className="flex-1 min-h-0 space-y-4 overflow-y-auto pr-1"
+        className="flex-1 min-h-0 space-y-4 overflow-y-auto pe-1"
       >
         {addingDevice && availableKinds && onKindChange ? (
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -521,7 +521,7 @@ export function RemoteConnectionDirectoryStep({
     return (
       <div className="flex min-h-0 flex-1 flex-col gap-6 h-full">
         <div className="flex min-h-[22rem] flex-1 items-center justify-center rounded-2xl border border-border bg-card text-ui-base text-remote-foreground-muted">
-          <LoaderCircle className="mr-2 size-4 animate-spin" />
+          <LoaderCircle className="me-2 size-4 animate-spin" />
           {intl.formatMessage({ id: "common.loading" })}
         </div>
         <div className="flex justify-end gap-3">
@@ -651,7 +651,7 @@ export function RemoteConnectionDirectoryStep({
                     }}
                   >
                     <FolderIcon className="size-3.5 shrink-0 text-remote-foreground-muted" />
-                    <span className="break-all whitespace-normal text-left">{path}</span>
+                    <span className="break-all whitespace-normal text-start">{path}</span>
                     {label ? (
                       <span className="font-sans text-ui-xs text-remote-foreground-muted">
                         {label}
@@ -693,7 +693,7 @@ export function RemoteConnectionDirectoryStep({
       </p>
       <div className="flex items-center justify-end gap-3 border-t border-border pt-3">
         {onChooseLater ? (
-          <Button variant="ghost" className="mr-auto" disabled={selecting} onClick={onChooseLater}>
+          <Button variant="ghost" className="me-auto" disabled={selecting} onClick={onChooseLater}>
             {intl.formatMessage({ id: "remote.chooseLater" })}
           </Button>
         ) : null}

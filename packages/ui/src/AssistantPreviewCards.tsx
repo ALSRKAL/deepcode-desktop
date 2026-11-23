@@ -295,7 +295,7 @@ function AssistantPreviewCardRow({
     <OpenSplitButton
       renderCard={(button, { handlePreview, canPreview }) => (
         <div
-          className="group/preview-card relative isolate flex w-full items-center gap-3 rounded-xl border border-card-border bg-card p-3 pr-4 text-foreground"
+          className="group/preview-card relative isolate flex w-full items-center gap-3 rounded-xl border border-card-border bg-card p-3 pe-4 text-foreground"
           data-preview-card-title={card.title}
           data-zcode-stream-animate="true"
           style={

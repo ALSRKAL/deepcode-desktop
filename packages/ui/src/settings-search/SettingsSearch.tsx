@@ -168,7 +168,7 @@ export function SettingsSearch({
               aria-label={title}
               placeholder={title}
               data-testid="settings-search-input"
-              className="pr-9 compact-web:text-mobile-input-safe"
+              className="pe-9 compact-web:text-mobile-input-safe"
             />
             {query ? (
               <Button
@@ -177,7 +177,7 @@ export function SettingsSearch({
                 size="icon-sm"
                 aria-label={intl.formatMessage({ id: "settings.search.clear" })}
                 data-testid="settings-search-clear"
-                className="absolute right-2 top-1.5"
+                className="absolute end-2 top-1.5"
                 onClick={() => {
                   setQuery("");
                   inputRef.current?.focus();

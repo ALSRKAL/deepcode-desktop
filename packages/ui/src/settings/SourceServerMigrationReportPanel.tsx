@@ -119,7 +119,7 @@ export function SourceServerMigrationReportPanel({
                 </span>
               ) : null}
               {showActions ? (
-                <span className="ml-auto flex shrink-0 gap-1">
+                <span className="ms-auto flex shrink-0 gap-1">
                   <Button
                     type="button"
                     variant="outline"

@@ -247,7 +247,7 @@ export function ConversationAnnotationMarks({
                     <span className="text-foreground-subtle">
                       {intl.formatMessage({ id: "chat.selections.sentTitle" })}
                     </span>
-                    <span className="line-clamp-3 border-l-2 border-border pl-2 text-foreground-subtle">
+                    <span className="line-clamp-3 border-s-2 border-border ps-2 text-foreground-subtle">
                       {layout.text}
                     </span>
                     {layout.comment ? <span className="line-clamp-6">{layout.comment}</span> : null}

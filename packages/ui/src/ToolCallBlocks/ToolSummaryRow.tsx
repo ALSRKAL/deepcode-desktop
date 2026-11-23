@@ -201,7 +201,7 @@ export function ToolSummaryRow(props: ToolSummaryRowProps) {
         aria-label={action.ariaLabel}
         onClick={action.onActivate}
         onKeyDown={(event) => handleToolSummaryActionKeyDown(event, action.onActivate)}
-        className="summary-hover-text group/tool-summary inline-flex max-w-full cursor-pointer items-center gap-2 self-start text-left text-ui-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+        className="summary-hover-text group/tool-summary inline-flex max-w-full cursor-pointer items-center gap-2 self-start text-start text-ui-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
         title={title}
       >
         {sharedContent}
@@ -228,7 +228,7 @@ export function ToolSummaryRow(props: ToolSummaryRowProps) {
             event.preventDefault();
             event.currentTarget.click();
           }}
-          className="summary-hover-text group/tool-summary inline-flex max-w-full cursor-pointer items-center gap-2 self-start text-left text-ui-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+          className="summary-hover-text group/tool-summary inline-flex max-w-full cursor-pointer items-center gap-2 self-start text-start text-ui-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
           title={title}
         >
           {sharedContent}
@@ -249,7 +249,7 @@ export function ToolSummaryRow(props: ToolSummaryRowProps) {
   return (
     <div
       data-testid={testId(TID_TOOL_SUMMARY_TRIGGER, toolId)}
-      className="summary-hover-text group/tool-summary cursor-default flex w-full items-center gap-2 text-left text-ui-base transition-colors focus-visible:outline-none"
+      className="summary-hover-text group/tool-summary cursor-default flex w-full items-center gap-2 text-start text-ui-base transition-colors focus-visible:outline-none"
       title={title}
     >
       {sharedContent}
@@ -375,7 +375,7 @@ export function ConsecutiveSummaryGroup({
             ref={scroll.contentRef}
             // 实体边框加 14px 内边距只有 23px，子文字会偏左；导线不占布局，8px + 16px 与组头文字严格对齐。
             // 组内思考原有导线与缩进会叠出第二层边界；由分组统一提供导线，正文与标题对齐，并收紧标题到正文的留白。
-            className="relative ml-2 flex flex-col gap-2 pl-4 before:absolute before:inset-y-0 before:left-0 before:border-l before:border-border [&_[data-summary-leading-icon]]:hidden [&_[data-reasoning-content]>div>div]:pt-1 [&_[data-reasoning-scroll-mask]]:ml-0 [&_[data-reasoning-scroll-mask]]:border-l-0 [&_[data-reasoning-scroll-mask]]:pl-0"
+            className="relative ms-2 flex flex-col gap-2 ps-4 before:absolute before:inset-y-0 before:left-0 before:border-l before:border-border [&_[data-summary-leading-icon]]:hidden [&_[data-reasoning-content]>div>div]:pt-1 [&_[data-reasoning-scroll-mask]]:ml-0 [&_[data-reasoning-scroll-mask]]:border-l-0 [&_[data-reasoning-scroll-mask]]:pl-0"
             data-conversation-work-items="group"
           >
             {children}

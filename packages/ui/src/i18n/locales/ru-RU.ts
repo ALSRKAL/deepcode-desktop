@@ -7074,7 +7074,7 @@ const ruRU: Record<string, string> = {
   "chat.toolCall.workflow.saveRun.lead.unsupported": "Этот агент не умеет сохранять напрямую.",
   "chat.toolCall.workflow.saveRun.or": "или сохраните как есть",
   "chat.toolCall.workflow.saveRun.name": "Имя",
-  "chat.toolCall.workflow.saveRun.name.placeholder": "pr-layered-review",
+  "chat.toolCall.workflow.saveRun.name.placeholder": "pe-layered-review",
   "chat.toolCall.workflow.saveRun.name.helper": "Буквы, цифры, - _ . ; не более 64 символов",
   "chat.toolCall.workflow.saveRun.name.invalid": "Только буквы, цифры и - _ .",
   "chat.toolCall.workflow.saveRun.scope.remoteOnly":

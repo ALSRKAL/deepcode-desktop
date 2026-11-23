@@ -25,7 +25,7 @@ import {
 import type { MessageFileLinkTarget } from "@/components/ai-elements/message.js";
 
 const NESTED_TOOLCALL_CONTAINER_CLASS =
-  "ml-2 space-y-2 border-border border-l pl-3.5 border-border";
+  "ms-2 space-y-2 border-border border-s ps-3.5 border-border";
 
 export function isAgentToolCall(toolCall: TaskChatToolCallTreeNode["toolCall"]): boolean {
   return resolveToolCallIdentity(toolCall).family === "agent";

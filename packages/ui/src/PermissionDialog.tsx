@@ -1054,8 +1054,8 @@ export function PermissionDialog({
                     onKeyDown={handleOptionKeyDown}
                     className={cn(
                       switchRow
-                        ? "inline-flex items-center gap-1 text-left text-ui-base font-medium text-foreground outline-none after:absolute after:inset-0 after:rounded-xl"
-                        : "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left outline-none transition-colors focus-visible:bg-selected",
+                        ? "inline-flex items-center gap-1 text-start text-ui-base font-medium text-foreground outline-none after:absolute after:inset-0 after:rounded-xl"
+                        : "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-start outline-none transition-colors focus-visible:bg-selected",
                       !switchRow && (isSelected ? "bg-selected" : "hover:bg-hover"),
                       blocked && "cursor-not-allowed",
                       blocked && !switchRow && "opacity-50",

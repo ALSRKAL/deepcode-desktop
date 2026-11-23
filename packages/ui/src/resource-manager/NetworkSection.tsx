@@ -138,7 +138,7 @@ export function NetworkSection({ bridge }: { bridge?: NetworkCaptureBridge }) {
         data-testid="resource-network-list"
         className="overflow-x-auto rounded-xl border border-border bg-background"
       >
-        <table className="w-full table-fixed text-left text-ui-sm">
+        <table className="w-full table-fixed text-start text-ui-sm">
           <thead className="text-muted-foreground">
             <tr className="border-b border-border">
               <th className="w-24 px-3 py-2 font-medium">{label("time")}</th>

@@ -186,7 +186,7 @@ export function WindowsCaptionMenuButton({
               ? WINDOWS_CAPTION_CONTROL_CLASS
               : "h-full w-[45px] rounded-none",
             "border-0 hover:bg-hover",
-            triggerPresentation === "header" && "border-l border-border/50",
+            triggerPresentation === "header" && "border-s border-border/50",
           )}
           aria-label={intl.formatMessage({ id: "titleBar.windowMenu" })}
         >

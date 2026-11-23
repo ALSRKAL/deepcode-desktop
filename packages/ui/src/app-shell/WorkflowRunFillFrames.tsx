@@ -127,7 +127,7 @@ export function useSpineFillFrames(
     <svg
       aria-hidden
       // 盒子只由 CSS 定（见文件头的不变量）；1px 见方而不是 0：空视口的 svg 整个不画。
-      className="pointer-events-none absolute left-0 top-0 size-px overflow-visible"
+      className="pointer-events-none absolute start-0 top-0 size-px overflow-visible"
       data-testid="workflow-run-fill-frames"
     >
       {[...fills, ...marks].map(({ holeId }) => {

@@ -82,7 +82,7 @@ export function HighspeedShareNoticeCard({
               variant="ghost"
               size="icon-xs"
               aria-label={intl.formatMessage({ id: "globalNotice.highspeed.close" })}
-              className="highspeed-sidebar-share-card__close absolute right-2.5 top-2.5 z-2 rounded-full text-foreground-subtle hover:bg-hover hover:text-foreground focus-visible:ring-foreground/50"
+              className="highspeed-sidebar-share-card__close absolute end-2.5 top-2.5 z-2 rounded-full text-foreground-subtle hover:bg-hover hover:text-foreground focus-visible:ring-foreground/50"
               onClick={onDismiss}
             >
               <XIcon aria-hidden="true" />

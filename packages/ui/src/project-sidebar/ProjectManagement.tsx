@@ -157,7 +157,7 @@ function ProjectManagementContent() {
         <div
           role="alert"
           data-testid="project-management-failure"
-          className="flex min-w-0 items-center gap-3 rounded-xl bg-warning-surface py-2.5 pl-4 pr-3 text-warning-surface-foreground"
+          className="flex min-w-0 items-center gap-3 rounded-xl bg-warning-surface py-2.5 ps-4 pe-3 text-warning-surface-foreground"
         >
           <TriangleAlert aria-hidden="true" className="size-4 shrink-0" />
           <span className="min-w-0 flex-1 text-ui-base">{failureText}</span>
@@ -333,8 +333,8 @@ function ProjectManagementContent() {
               <span className="hidden md:inline">{msg("column.project")}</span>
             </span>
             <span className="hidden md:block">{msg("column.device")}</span>
-            <span className="hidden text-right md:block">{msg("column.sessions")}</span>
-            <span className="hidden text-right md:block">{msg("column.lastActive")}</span>
+            <span className="hidden text-end md:block">{msg("column.sessions")}</span>
+            <span className="hidden text-end md:block">{msg("column.lastActive")}</span>
             <span className="hidden md:block" />
           </div>
           {visible.slice(0, limit).map((row) => (
@@ -371,7 +371,7 @@ function ProjectManagementContent() {
         // 窄屏仍有设置侧栏，固定高度的单行操作栏会溢出；允许换行，保留所有操作。
         <div
           data-testid="project-management-selection-bar"
-          className="sticky bottom-4 z-10 flex min-h-12 min-w-0 flex-wrap items-center gap-3 rounded-xl border border-popover-border bg-popover py-2 pl-4 pr-2 shadow-md"
+          className="sticky bottom-4 z-10 flex min-h-12 min-w-0 flex-wrap items-center gap-3 rounded-xl border border-popover-border bg-popover py-2 ps-4 pe-2 shadow-md"
         >
           <span className="shrink-0 text-ui-base font-medium">
             {msg("selected", { count: selected.length })}

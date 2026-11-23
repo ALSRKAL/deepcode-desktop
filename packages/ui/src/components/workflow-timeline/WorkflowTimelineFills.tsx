@@ -237,7 +237,7 @@ export function WorkflowTimelineFills({
       {/* 框在一切之下：灯与轨道画在它的边上。 */}
       <svg
         aria-hidden
-        className="pointer-events-none absolute left-0 top-0 overflow-visible"
+        className="pointer-events-none absolute start-0 top-0 overflow-visible"
         data-testid="workflow-timeline-fill-frames"
         height={height}
         width={width}

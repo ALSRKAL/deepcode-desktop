@@ -79,7 +79,7 @@ export function ExtensionLauncherSection(props: ExtensionLauncherSectionProps) {
     <>
       <div aria-hidden="true" className="my-4 h-px w-24 self-center bg-border" />
       <section className="min-w-0" data-testid={TID_SIDE_PANE_EXTENSIONS}>
-        <h2 className="pb-2 pl-2 text-ui-lg font-semibold text-foreground">
+        <h2 className="pb-2 ps-2 text-ui-lg font-semibold text-foreground">
           {intl.formatMessage({ id: "extensions.launcher.title" })}
         </h2>
         <div className="mt-2 grid min-w-0 grid-cols-1 gap-x-8 gap-y-1 @min-[36rem]/launcher:grid-cols-2">

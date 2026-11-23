@@ -146,7 +146,7 @@ export function phasePillRenderers({
         {/* 问题挂在提问者下面，再退一步（26px）：它属于这一行，不属于这一站。 */}
         {questions.map((question) => (
           <WorkflowRunQuestionRow
-            className="ml-[26px]"
+            className="ms-[26px]"
             key={question.qid}
             now={now}
             question={question}

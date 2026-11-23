@@ -491,7 +491,7 @@ export function ImagePreviewSurface({
           <div
             data-image-preview-surface=""
             ref={surfaceRef}
-            className="absolute left-1/2 top-1/2 touch-none select-none"
+            className="absolute start-1/2 top-1/2 touch-none select-none"
             onClick={(event) => event.stopPropagation()}
             onPointerDown={pointerDown}
             onPointerMove={pointerMove}
@@ -532,7 +532,7 @@ export function ImagePreviewSurface({
       </ImagePreviewActions>
       {textDraft ? (
         <div
-          className="absolute left-1/2 top-20 z-30 flex max-w-full -translate-x-1/2 gap-1 rounded-xl border border-popover-border bg-popover p-2"
+          className="absolute start-1/2 top-20 z-30 flex max-w-full -translate-x-1/2 gap-1 rounded-xl border border-popover-border bg-popover p-2"
           onKeyDown={(event) => event.stopPropagation()}
         >
           <Input

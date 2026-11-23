@@ -249,13 +249,13 @@ export function ProjectManagementListRow({
         <DeviceTag host={row.host} label={row.deviceLabel} />
       </div>
       <span
-        className="hidden text-right text-ui-sm tabular-nums text-foreground-subtle md:block"
+        className="hidden text-end text-ui-sm tabular-nums text-foreground-subtle md:block"
         title={known ? undefined : msg("offline")}
       >
         {sessions}
       </span>
       <span
-        className="hidden truncate text-right text-ui-sm text-foreground-subtle md:block"
+        className="hidden truncate text-end text-ui-sm text-foreground-subtle md:block"
         title={known ? undefined : msg("offline")}
       >
         {lastActive}

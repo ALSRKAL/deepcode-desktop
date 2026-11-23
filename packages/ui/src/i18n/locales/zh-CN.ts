@@ -7031,7 +7031,7 @@ const zhCN: Record<string, string> = {
   "chat.toolCall.workflow.saveRun.lead.unsupported": "当前 agent 不支持直接保存。",
   "chat.toolCall.workflow.saveRun.or": "或按原样直接保存",
   "chat.toolCall.workflow.saveRun.name": "名称",
-  "chat.toolCall.workflow.saveRun.name.placeholder": "pr-layered-review",
+  "chat.toolCall.workflow.saveRun.name.placeholder": "pe-layered-review",
   "chat.toolCall.workflow.saveRun.name.helper": "字母、数字、- _ .，最多 64 个字符",
   "chat.toolCall.workflow.saveRun.name.invalid": "名字只能用字母、数字和 - _ .",
   "chat.toolCall.workflow.saveRun.scope.remoteOnly": "远程项目只能保存到项目里。",

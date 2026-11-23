@@ -215,7 +215,7 @@ export function SettingsRangeControl({
       />
       <span
         className={cn(
-          "min-w-10 text-right text-ui-base font-medium tabular-nums text-foreground",
+          "min-w-10 text-end text-ui-base font-medium tabular-nums text-foreground",
           valueLabelClassName,
         )}
       >

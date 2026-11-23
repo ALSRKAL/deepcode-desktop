@@ -92,7 +92,7 @@ export function TodoPanel({
           <button
             type="button"
             aria-expanded={isOpen}
-            className="inline-flex min-w-0 max-w-full cursor-pointer items-center gap-3 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+            className="inline-flex min-w-0 max-w-full cursor-pointer items-center gap-3 rounded-md p-1 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
             onClick={toggleOpen}
           >
             {isOpen ? (

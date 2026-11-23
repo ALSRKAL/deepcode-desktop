@@ -195,7 +195,7 @@ function ConversationShareSelectionPanelImpl({
           data-testid="conversation-share-selection-panel"
           data-conversation-share-left-navigation="true"
           data-conversation-share-mode-motion="selection-panel"
-          className="group/share-selection-panel absolute left-4 z-30 flex h-auto w-[20rem] flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground shadow-md ring-1 ring-inset ring-popover-border max-md:left-2 max-md:w-[min(20rem,calc(100vw-1rem))]"
+          className="group/share-selection-panel absolute start-4 z-30 flex h-auto w-[20rem] flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground shadow-md ring-1 ring-inset ring-popover-border max-md:left-2 max-md:w-[min(20rem,calc(100vw-1rem))]"
           style={PANEL_LAYOUT_STYLE}
           initial={motionConfig.initial}
           animate={motionConfig.animate}
@@ -281,7 +281,7 @@ function ConversationShareSelectionPanelImpl({
                           aria-label={item.userPreview}
                           aria-pressed={selected}
                           data-testid="conversation-share-selection-toggle"
-                          className="flex min-w-0 flex-1 flex-col gap-1 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+                          className="flex min-w-0 flex-1 flex-col gap-1 rounded-md text-start outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
                         >
                           <span
                             className={cn(
@@ -338,12 +338,12 @@ function ConversationShareSelectionPanelImpl({
               ref={visualThumbRef}
               aria-hidden="true"
               data-testid="conversation-share-selection-scroll-thumb"
-              className="pointer-events-none absolute right-1 top-0 z-10 hidden w-1.5 rounded-full bg-border opacity-0 transition-opacity group-hover/share-selection-panel:opacity-100 group-focus-within/share-selection-panel:opacity-100 [@media(hover:none)]:opacity-100"
+              className="pointer-events-none absolute end-1 top-0 z-10 hidden w-1.5 rounded-full bg-border opacity-0 transition-opacity group-hover/share-selection-panel:opacity-100 group-focus-within/share-selection-panel:opacity-100 [@media(hover:none)]:opacity-100"
             />
           </div>
           {onConfirm && onCancel ? (
             <div
-              className="flex shrink-0 items-center justify-between gap-1 border-t border-border pr-2 pl-4 py-2"
+              className="flex shrink-0 items-center justify-between gap-1 border-t border-border pe-2 ps-4 py-2"
               data-testid="conversation-share-selection-footer"
             >
               <span

@@ -41,7 +41,7 @@ export function WorktreeOutputBlock({
             : "git.managedWorktree.creation.showOutput",
         })}
         onClick={() => setExpanded((value) => !value)}
-        className="flex w-fit min-w-0 items-center gap-2 rounded-md text-left hover:text-foreground disabled:cursor-default disabled:hover:text-foreground-subtle"
+        className="flex w-fit min-w-0 items-center gap-2 rounded-md text-start hover:text-foreground disabled:cursor-default disabled:hover:text-foreground-subtle"
       >
         {status === "running" ? (
           <LoaderCircle className="size-4 shrink-0 animate-spin" />

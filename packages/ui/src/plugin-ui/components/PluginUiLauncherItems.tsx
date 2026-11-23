@@ -277,7 +277,7 @@ export function SidePaneLauncherRow({
         data-side-pane-open-tab-item={itemId}
         data-testid={testId}
         title={title}
-        className="flex w-full min-w-0 items-center gap-3 rounded-xl px-2 py-2.5 text-left"
+        className="flex w-full min-w-0 items-center gap-3 rounded-xl px-2 py-2.5 text-start"
       >
         {content}
       </div>
@@ -289,7 +289,7 @@ export function SidePaneLauncherRow({
       data-side-pane-open-tab-item={itemId}
       data-testid={testId}
       title={title}
-      className="flex w-full min-w-0 items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
+      className="flex w-full min-w-0 items-center gap-3 rounded-xl px-2 py-2.5 text-start transition-colors hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-input-border-focused"
       onClick={onOpen}
       disabled={disabled}
       aria-busy={loading || undefined}

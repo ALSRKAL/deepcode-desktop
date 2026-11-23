@@ -127,7 +127,7 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
   <div
     className={cn(
       "group flex w-full flex-col gap-2",
-      from === "user" ? "is-user ml-auto justify-end" : "is-assistant",
+      from === "user" ? "is-user ms-auto justify-end" : "is-assistant",
       className,
     )}
     {...props}
@@ -1602,7 +1602,7 @@ function MessageExternalLink({
           type="button"
           className={cn(
             messageLinkClassName,
-            "cursor-pointer bg-transparent p-0 text-left",
+            "cursor-pointer bg-transparent p-0 text-start",
             className,
           )}
           title={href}
@@ -1654,7 +1654,7 @@ const MessageFileLinkButton = forwardRef<HTMLButtonElement, MessageFileLinkButto
         onClick={onOpen}
         {...props}
       >
-        <FileDisplayIcon src={fileIconSrc} size={16} className="ml-0.5 shrink-0 self-center" />
+        <FileDisplayIcon src={fileIconSrc} size={16} className="ms-0.5 shrink-0 self-center" />
         <span className="min-w-0 self-baseline truncate">{children}</span>
       </button>
     );
@@ -2232,7 +2232,7 @@ export const MessageResponse = memo(
               wrapLongLines={wrapLongLines}
             >
               <CodeBlockHeader
-                className="pl-3 pr-2 pt-2"
+                className="ps-3 pe-2 pt-2"
                 language={language}
                 showWrapButton={!forceCodeWrap}
               />

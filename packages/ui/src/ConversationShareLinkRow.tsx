@@ -39,7 +39,7 @@ export function ConversationShareLinkRow({
             onClick={onOpen}
             aria-label={intl.formatMessage({ id: "conversationShare.openLink" })}
             title={shareUrl}
-            className="group flex h-9 min-w-0 flex-1 items-center gap-1 rounded-lg border border-input-border bg-input px-3 text-left text-ui-base text-foreground outline-none transition-colors hover:border-input-border-hover focus-visible:border-input-border-focused focus-visible:bg-input-focused"
+            className="group flex h-9 min-w-0 flex-1 items-center gap-1 rounded-lg border border-input-border bg-input px-3 text-start text-ui-base text-foreground outline-none transition-colors hover:border-input-border-hover focus-visible:border-input-border-focused focus-visible:bg-input-focused"
           >
             <span className="min-w-0 flex-1 truncate">{shareUrl}</span>
             <ArrowUpRight
@@ -56,7 +56,7 @@ export function ConversationShareLinkRow({
           size="lg"
           disabled={pending}
           onClick={onCopy}
-          className="ml-auto h-9 bg-background px-4 text-foreground hover:bg-background/80"
+          className="ms-auto h-9 bg-background px-4 text-foreground hover:bg-background/80"
         >
           {intl.formatMessage({ id: "conversationShare.copyLink" })}
         </Button>

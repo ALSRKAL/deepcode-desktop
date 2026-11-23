@@ -75,7 +75,7 @@ const ExtensionLogRow = memo(function ExtensionLogRow({
       data-plugin-id={entry.pluginId}
       title={`${new Date(entry.ts).toLocaleString()} · gen=${entry.gen}`}
       className={cn(
-        "min-w-0 py-0.5 pr-3 pl-9 -indent-6 font-mono text-ui-sm break-words whitespace-pre-wrap",
+        "min-w-0 py-0.5 pe-3 ps-9 -indent-6 font-mono text-ui-sm break-words whitespace-pre-wrap",
         LEVEL_ROW_CLASS[entry.level],
       )}
     >
@@ -173,16 +173,16 @@ export function ExtensionLogsPane({ visible }: ExtensionLogsPaneProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent position="popper" align="start">
-            <SelectItem className="pr-8" value="all">
+            <SelectItem className="pe-8" value="all">
               {intl.formatMessage({ id: "extensions.logs.source.all" })}
             </SelectItem>
-            <SelectItem className="pr-8" value="host">
+            <SelectItem className="pe-8" value="host">
               {hostLabel}
             </SelectItem>
             {pluginOptions.map((pluginId) => (
               <SelectItem
                 key={pluginId}
-                className="pr-8"
+                className="pe-8"
                 value={`plugin:${pluginId}`}
                 data-plugin-id={pluginId}
               >
@@ -201,13 +201,13 @@ export function ExtensionLogsPane({ visible }: ExtensionLogsPaneProps) {
           </SelectTrigger>
           <SelectContent position="popper" align="start">
             {LEVEL_FILTERS.map((option) => (
-              <SelectItem key={option.value} className="pr-8" value={option.value}>
+              <SelectItem key={option.value} className="pe-8" value={option.value}>
                 {intl.formatMessage({ id: option.labelId })}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <div className="ml-auto flex shrink-0 items-center gap-1">
+        <div className="ms-auto flex shrink-0 items-center gap-1">
           <ControlHintTooltip title={autoScrollLabel}>
             <Button
               type="button"

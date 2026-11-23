@@ -95,7 +95,7 @@ function ConversationSharePreflightStatusImpl({
             aria-label={triggerLabel}
             title={statusLabel}
             aria-busy={checking}
-            className="flex min-w-0 items-start gap-1.5 text-left text-ui-sm leading-5 text-foreground-subtle hover:text-foreground"
+            className="flex min-w-0 items-start gap-1.5 text-start text-ui-sm leading-5 text-foreground-subtle hover:text-foreground"
           >
             {blockingIssues.length > 0 ? (
               <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />

@@ -21,7 +21,7 @@ const NO_VALUE_PLACEHOLDER = "—";
 const ARGS_PREVIEW_ROWS = 8;
 // 与确认窗脚本开关同一副文字按钮样式：几个「展开」类开关在同一个窗里长得一样。
 const DISCLOSURE_BUTTON_CLASS =
-  "flex min-w-0 items-center gap-1 self-start rounded-md py-0.5 text-left text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle";
+  "flex min-w-0 items-center gap-1 self-start rounded-md py-0.5 text-start text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle";
 
 /**
  * 模型写的长文本：折叠时最多 4 行。开关只在文本**真的**被截断时出现——按字数或换行数去猜，
@@ -135,7 +135,7 @@ function WorkflowArgsTable({ args }: { args: readonly WorkflowArgDeclaration[] }
 
   return (
     <table
-      className="w-full border-separate border-spacing-0 text-left"
+      className="w-full border-separate border-spacing-0 text-start"
       data-workflow-save-args="true"
     >
       <thead>
@@ -144,7 +144,7 @@ function WorkflowArgsTable({ args }: { args: readonly WorkflowArgDeclaration[] }
             <th
               key={header}
               scope="col"
-              className="sticky top-0 border-b border-border bg-popover pb-1 pr-3 text-ui-xs font-medium text-foreground-subtlest [@media(min-height:36rem)]:-top-3"
+              className="sticky top-0 border-b border-border bg-popover pb-1 pe-3 text-ui-xs font-medium text-foreground-subtlest [@media(min-height:36rem)]:-top-3"
             >
               {header}
             </th>
@@ -155,13 +155,13 @@ function WorkflowArgsTable({ args }: { args: readonly WorkflowArgDeclaration[] }
         {args.map((arg) => (
           <Fragment key={arg.name}>
             <tr data-workflow-save-arg={arg.name}>
-              <td className="pr-3 pt-1.5 align-top font-mono text-ui-sm text-foreground-subtle [overflow-wrap:anywhere]">
+              <td className="pe-3 pt-1.5 align-top font-mono text-ui-sm text-foreground-subtle [overflow-wrap:anywhere]">
                 {arg.name}
               </td>
-              <td className="pr-3 pt-1.5 align-top font-mono text-ui-sm text-foreground-subtlest">
+              <td className="pe-3 pt-1.5 align-top font-mono text-ui-sm text-foreground-subtlest">
                 {arg.type ?? NO_VALUE_PLACEHOLDER}
               </td>
-              <td className="pr-3 pt-1.5 align-top text-ui-sm text-foreground-subtlest">
+              <td className="pe-3 pt-1.5 align-top text-ui-sm text-foreground-subtlest">
                 {arg.required ? requiredLabel : optionalLabel}
               </td>
               <td className="pt-1.5 align-top font-mono text-ui-sm text-foreground-subtlest [overflow-wrap:anywhere]">
@@ -306,7 +306,7 @@ export function SaveWorkflowPermissionBlock({ request }: { request: ZCodePermiss
 
       {input.script === undefined ? null : (
         <Collapsible open={scriptOpen} onOpenChange={setScriptOpen}>
-          <CollapsibleTrigger className="flex min-w-0 items-center gap-1 rounded-md py-0.5 text-left text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle">
+          <CollapsibleTrigger className="flex min-w-0 items-center gap-1 rounded-md py-0.5 text-start text-ui-xs font-medium text-foreground-subtlest transition-colors hover:text-foreground-subtle">
             <ChevronRightIcon
               className={cn("size-3.5 shrink-0 transition-transform", scriptOpen && "rotate-90")}
             />

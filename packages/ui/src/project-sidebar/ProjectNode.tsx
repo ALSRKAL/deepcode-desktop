@@ -143,7 +143,7 @@ export function ProjectNode(props: ProjectNodeProps) {
             aria-hidden="true"
             data-testid="project-drop-indicator"
             data-drop-position={dropPosition}
-            className={`pointer-events-none absolute left-5 right-2 z-20 h-0.5 bg-icon-blue ${dropPosition === "before" ? "top-0 -translate-y-1/2" : "bottom-0 translate-y-1/2"}`}
+            className={`pointer-events-none absolute start-5 end-2 z-20 h-0.5 bg-icon-blue ${dropPosition === "before" ? "top-0 -translate-y-1/2" : "bottom-0 translate-y-1/2"}`}
           >
             <span className="absolute -left-1 top-1/2 size-2 -translate-y-1/2 rounded-full border-2 border-icon-blue bg-sidebar" />
           </div>

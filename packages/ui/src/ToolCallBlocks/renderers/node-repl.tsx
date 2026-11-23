@@ -142,7 +142,7 @@ function FriendlyCodeBlock({
       style={eagerLayout ? COLLAPSIBLE_CODE_LAYOUT_STYLE : undefined}
       wrapLongLines
     >
-      <CodeBlockHeader className="pl-3 pr-2 pt-2">
+      <CodeBlockHeader className="ps-3 pe-2 pt-2">
         <CodeBlockTitle>
           <span className="text-ui-base font-medium text-foreground-subtle">{label}</span>
         </CodeBlockTitle>

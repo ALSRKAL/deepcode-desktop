@@ -184,7 +184,7 @@ export function OffPeakNewTaskEntry({ onOpenAutomations }: OffPeakNewTaskEntryPr
           data-off-peak-new-task-dismiss="true"
           onClick={dismiss}
           aria-label={intl.formatMessage({ id: "common.close" })}
-          className="ml-auto hidden size-8 shrink-0 items-center justify-center rounded-md text-foreground-subtle opacity-80 hover:bg-hover hover:opacity-100"
+          className="ms-auto hidden size-8 shrink-0 items-center justify-center rounded-md text-foreground-subtle opacity-80 hover:bg-hover hover:opacity-100"
         >
           <X className="size-4" strokeWidth={2} aria-hidden="true" />
         </button>
@@ -201,7 +201,7 @@ export function OffPeakNewTaskEntry({ onOpenAutomations }: OffPeakNewTaskEntryPr
             key={template.id}
             type="button"
             onClick={() => handleCardClick(template)}
-            className="flex h-full w-full flex-col gap-2 rounded-2xl border border-card-border bg-background p-3 text-left transition-colors hover:bg-surface-hover"
+            className="flex h-full w-full flex-col gap-2 rounded-2xl border border-card-border bg-background p-3 text-start transition-colors hover:bg-surface-hover"
           >
             <div className="flex items-center gap-1.5 text-foreground">
               <span className="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">

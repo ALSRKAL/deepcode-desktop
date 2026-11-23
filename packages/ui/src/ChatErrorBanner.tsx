@@ -287,7 +287,7 @@ export function ChatErrorBanner({
         data-testid={TID_CHAT_ERROR_BANNER}
         data-error-code={error.code}
         className={cn(
-          "w-full flex flex-wrap items-center gap-2 rounded-xl bg-surface backdrop-blur-md border-[0.5px] border-border py-2 pl-3 pr-2",
+          "w-full flex flex-wrap items-center gap-2 rounded-xl bg-surface backdrop-blur-md border-[0.5px] border-border py-2 ps-3 pe-2",
         )}
       >
         {/* 配置恢复需要可操作的完整提示；手机横幅若与按钮挤在同一行，正文会只剩省略号。 */}

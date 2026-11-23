@@ -447,7 +447,7 @@ function ConversationShareConfirmationDockImpl({
                     data-testid="conversation-share-adjust"
                     aria-expanded={selectionEditing}
                     aria-busy={preflightChecking}
-                    className="w-full justify-start gap-2 border-input-border bg-input pl-3 pr-2 font-normal hover:border-input-border-hover"
+                    className="w-full justify-start gap-2 border-input-border bg-input ps-3 pe-2 font-normal hover:border-input-border-hover"
                   >
                     {preflightChecking ? (
                       <LoaderCircle
@@ -461,7 +461,7 @@ function ConversationShareConfirmationDockImpl({
                       />
                     )}
                     <span
-                      className="min-w-0 flex-1 truncate text-left"
+                      className="min-w-0 flex-1 truncate text-start"
                       data-testid="conversation-share-range-summary"
                     >
                       {preflightChecking
@@ -552,7 +552,7 @@ function ConversationShareConfirmationDockImpl({
                       data-testid="conversation-share-disclosure-supporting-row"
                       className={cn(
                         "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-ui-sm leading-5",
-                        "pl-6",
+                        "ps-6",
                       )}
                     >
                       <span

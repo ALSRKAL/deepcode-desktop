@@ -42,7 +42,7 @@ const EDGE_RESIZE_HANDLES = [
     widthDirection: 1,
   },
   {
-    className: "-top-2 left-0 h-4 w-full cursor-ns-resize",
+    className: "-top-2 start-0 h-4 w-full cursor-ns-resize",
     dimension: "height",
     heightDirection: -1,
     key: "top",
@@ -51,7 +51,7 @@ const EDGE_RESIZE_HANDLES = [
     widthDirection: 0,
   },
   {
-    className: "-bottom-2 left-0 h-4 w-full cursor-ns-resize",
+    className: "-bottom-2 start-0 h-4 w-full cursor-ns-resize",
     dimension: "height",
     heightDirection: 1,
     key: "bottom",
@@ -93,7 +93,7 @@ const CORNER_RESIZE_HANDLES = [
 ] as const;
 
 const RESIZE_SEPARATOR_ICON_CLASS =
-  "pointer-events-none absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-foreground-subtlest opacity-0 transition-[color,opacity] group-hover/resize-edge:text-foreground-subtle group-hover/resize-edge:opacity-100 group-focus-visible/resize-edge:text-foreground-subtle group-focus-visible/resize-edge:opacity-100";
+  "pointer-events-none absolute top-1/2 start-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-foreground-subtlest opacity-0 transition-[color,opacity] group-hover/resize-edge:text-foreground-subtle group-hover/resize-edge:opacity-100 group-focus-visible/resize-edge:text-foreground-subtle group-focus-visible/resize-edge:opacity-100";
 
 export function ResponsiveBrowserResizeHandles({
   height,

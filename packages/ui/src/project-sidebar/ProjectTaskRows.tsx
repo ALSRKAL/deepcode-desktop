@@ -181,7 +181,7 @@ export function ProjectTaskRows({
           variant="ghost"
           size="sm"
           // 原因：分页入口误用辅助字号和次级颜色，与任务标题及空态不一致；仅交互时提亮。
-          className="ml-8.5 h-auto p-0 text-ui-base text-foreground-subtlest hover:bg-transparent focus-visible:text-foreground"
+          className="ms-8.5 h-auto p-0 text-ui-base text-foreground-subtlest hover:bg-transparent focus-visible:text-foreground"
           onClick={() =>
             kind === "pinned" ? setShowAll((value) => !value) : setLimit((n) => n + pageSize)
           }

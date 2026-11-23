@@ -205,7 +205,7 @@ export function ImagePreviewContent({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                className="absolute top-3 right-3 min-h-11 gap-2 bg-menu sm:hidden"
+                className="absolute top-3 end-3 min-h-11 gap-2 bg-menu sm:hidden"
                 variant="outline"
                 aria-label={intl.formatMessage({ id: "preview.image.actions" })}
               >

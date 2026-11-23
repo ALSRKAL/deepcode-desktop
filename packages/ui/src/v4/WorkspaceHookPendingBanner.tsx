@@ -174,7 +174,7 @@ export const WorkspaceHookPendingIndicator = memo(function WorkspaceHookPendingI
             <span
               data-testid={TID_V4_WORKSPACE_HOOK_PENDING_UNREAD}
               aria-hidden="true"
-              className="pointer-events-none absolute right-0.5 top-0.5 size-1.5 rounded-full bg-workspace-admission-unread"
+              className="pointer-events-none absolute end-0.5 top-0.5 size-1.5 rounded-full bg-workspace-admission-unread"
             />
           ) : null}
         </Button>
@@ -266,7 +266,7 @@ export const WorkspaceMcpPendingIndicator = memo(function WorkspaceMcpPendingInd
             <span
               data-testid={TID_V4_WORKSPACE_MCP_PENDING_UNREAD}
               aria-hidden="true"
-              className="pointer-events-none absolute right-0.5 top-0.5 size-1.5 rounded-full bg-workspace-admission-unread"
+              className="pointer-events-none absolute end-0.5 top-0.5 size-1.5 rounded-full bg-workspace-admission-unread"
             />
           ) : null}
         </Button>

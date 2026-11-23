@@ -193,7 +193,7 @@ function OpenAsFileSplitButton({
       {/* 分段外壳：主动作在左、菜单在右（DESIGN.md「Composite triggers」）。高度对齐头部的 sm 按钮。 */}
       <div className="flex h-6 shrink-0 items-center overflow-hidden rounded-md border border-border bg-input transition-colors hover:border-border-hover">
         <Button
-          className="h-6 rounded-none border-0 pr-1.5"
+          className="h-6 rounded-none border-0 pe-1.5"
           data-testid="workflow-artifact-open-as-file"
           disabled={disabled}
           title={intl.formatMessage(

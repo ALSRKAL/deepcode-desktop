@@ -69,7 +69,7 @@ const VoiceInputWaveform = memo(function VoiceInputWaveform(props: {
       aria-hidden
       data-testid={TID_V4_COMPOSER_VOICE_WAVEFORM}
       data-voice-active-dots={levels.filter((level) => level > 0).length}
-      className="flex h-3.5 items-center gap-1 pr-1 pl-3"
+      className="flex h-3.5 items-center gap-1 pe-1 ps-3"
     >
       {levels.map((level, index) => (
         <span

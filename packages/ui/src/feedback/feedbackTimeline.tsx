@@ -160,8 +160,8 @@ export function FeedbackTimeline({
   }
 
   return (
-    <ol className="relative space-y-4 pl-5">
-      <span className="absolute bottom-1 left-[7px] top-1 w-px bg-border" />
+    <ol className="relative space-y-4 ps-5">
+      <span className="absolute bottom-1 start-[7px] top-1 w-px bg-border" />
       {items.map((item, index) => {
         const Icon =
           item.kind === "event" && item.type

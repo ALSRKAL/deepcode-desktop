@@ -171,7 +171,7 @@ export const FileTreeFolder = ({
         >
           <div
             className={cn(
-              "flex w-full items-center gap-1 rounded px-2 py-1 text-left transition-colors hover:bg-muted/50",
+              "flex w-full items-center gap-1 rounded px-2 py-1 text-start transition-colors hover:bg-muted/50",
               isSelected && "bg-muted"
             )}
           >
@@ -189,7 +189,7 @@ export const FileTreeFolder = ({
               </button>
             </CollapsibleTrigger>
             <button
-              className="flex min-w-0 flex-1 cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-left"
+              className="flex min-w-0 flex-1 cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-start"
               onClick={handleSelect}
               type="button"
             >
@@ -204,7 +204,7 @@ export const FileTreeFolder = ({
             </button>
           </div>
           <CollapsibleContent>
-            <div className="ml-4 border-l pl-2">{children}</div>
+            <div className="ms-4 border-s ps-2">{children}</div>
           </CollapsibleContent>
         </div>
       </Collapsible>
@@ -293,7 +293,7 @@ export const FileTreeActions = ({
   ...props
 }: FileTreeActionsProps) => (
   <div
-    className={cn("ml-auto flex items-center gap-1", className)}
+    className={cn("ms-auto flex items-center gap-1", className)}
     onClick={stopPropagation}
     onKeyDown={stopPropagation}
     role="group"

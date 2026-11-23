@@ -28,7 +28,7 @@ export function AssistantDetailCard({
     >
       <CollapsibleTrigger
         aria-label={label}
-        className="flex min-h-7 w-full min-w-0 items-center gap-1.5 rounded-md px-2 py-1 text-left text-ui-sm text-foreground-subtle transition-colors hover:bg-hover"
+        className="flex min-h-7 w-full min-w-0 items-center gap-1.5 rounded-md px-2 py-1 text-start text-ui-sm text-foreground-subtle transition-colors hover:bg-hover"
       >
         <span className="flex size-4 shrink-0 items-center justify-center text-foreground-subtlest">
           <Icon className="size-3.5 group-hover:hidden" />

@@ -66,21 +66,21 @@ export function WorkspacePurposeSection({
       data-testid={testId}
       data-source-hierarchy-children={inset ? "true" : undefined}
       aria-label={title}
-      className={cn("group/purpose-section relative min-w-0", inset && "ml-6 mr-1")}
+      className={cn("group/purpose-section relative min-w-0", inset && "ms-6 me-1")}
     >
       {dropPosition && (
         <div
           aria-hidden="true"
           data-testid="purpose-section-drop-indicator"
           data-drop-position={dropPosition}
-          className={`pointer-events-none absolute left-5 right-2 z-20 h-0.5 bg-icon-blue ${dropPosition === "before" ? "top-0 -translate-y-1/2" : "bottom-0 translate-y-1/2"}`}
+          className={`pointer-events-none absolute start-5 end-2 z-20 h-0.5 bg-icon-blue ${dropPosition === "before" ? "top-0 -translate-y-1/2" : "bottom-0 translate-y-1/2"}`}
         >
           <span className="absolute -left-1 top-1/2 size-2 -translate-y-1/2 rounded-full border-2 border-icon-blue bg-sidebar" />
         </div>
       )}
       <Collapsible open={open} onOpenChange={onOpenChange}>
         {/* 原因：右侧 margin 与 action padding 叠加，多出 10px；与项目行统一保留 4px。 */}
-        <div className="ml-2 mr-1 flex h-7 min-w-0 items-center">
+        <div className="ms-2 me-1 flex h-7 min-w-0 items-center">
           <CollapsibleTrigger asChild>
             {/* purpose 分组标题之前使用 13px，比同级“已置顶”更小。
                 这里统一为 section title 的 text-ui-base，避免可折叠能力改变标题层级。 */}
@@ -91,7 +91,7 @@ export function WorkspacePurposeSection({
               type="button"
               aria-description={dragHandleLabel}
               data-purpose-section-drag-trigger={sortableId}
-              className="flex h-7 min-w-0 flex-1 touch-none items-center gap-1 px-2.5 text-left text-ui-base font-medium text-foreground-subtlest outline-none transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-ring/30"
+              className="flex h-7 min-w-0 flex-1 touch-none items-center gap-1 px-2.5 text-start text-ui-base font-medium text-foreground-subtlest outline-none transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-ring/30"
             >
               <span className="min-w-0 truncate">{title}</span>
               {open ? (

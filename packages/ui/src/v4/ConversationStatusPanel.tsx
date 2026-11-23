@@ -250,7 +250,7 @@ export function StatusCapsule({
           aria-label={hideLabel && typeof label === "string" ? label : undefined}
           // 基础 Button 的 bg-clip-padding 会让边框下方缺少背景；胶囊局部覆盖以保持边缘连续。
           className={cn(
-            "relative grid h-8 min-w-min max-w-64 shrink gap-1.5 rounded-full border-[0.5px] border-input-border bg-input bg-clip-border backdrop-blur-md pl-2 pr-2.5 text-ui-base shadow-(--shadow-composer-soft) @max-[640px]:gap-1",
+            "relative grid h-8 min-w-min max-w-64 shrink gap-1.5 rounded-full border-[0.5px] border-input-border bg-input bg-clip-border backdrop-blur-md ps-2 pe-2.5 text-ui-base shadow-(--shadow-composer-soft) @max-[640px]:gap-1",
             // flex 的 min-w-0 会把外框缩得比固定图标与数字更窄；Grid 最小列宽保护这些槽位。
             hideLabel
               ? "grid-cols-[auto_auto] shrink-0"
@@ -593,7 +593,7 @@ function RunningWorkCancelButton({
         id: "chat.summaryPanel.stopRunningBackgroundTask",
       })}
       onClick={handleClick}
-      className="pointer-events-auto relative z-[2] ml-auto h-6 shrink-0 px-1.5 text-ui-base text-foreground"
+      className="pointer-events-auto relative z-[2] ms-auto h-6 shrink-0 px-1.5 text-ui-base text-foreground"
     >
       <CircleStopIcon aria-hidden className="size-3" />
       {intl.formatMessage({ id: "chat.statusPanel.runningStop" })}
@@ -875,7 +875,7 @@ function SubagentStatusSection({
                       event.stopPropagation();
                       onStopSubagent?.(stopControl);
                     }}
-                    className="pointer-events-auto relative z-[2] ml-auto h-6 shrink-0 px-1.5 text-ui-base text-foreground"
+                    className="pointer-events-auto relative z-[2] ms-auto h-6 shrink-0 px-1.5 text-ui-base text-foreground"
                   >
                     <CircleStopIcon aria-hidden className="size-3" />
                     {intl.formatMessage({ id: "chat.statusPanel.runningStop" })}
@@ -921,12 +921,12 @@ function EndedDirectoryRow({
       <button
         type="button"
         data-testid={testId}
-        className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-ui-base text-foreground hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-input-border-focused"
+        className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-start text-ui-base text-foreground hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-input-border-focused"
         onClick={onOpen}
       >
         {icon}
         <span>{label}</span>
-        <span className="ml-auto text-ui-sm tabular-nums text-foreground-subtle">{count}</span>
+        <span className="ms-auto text-ui-sm tabular-nums text-foreground-subtle">{count}</span>
         <ChevronRightIcon className="size-4 text-foreground-subtle" />
       </button>
     </div>
@@ -1482,7 +1482,7 @@ function ConversationStatusPanelImpl(props: ConversationStatusPanelProps) {
                 type="button"
                 title={`${change.workspaceRelativePath || change.path} · ${intl.formatMessage({ id: "chat.capsule." + source })}`}
                 aria-label={`${change.workspaceRelativePath || change.path} ${intl.formatMessage({ id: "chat.capsule." + source })} ${change.added + change.removed > 0 ? `+${change.added} -${change.removed}` : intl.formatMessage({ id: "chat.capsule.fileChanged" })}`}
-                className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-ui-base hover:bg-hover"
+                className="flex w-full items-center gap-2 rounded-lg p-2 text-start text-ui-base hover:bg-hover"
                 onClick={closeOnNavigate(() => gitData?.openChange(change.path, source))}
               >
                 <FileDisplayIcon
@@ -1511,12 +1511,12 @@ function ConversationStatusPanelImpl(props: ConversationStatusPanelProps) {
               <Button
                 data-testid="status-git-view-all"
                 variant="ghost"
-                className="h-8 w-full justify-start gap-2 rounded-lg border-0 px-2 text-left text-ui-base"
+                className="h-8 w-full justify-start gap-2 rounded-lg border-0 px-2 text-start text-ui-base"
                 disabled={!onOpenGitReview}
                 onClick={() => onOpenGitReview?.(props.gitWorktreeReviewSourceId ?? undefined)}
               >
                 <FileDiffIcon className="size-4" />
-                <span className="min-w-0 flex-1 text-left">
+                <span className="min-w-0 flex-1 text-start">
                   {intl.formatMessage({ id: "chat.statusPanel.viewAllChanges" })}
                 </span>
                 <span className="shrink-0 text-ui-sm text-foreground-subtle">
@@ -1533,7 +1533,7 @@ function ConversationStatusPanelImpl(props: ConversationStatusPanelProps) {
                     onRefreshGit={onRefreshGit}
                     onModalOpen={() => capsuleContext?.setOpen(null)}
                     className="min-w-0 w-full p-0"
-                    triggerClassName="h-8 w-full justify-start gap-2 rounded-lg border-0 px-2 text-left text-ui-base [&_svg]:shrink-0 [&_[data-branch-switcher-primary-icon]]:text-foreground"
+                    triggerClassName="h-8 w-full justify-start gap-2 rounded-lg border-0 px-2 text-start text-ui-base [&_svg]:shrink-0 [&_[data-branch-switcher-primary-icon]]:text-foreground"
                     renderTriggerLabel={(label) => (
                       <span className="min-w-0 flex-1">
                         <StatusCapsuleTitle title={label} />
@@ -1606,7 +1606,7 @@ function ConversationStatusPanelImpl(props: ConversationStatusPanelProps) {
               {!activityAvatars.length && !activities.length && endedActivities.length > 0 ? (
                 <svg
                   aria-hidden
-                  className="pointer-events-none absolute bottom-0 left-0 size-4 overflow-visible"
+                  className="pointer-events-none absolute bottom-0 start-0 size-4 overflow-visible"
                   viewBox="0 0 20 20"
                 >
                   <AgentResultBadge result={activityResult} />

@@ -25,7 +25,7 @@ export function DataSyncMinimizedProgress(props: {
       type="button"
       data-testid="remote-sync-minimized"
       onClick={props.onRestore}
-      className="fixed right-4 bottom-4 left-4 z-50 flex items-center gap-3 rounded-xl border border-popover-border bg-popover px-4 py-3 text-left text-foreground shadow-md sm:left-auto sm:max-w-sm [app-region:no-drag]"
+      className="fixed end-4 bottom-4 start-4 z-50 flex items-center gap-3 rounded-xl border border-popover-border bg-popover px-4 py-3 text-start text-foreground shadow-md sm:left-auto sm:max-w-sm [app-region:no-drag]"
     >
       <RefreshCw
         className={cn("size-4 shrink-0", props.pushing && "animate-spin")}
@@ -55,7 +55,7 @@ export function DataSyncMinimizeButton(props: { pushing: boolean; onMinimize(): 
       data-testid="remote-sync-minimize"
       className={cn(
         "absolute top-4 z-20 hover:bg-surface-hover",
-        props.pushing ? "right-4" : "right-12",
+        props.pushing ? "end-4" : "end-12",
       )}
       title={label}
       aria-label={label}

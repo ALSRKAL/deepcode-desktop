@@ -64,7 +64,7 @@ export function ToolPresentation({
     errorText: getToolCallErrorText(toolCall),
     disableSummaryContentAnimation: true,
     childToolList: childToolCalls.length ? (
-      <div className="ml-2 space-y-2 border-l border-border pl-3.5">
+      <div className="ms-2 space-y-2 border-s border-border ps-3.5">
         {childToolCalls.map((child) => (
           <ToolPresentation key={child.toolCall.toolId} toolCallNode={child} {...options} />
         ))}

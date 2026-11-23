@@ -84,7 +84,7 @@ export function SpineRail({
       aria-hidden
       className={cn(
         "wf-ink absolute rounded-full",
-        lit ? "left-[20.25px] w-[1.5px]" : "left-[20.5px] w-px",
+        lit ? "start-[20.25px] w-[1.5px]" : "start-[20.5px] w-px",
         position === "above" ? "top-0 h-3" : position === "below" ? "bottom-0 top-6" : "inset-y-0",
         !lit && "bg-foreground-subtlest",
         lit && "wf-spine-march",
@@ -175,7 +175,7 @@ export function SpineJointRow({
         {...(joint.open === true ? { overhang: kind === "fork" ? "top" : "bottom" } : {})}
       />
       <svg
-        className="absolute left-0 top-0 overflow-visible"
+        className="absolute start-0 top-0 overflow-visible"
         height={SPINE_JOINT_PX}
         viewBox={`0 0 ${width} ${SPINE_JOINT_PX}`}
         width={width}
@@ -232,7 +232,7 @@ export function SpineLamp({
     <span
       aria-hidden
       className={cn(
-        "wf-lamp absolute left-4 top-[13px] size-2.5 rounded-full",
+        "wf-lamp absolute start-4 top-[13px] size-2.5 rounded-full",
         STATUS_DOT[status],
         status === "pending" && "bg-background",
         status === "running" && "wf-lamp-running motion-reduce:animate-none",
@@ -281,7 +281,7 @@ export function AvatarCluster({
         );
       })}
       {more > 0 ? (
-        <span className="ml-1 font-mono text-ui-xs tabular-nums text-foreground-subtlest">
+        <span className="ms-1 font-mono text-ui-xs tabular-nums text-foreground-subtlest">
           +{more}
         </span>
       ) : null}

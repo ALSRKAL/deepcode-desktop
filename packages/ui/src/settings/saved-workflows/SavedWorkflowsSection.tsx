@@ -277,7 +277,7 @@ export function SavedWorkflowsSection({
         <h2 className="text-ui-base font-medium leading-5 text-foreground-subtle">
           {intl.formatMessage({ id: "workflows.hub.sectionTitle" })}
           {totalCount > 0 ? (
-            <span className="ml-1 font-normal text-foreground-subtlest">{totalCount}</span>
+            <span className="ms-1 font-normal text-foreground-subtlest">{totalCount}</span>
           ) : null}
         </h2>
         <div className="flex items-center gap-3">
@@ -293,7 +293,7 @@ export function SavedWorkflowsSection({
               <Settings2 className="size-4" aria-hidden="true" />
               <span>{intl.formatMessage({ id: "workflows.hub.openSettings" })}</span>
               {dynamicWorkflowMode ? (
-                <span className="ml-0.5 text-ui-sm text-foreground-subtlest">
+                <span className="ms-0.5 text-ui-sm text-foreground-subtlest">
                   {intl.formatMessage({
                     id: `settings.dynamicWorkflow.option.${dynamicWorkflowMode}`,
                   })}

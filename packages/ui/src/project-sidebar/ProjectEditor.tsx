@@ -56,7 +56,7 @@ import {
 
 const FIELD_LABEL = "text-ui-sm font-medium text-foreground";
 // SelectItem 的 ItemText 默认按内容收缩；撑满整行后状态才能靠右，长名称截断时不挤掉状态。
-const DEVICE_ITEM = "pr-8 *:[span]:last:min-w-0 *:[span]:last:flex-1";
+const DEVICE_ITEM = "pe-8 *:[span]:last:min-w-0 *:[span]:last:flex-1";
 
 /** 设备行：图标 + 名称 + 状态；状态颜色只取远程连接展示模型，在线只留圆点。 */
 function DeviceOption({ label, status }: { label: string; status?: string }) {
@@ -73,7 +73,7 @@ function DeviceOption({ label, status }: { label: string; status?: string }) {
         <span
           data-testid="virtual-project-device-status"
           data-status={status}
-          className="ml-auto flex shrink-0 items-center gap-1.5 text-ui-sm text-foreground-subtle"
+          className="ms-auto flex shrink-0 items-center gap-1.5 text-ui-sm text-foreground-subtle"
         >
           {presentation.icon === "spinner" ? (
             <LoaderCircle className={`size-3 animate-spin ${presentation.foreground}`} />
@@ -628,7 +628,7 @@ export function ProjectEditor({
                         type="button"
                         data-testid="virtual-project-browse"
                         aria-label={msg(needsConnection ? "connectAndBrowse" : "browse")}
-                        className={`group flex w-full items-center gap-2 text-ui-base transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30 ${roots.length ? "min-h-12 px-3 py-2 text-left" : "min-h-32 flex-col justify-center rounded-lg border border-dashed border-border px-4 py-5 text-center hover:border-border-hover"}`}
+                        className={`group flex w-full items-center gap-2 text-ui-base transition-colors hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/30 ${roots.length ? "min-h-12 px-3 py-2 text-start" : "min-h-32 flex-col justify-center rounded-lg border border-dashed border-border px-4 py-5 text-center hover:border-border-hover"}`}
                         onClick={() => {
                           void browse();
                         }}
@@ -685,7 +685,7 @@ export function ProjectEditor({
                       onClick={() => {
                         void remove();
                       }}
-                      className="mr-auto bg-destructive-surface text-destructive-surface-foreground hover:bg-destructive-surface hover:text-destructive-surface-foreground"
+                      className="me-auto bg-destructive-surface text-destructive-surface-foreground hover:bg-destructive-surface hover:text-destructive-surface-foreground"
                     >
                       {msg("delete")}
                     </Button>

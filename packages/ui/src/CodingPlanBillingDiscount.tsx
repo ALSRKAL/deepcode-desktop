@@ -268,7 +268,7 @@ export function CodingPlanBillingDiscountInfoDialog({
       >
         <div className={CODING_PLAN_BILLING_DISCOUNT_DIALOG_BODY_CLASS}>
           <MessageResponse
-            className="min-h-0 overflow-y-auto pr-1 text-foreground"
+            className="min-h-0 overflow-y-auto pe-1 text-foreground"
             theme={theme}
             codePreviewSettings={codePreviewSettings}
           >

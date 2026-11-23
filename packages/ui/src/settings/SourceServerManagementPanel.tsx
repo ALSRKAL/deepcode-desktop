@@ -872,7 +872,7 @@ export function SourceServerManagementPanel({
             {intl.formatMessage({ id: "settings.source.defaultProfile" })}
           </span>
         ) : null}
-        <span className="ml-auto flex min-w-0 flex-wrap items-center gap-2">
+        <span className="ms-auto flex min-w-0 flex-wrap items-center gap-2">
           {connectionErrorText ? (
             <span
               className="max-w-64 truncate text-ui-sm text-destructive-surface-foreground"
@@ -1667,7 +1667,7 @@ export function SourceServerManagementPanel({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="ml-auto"
+                          className="ms-auto"
                           onClick={() => sourceServerUpdatePreferences.defer(updateKey)}
                         >
                           {intl.formatMessage({ id: "updateDialog.later" })}
@@ -1826,7 +1826,7 @@ export function SourceServerManagementPanel({
                                 <span className="max-w-48 shrink-0 truncate text-ui-base font-medium">
                                   {projectName}
                                 </span>
-                                <span className="min-w-0 flex-1 truncate text-left font-mono text-ui-sm text-remote-foreground-muted">
+                                <span className="min-w-0 flex-1 truncate text-start font-mono text-ui-sm text-remote-foreground-muted">
                                   {project.workspacePath}
                                 </span>
                                 {openedProjectPaths.has(project.workspacePath) ? (
@@ -1888,7 +1888,7 @@ export function SourceServerManagementPanel({
                             // 只有日志入口时靠左，避免页脚左侧空出一整行。
                             className={cn(
                               "text-remote-foreground-muted",
-                              showOtherProfiles ? "-mr-2 ml-auto" : "-ml-2",
+                              showOtherProfiles ? "-mr-2 ms-auto" : "-ml-2",
                             )}
                             aria-expanded={logExpanded}
                             onClick={() =>
@@ -2085,7 +2085,7 @@ export function SourceServerManagementPanel({
                 })}
               </span>
             </summary>
-            <div className="mt-2 space-y-1 pl-6">
+            <div className="mt-2 space-y-1 ps-6">
               {retiredProfiles.map((profile) => (
                 <div
                   key={profile.profileId}

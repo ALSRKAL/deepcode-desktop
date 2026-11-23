@@ -30,7 +30,7 @@ export function ToolCallProgressIndicator({ progress }: { progress: ToolProgress
       <span className="relative inline-block h-1 w-16 shrink-0 overflow-hidden rounded-full bg-surface-hover">
         {fraction !== undefined ? (
           <span
-            className="absolute inset-y-0 left-0 rounded-full bg-brand transition-[width] duration-200"
+            className="absolute inset-y-0 start-0 rounded-full bg-brand transition-[width] duration-200"
             style={{ width: `${Math.round(fraction * 100)}%` }}
           />
         ) : (

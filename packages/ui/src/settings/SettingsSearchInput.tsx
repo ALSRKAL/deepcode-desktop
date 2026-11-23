@@ -24,7 +24,7 @@ export function SettingsSearchInput({
   return (
     <div className={cn("relative", containerClassName)}>
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground-subtle"
+        className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-foreground-subtle"
         aria-hidden="true"
       />
       <Input
@@ -32,13 +32,13 @@ export function SettingsSearchInput({
         type="search"
         size="lg"
         className={cn(
-          "h-9 rounded-xl pl-9 [&::-webkit-search-cancel-button]:appearance-none",
-          (canClear || trailingAction) && "pr-9",
-          canClear && trailingAction && "pr-16",
+          "h-9 rounded-xl ps-9 [&::-webkit-search-cancel-button]:appearance-none",
+          (canClear || trailingAction) && "pe-9",
+          canClear && trailingAction && "pe-16",
           className,
         )}
       />
-      <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
+      <div className="absolute end-1 top-1/2 flex -translate-y-1/2 items-center">
         {canClear ? (
           <Button
             type="button"

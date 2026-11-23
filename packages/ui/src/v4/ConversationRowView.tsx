@@ -223,7 +223,7 @@ const SessionSourceHint = memo(function SessionSourceHint({ source }: { source: 
   );
   return (
     <div
-      className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+      className="mt-1 text-end text-ui-sm text-foreground-subtlest"
       data-v4-user-input-source="session"
       data-source-session-id={source.sessionId}
     >
@@ -876,7 +876,7 @@ const UserInputAttachmentList = memo(function UserInputAttachmentList({
               : "relative size-20 overflow-hidden rounded-xl bg-surface p-0 after:pointer-events-none after:absolute after:inset-0 after:rounded-xl after:border after:border-border after:content-[''] hover:bg-surface-hover"),
           !isThumbnail &&
             (isEditingAttachment
-              ? "h-12 w-fit max-w-full min-w-0 gap-2 rounded-lg border border-border bg-surface p-1.5 pr-6 [--attachment-bg:var(--color-surface)] hover:bg-surface-hover"
+              ? "h-12 w-fit max-w-full min-w-0 gap-2 rounded-lg border border-border bg-surface p-1.5 pe-6 [--attachment-bg:var(--color-surface)] hover:bg-surface-hover"
               : "rounded-full border-0 bg-surface px-3 py-1.5 hover:bg-surface-hover"),
         )}
         onRemove={onRemove ? () => onRemove(index) : undefined}
@@ -960,7 +960,7 @@ const UserInputAttachmentList = memo(function UserInputAttachmentList({
             aria-label={intl.formatMessage({ id: "chat.attachments.remove" })}
             label={intl.formatMessage({ id: "chat.attachments.remove" })}
             data-testid={testId(TID_V4_EDIT_ATTACHMENT_REMOVE, `${rowId}-${index}`)}
-            className="absolute top-0.5 right-0.5 z-10 size-3.5 rounded-full p-0 text-primary-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+            className="absolute top-0.5 end-0.5 z-10 size-3.5 rounded-full p-0 text-primary-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
           >
             <XIcon className="size-2.5" />
           </AttachmentRemove>
@@ -1229,7 +1229,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
       {row.source?.kind === "session" && <SessionSourceHint source={row.source} />}
       {row.source?.kind === "genUi" && (
         <div
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-end text-ui-sm text-foreground-subtlest"
           data-v4-user-input-source="genUi"
         >
           {intl.formatMessage({ id: "genUi.from" }, { name: row.source.title || "Gen UI" })}
@@ -1241,7 +1241,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
         <div
           data-v4-user-input-source={row.source.pluginId}
           data-v4-user-input-source-kind={row.source.kind}
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-end text-ui-sm text-foreground-subtlest"
         >
           {intl.formatMessage(
             { id: "pluginUi.fromPlugin" },
@@ -1252,7 +1252,7 @@ const SingleUserInputRowView = memo(function SingleUserInputRowView({
       {status ? (
         <div
           data-v4-user-input-status="true"
-          className="mt-1 text-right text-ui-sm text-foreground-subtlest"
+          className="mt-1 text-end text-ui-sm text-foreground-subtlest"
           aria-live="polite"
         >
           {status}

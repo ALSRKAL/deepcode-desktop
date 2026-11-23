@@ -164,7 +164,7 @@ export function EmbeddedBrowserPermissionPrompts({
     <>
       {permissionPrompts.length > 0 ? (
         <div
-          className="pointer-events-none absolute left-3 top-1.5 z-40 flex w-80 max-w-[calc(100%-24px)] flex-col gap-2"
+          className="pointer-events-none absolute start-3 top-1.5 z-40 flex w-80 max-w-[calc(100%-24px)] flex-col gap-2"
           data-testid={TID_BROWSER_PERMISSION_PROMPTS}
         >
           {permissionPrompts.map((prompt) => (
@@ -211,7 +211,7 @@ export function EmbeddedBrowserPermissionPrompts({
                   type="button"
                   variant="secondary"
                   data-testid={TID_BROWSER_PERMISSION_ALLOW_ALWAYS}
-                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-left whitespace-normal"
+                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-start whitespace-normal"
                   onClick={() => resolve(prompt.requestId, { action: "allow-always" })}
                 >
                   {formatMessage({ id: "browser.permission.allowAlways" })}
@@ -220,7 +220,7 @@ export function EmbeddedBrowserPermissionPrompts({
                   type="button"
                   variant="secondary"
                   data-testid={TID_BROWSER_PERMISSION_ALLOW_ONCE}
-                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-left whitespace-normal"
+                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-start whitespace-normal"
                   onClick={() => resolve(prompt.requestId, { action: "allow-session" })}
                 >
                   {formatMessage({ id: "browser.permission.allowOnce" })}
@@ -229,7 +229,7 @@ export function EmbeddedBrowserPermissionPrompts({
                   type="button"
                   variant="secondary"
                   data-testid={TID_BROWSER_PERMISSION_DENY}
-                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-left whitespace-normal"
+                  className="h-auto min-h-9 justify-start rounded-full px-4 py-2 text-start whitespace-normal"
                   onClick={() => resolve(prompt.requestId, { action: "dismiss" })}
                 >
                   {formatMessage({ id: "browser.permission.denyThisTime" })}
@@ -287,7 +287,7 @@ export function EmbeddedBrowserPermissionPrompts({
                         <button
                           type="button"
                           key={screen.sourceId}
-                          className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-menu-hover data-[selected=true]:bg-selected"
+                          className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-start hover:bg-menu-hover data-[selected=true]:bg-selected"
                           data-selected={selection[prompt.requestId] === screen.sourceId}
                           onClick={() =>
                             setSelection((current) => ({
@@ -316,7 +316,7 @@ export function EmbeddedBrowserPermissionPrompts({
                   <button
                     type="button"
                     key={device.deviceId}
-                    className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-menu-hover data-[selected=true]:bg-selected"
+                    className="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-start hover:bg-menu-hover data-[selected=true]:bg-selected"
                     data-selected={selection[prompt.requestId] === device.deviceId}
                     onClick={() =>
                       setSelection((current) => ({

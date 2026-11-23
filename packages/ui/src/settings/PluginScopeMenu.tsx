@@ -123,7 +123,7 @@ function DeviceScopeMenu({
           data-testid={triggerTestId}
           data-plugin-scope-trigger="true"
           data-plugin-scope-key={selectedScopeKey}
-          className="rounded-full pl-2.5 pr-1.5"
+          className="rounded-full ps-2.5 pe-1.5"
         >
           <TriggerIcon className="size-4" aria-hidden="true" data-testid={triggerIconTestId} />
           <span className="flex max-w-56 min-w-0 items-center gap-1">

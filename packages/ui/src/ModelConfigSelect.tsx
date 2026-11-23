@@ -151,7 +151,7 @@ export function getModelTriggerLabelClassName({
     return triggerLabelClassName;
   }
 
-  return cn("min-w-0 text-left", labelVisibilityClassName);
+  return cn("min-w-0 text-start", labelVisibilityClassName);
 }
 
 /** 锚在模型按钮上的一次性引导气泡（如服务端规则切换草稿模型后的提示）。 */
@@ -387,7 +387,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
       } as const;
       const content = (
         <>
-          <span className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
+          <span className="flex min-w-0 flex-1 items-center gap-1.5 text-start">
             <span className="min-w-0 truncate" title={item.name}>
               {item.name}
             </span>
@@ -441,7 +441,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
               aria-selected={itemSelected}
               aria-disabled={itemLocked || Boolean(pending)}
               className={cn(
-                "relative flex w-full min-h-8 items-center gap-2 rounded-md py-1.5 pl-2 pr-8 text-left text-ui-base outline-none hover:bg-menu-hover focus-visible:bg-menu-hover disabled:pointer-events-none",
+                "relative flex w-full min-h-8 items-center gap-2 rounded-md py-1.5 ps-2 pe-8 text-start text-ui-base outline-none hover:bg-menu-hover focus-visible:bg-menu-hover disabled:pointer-events-none",
                 itemLocked && "cursor-not-allowed text-foreground-subtlest",
               )}
               onClick={() => {
@@ -452,7 +452,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
               {itemSelected && !itemLocked ? (
                 <CheckIcon
                   aria-hidden="true"
-                  className="absolute right-2 size-4 text-foreground-subtle"
+                  className="absolute end-2 size-4 text-foreground-subtle"
                 />
               ) : null}
             </button>
@@ -478,7 +478,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
           key={itemKey}
           {...commonProps}
           value={item.value}
-          className="min-h-8 gap-2 pl-2 pr-8 text-ui-base"
+          className="min-h-8 gap-2 ps-2 pe-8 text-ui-base"
           onSelect={() => {
             handleModelValueChange(item.value);
             handlePopoverOpenChange(false);
@@ -517,7 +517,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
 
   const renderGroupLabel = useCallback(
     (group: ModelSelectGroup, options: { mutedLabel?: boolean } = {}) => (
-      <span className="min-w-0 flex-1 items-center gap-1.5 text-left inline-flex">
+      <span className="min-w-0 flex-1 items-center gap-1.5 text-start inline-flex">
         <span
           className={cn(
             "min-w-0 whitespace-normal break-words text-ui-base",
@@ -545,7 +545,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
         return (
           <div className="flex min-h-8 items-center gap-2 px-2 py-1">
             <span
-              className="min-w-0 flex-1 truncate text-left text-ui-sm font-medium text-foreground-subtlest"
+              className="min-w-0 flex-1 truncate text-start text-ui-sm font-medium text-foreground-subtlest"
               title={group.label}
             >
               {group.label}
@@ -564,7 +564,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
               <SelectTrigger
                 size="xs"
                 variant="outline"
-                className="min-w-0 shrink-0 gap-0.5 rounded-full pr-1.5 text-ui-sm text-foreground-subtle [&_svg]:size-3"
+                className="min-w-0 shrink-0 gap-0.5 rounded-full pe-1.5 text-ui-sm text-foreground-subtle [&_svg]:size-3"
                 data-testid={testId(TID_CHAT_MODEL_SELECT_GROUP, group.key)}
                 data-model-provider-key={group.key}
                 onPointerDown={(event) => event.stopPropagation()}
@@ -702,7 +702,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
         data-composer-combined-model={composerOptions ? "true" : undefined}
         data-composer-collapse-priority={composerOptions ? "3" : undefined}
         className={cn(
-          "w-fit justify-between gap-1 rounded-lg pl-2 pr-1.5 text-ui-base whitespace-nowrap",
+          "w-fit justify-between gap-1 rounded-lg ps-2 pe-1.5 text-ui-base whitespace-nowrap",
           triggerClassName,
           composerOptions && "group/combined relative",
           showSelectionLabel &&
@@ -746,7 +746,7 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
           collisionPadding={guideOpen ? 8 : undefined}
           className={
             guideOpen
-              ? "max-w-[min(28rem,var(--radix-tooltip-content-available-width))] bg-background py-0.5 pr-0.5 pl-2"
+              ? "max-w-[min(28rem,var(--radix-tooltip-content-available-width))] bg-background py-0.5 pe-0.5 ps-2"
               : undefined
           }
         >

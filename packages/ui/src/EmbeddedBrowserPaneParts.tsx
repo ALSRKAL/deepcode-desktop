@@ -160,13 +160,13 @@ export function BrowserToolbar({
           value={addressValue}
           data-testid={TID_BROWSER_ADDRESS_INPUT}
           size="sm"
-          className="h-8 min-w-0 rounded-full px-2 text-left @min-[9rem]/browser-address:px-3 @min-[9rem]/browser-address:not-focus:px-14 @min-[9rem]/browser-address:not-focus:text-center"
+          className="h-8 min-w-0 rounded-full px-2 text-start @min-[9rem]/browser-address:px-3 @min-[9rem]/browser-address:not-focus:px-14 @min-[9rem]/browser-address:not-focus:text-center"
           onChange={(event) => onAddressChange(event.target.value)}
           placeholder={formatMessage({ id: "browser.addressPlaceholder" })}
           spellCheck={false}
         />
         {/* 编辑 URL 时隐藏入口但不卸载，避免将隐藏图标误当成关闭权限申请。 */}
-        <div className="absolute top-1/2 left-0.5 -translate-y-1/2 group-has-[input:focus]/browser-address:hidden @max-[9rem]/browser-address:hidden">
+        <div className="absolute top-1/2 start-0.5 -translate-y-1/2 group-has-[input:focus]/browser-address:hidden @max-[9rem]/browser-address:hidden">
           {permissionControl}
         </div>
       </div>
@@ -397,7 +397,7 @@ function BrowserRecentVisits({
     >
       <div
         data-testid="browser-recent-visits-content"
-        className="absolute top-[40%] left-1/2 max-h-[calc(80%_-_40px)] w-[calc(100%_-_32px)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto sm:w-[calc(100%_-_48px)]"
+        className="absolute top-[40%] start-1/2 max-h-[calc(80%_-_40px)] w-[calc(100%_-_32px)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto sm:w-[calc(100%_-_48px)]"
       >
         <h2 className="mb-3 text-center text-ui-base font-medium text-foreground">
           {formatMessage({ id: "browser.recentVisits.title" })}
@@ -410,7 +410,7 @@ function BrowserRecentVisits({
                 data-browser-recent-url={visit.url}
                 title={visit.url}
                 onClick={() => onOpen(visit.url)}
-                className="flex min-w-0 flex-1 items-center gap-3 px-2 py-3 text-left hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
+                className="flex min-w-0 flex-1 items-center gap-3 px-2 py-3 text-start hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand"
               >
                 {visit.faviconUrl ? (
                   <img
@@ -449,7 +449,7 @@ function BrowserRecentVisits({
                     variant="ghost"
                     aria-label={formatMessage({ id: "browser.recentVisits.remove" })}
                     data-browser-recent-remove-url={visit.url}
-                    className="mr-1 text-foreground-subtle"
+                    className="me-1 text-foreground-subtle"
                     onClick={() => onRemove(visit.url)}
                   >
                     <X aria-hidden="true" className="size-4" />

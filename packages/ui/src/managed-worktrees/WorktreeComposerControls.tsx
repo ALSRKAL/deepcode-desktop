@@ -115,10 +115,10 @@ export function WorktreeBranchPicker({
             size="default"
             data-worktree-branch-picker="true"
             aria-label={intl.formatMessage({ id: "git.managedWorktree.ref.title" })}
-            className="min-w-0 max-w-full rounded-full pl-3 pr-2 text-ui-base/relaxed"
+            className="min-w-0 max-w-full rounded-full ps-3 pe-2 text-ui-base/relaxed"
           >
             <GitBranchIcon className="size-4 text-foreground-subtle" />
-            <span className="min-w-0 max-w-25 truncate text-left">{triggerLabel}</span>
+            <span className="min-w-0 max-w-25 truncate text-start">{triggerLabel}</span>
             <ChevronDownIcon className="size-3.5 text-foreground-subtle" />
           </Button>
         </DropdownMenuTrigger>
