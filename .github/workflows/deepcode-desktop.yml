@@ -54,6 +54,8 @@ jobs:
         run: |
           command -v rg >/dev/null || (sudo apt-get update && sudo apt-get install -y --no-install-recommends ripgrep)
           node scripts/ci/brand-leak-check.mjs .
+      - name: DeepCode model registry sync
+        run: node scripts/ci/deepcode-builtin-models.mjs .
       - name: DeepCode tests (account, deep link, HUD, sync, locale parity)
         run: |
           pnpm --dir packages/deepcode exec vitest run

@@ -24,11 +24,14 @@ const check = process.argv.includes("--check");
 const upstream = JSON.parse(readFileSync(resolve(root, "config/provider/zcode-builtin.json"), "utf8"));
 
 /**
- * DeepCode 网关可服务的全部模型（packages/db/src/catalog.ts SYNTHETIC_MODELS 的品牌 id）。
+ * DeepCode 网关可服务的全部模型（与 packages/db/src/catalog.ts 的
+ * GO_TEAM_MODELS + OWNER_SYNTHETIC_MODELS 以及 packages/ui/src/lib/deepcodeModels.ts
+ * 保持一致）。
  *
  * 修复原因：Agent 进程的 Registry 使用 EmptyAccountProviderConfigSource，不接收宿主按
- * 计划下发的动态模型清单，只认这里的静态 builtinModelIds。此前清单只有 16 个旧模型，
- * 用户在模型选择器里选中网关下发的 beam-free 等模型时，Agent 报
+ * 计划下发的动态模型清单，只认这里的静态 builtinModelIds。此前清单只有 Synthetic 的
+ * 8 个品牌 id；2026-11-23 公开计划改为 OpenCode Go 后，用户在模型选择器里选
+ * deepseek-v4.1-flash 等 Go 模型时，Agent 报
  * "Provider Registry 中不存在 Model"。这里放全集即可：模型选择器仍只展示宿主从网关
  * 取到的计划内模型，计划外模型由网关返回 403，权限边界始终在服务端。
  */
@@ -43,6 +46,35 @@ const DEEPCODE_MODELS = [
   "deepcode-lite",
   "deepcode-general",
   "deepcode-background",
+  // OpenCode Go（公开计划，owner 2026-11-23）。必须与网关的 GO_TEAM_MODELS 同步：
+  // 少一个，该模型在 Agent Registry 里就不存在；多一个也无妨，网关仍会按计划拒绝。
+  "hy4-flash-free",
+  "deepseek-v4.1-flash",
+  "glm-5.3-flash",
+  "glm-5.2",
+  "longcat-2.0",
+  "mimo-v2.6-flash",
+  "minimax-m3",
+  "qwen3.7-plus",
+  "hy4",
+  "hy3",
+  "kimi-k2.7-code",
+  "qwen3.8-flash",
+  "hy4-preview",
+  "gemini-4-argon",
+  "minimax-m3.1-flash",
+  "glm-5.3",
+  "kimi-k3.1-pro",
+  "kimi-k3",
+  "step-5-preview",
+  "mimo-v2.6-pro",
+  "deepseek-v4-pro",
+  "gpt-6-luna",
+  "gpt-5.6-luna",
+  "claude-haiku-5-5",
+  "grok-4.7",
+  "qwen4-max",
+  "qwen3.8-max",
 ];
 
 /**
