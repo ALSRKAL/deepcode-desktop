@@ -150,7 +150,8 @@ function withDeepCodePresentation(
     return i < 0 ? DEEPCODE_MODELS.length : i;
   };
   primary.items = [...primary.items].sort((a, b) => rank(a.name) - rank(b.name));
-  const locked = DEEPCODE_MODELS.filter((m) => !available.has(m.id))
+  // Owner-only Synthetic models are not advertised to non-owner accounts at all.
+  const locked = DEEPCODE_MODELS.filter((m) => !m.ownerOnly && !available.has(m.id))
     .sort((a, b) => DEEPCODE_PLAN_ORDER[a.plan] - DEEPCODE_PLAN_ORDER[b.plan])
     .map((m) => ({
       key: `deepcode-locked:${m.id}`,

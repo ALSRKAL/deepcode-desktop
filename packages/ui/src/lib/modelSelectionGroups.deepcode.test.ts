@@ -37,17 +37,16 @@ describe("DeepCode model menu", () => {
     ]);
   });
 
-  it("lists the plan's missing models as locked with the plan that has them", () => {
-    const [group] = buildRegistryModelSelectGroups(ZCODE_AGENT_PROVIDER, view(["deepcode-default"]), labels);
+  it("locks missing Go models by plan and never advertises owner-only Synthetic models", () => {
+    const [group] = buildRegistryModelSelectGroups(ZCODE_AGENT_PROVIDER, view(["hy4-flash-free"]), labels);
     const locked = group!.items.filter((i) => i.lockedBadge);
-    expect(locked.map((i) => `${i.name}:${i.lockedBadge}`)).toEqual([
-      "DeepCode Lite:STARTER",
-      "DeepCode General:STARTER",
-      "DeepCode Fast Agent:STARTER",
-      "DeepCode Mid:PRO",
-      "DeepCode Coder Pro:PRO",
-      "DeepCode Architect:TEAM",
-    ]);
+    const pairs = locked.map((i) => `${i.name}:${i.lockedBadge}`);
+    expect(pairs).toContain("GLM-5.3-Flash:STARTER");
+    expect(pairs).toContain("Qwen3.8 Flash:PRO");
+    expect(pairs).toContain("GLM-5.3:TEAM");
+    // Synthetic branded models are owner-only: non-owners must not see a locked row.
+    expect(pairs).not.toContain("DeepCode Default:TEAM");
+    expect(pairs).not.toContain("DeepCode Architect:TEAM");
     expect(locked.every((i) => isDeepCodeLockedValue(i.value))).toBe(true);
   });
 
