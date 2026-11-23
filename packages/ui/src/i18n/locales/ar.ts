@@ -1752,6 +1752,7 @@ const ar: Record<string, string> = {
   "deepcode.hud.credits": "متبقي {remaining} كريدت",
   "deepcode.hud.expiresIn": "متبقٍ {days} يوم",
   "deepcode.hud.usedOf": "استُهلك {used} من {limit}",
+  "deepcode.models.plan.free": "مجاني",
   "deepcode.models.plan.trial": "تجربة",
   "deepcode.models.plan.starter": "Starter",
   "deepcode.models.plan.pro": "Pro",

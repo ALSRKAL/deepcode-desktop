@@ -1773,6 +1773,7 @@ const enUS: Record<string, string> = {
   "deepcode.hud.credits": "{remaining} credits left",
   "deepcode.hud.expiresIn": "{days}d left",
   "deepcode.hud.usedOf": "{used} of {limit} used",
+  "deepcode.models.plan.free": "Free",
   "deepcode.models.plan.trial": "Trial",
   "deepcode.models.plan.starter": "Starter",
   "deepcode.models.plan.pro": "Pro",

@@ -6,7 +6,7 @@
  * 可用性仍由网关按计划下发（宿主 registry），这里只决定展示；计划与网关
  * packages/db/src/catalog.ts 的 SYNTHETIC_PLAN_LAYOUT / TRIAL_PLAN 保持一致。
  */
-export type DeepCodePlanTier = "trial" | "starter" | "pro" | "team";
+export type DeepCodePlanTier = "free" | "trial" | "starter" | "pro" | "team";
 
 export interface DeepCodeModelInfo {
   id: string;
@@ -19,6 +19,10 @@ export interface DeepCodeModelInfo {
 
 /** Cheapest → strongest, the order users see. */
 export const DEEPCODE_MODELS: readonly DeepCodeModelInfo[] = [
+  // Free plan (owner decision 2026-11-23): both run on OpenCode Go. Hy4 is $0;
+  // DeepSeek Flash is metered against the free plan's credits.
+  { id: "hy4-flash-free", name: "Hy4 Flash Free", detail: "Free · no credits", plan: "free" },
+  { id: "deepseek-v4.1-flash", name: "DeepSeek Flash", detail: "DeepSeek V4.1 Flash", plan: "free" },
   { id: "deepcode-default", name: "DeepCode Default", detail: "DeepSeek V4.1 Flash", plan: "trial" },
   { id: "deepcode-lite", name: "DeepCode Lite", detail: "GLM 4.7 Flash", plan: "starter" },
   { id: "deepcode-general", name: "DeepCode General", detail: "GPT-OSS 120B", plan: "starter" },

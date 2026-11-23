@@ -125,7 +125,7 @@ export function resolveModelDisplayName(
   return decodeCustomModelValue(value)?.modelName ?? null;
 }
 
-const DEEPCODE_PLAN_ORDER: Record<DeepCodePlanTier, number> = { trial: 0, starter: 1, pro: 2, team: 3 };
+const DEEPCODE_PLAN_ORDER: Record<DeepCodePlanTier, number> = { free: 0, trial: 1, starter: 2, pro: 3, team: 4 };
 
 /**
  * DeepCode groups: available models ordered cheapest → strongest, then the models of
