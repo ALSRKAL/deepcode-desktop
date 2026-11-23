@@ -89,7 +89,7 @@ import { usePromptEditorDragState } from "@/prompt-editor/usePromptEditorDragSta
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { advanceComposerDraftRevision } from "@/v4/composer/composerDraftRevision.js";
 import type { AppSlashCommand } from "@/slashCommandHelpers.js";
-import { useOptionalServices } from "@/hooks/useServices.js";
+import { ComposerInputPrediction } from "@/v4/ComposerInputPrediction.js";
 import { logger } from "@/logger.js";
 
 import { useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
@@ -134,6 +134,9 @@ import { isAppleKeyboardPlatform } from "@/lib/keyboardShortcuts.js";
 import { usePrimaryFollowupModifier } from "@/v4/composer/usePrimaryFollowupModifier.js";
 import { consumeV4ComposerDraftWorkspaceTransferRequest } from "@/v4/composer/composerDraftWorkspaceTransfer.js";
 import { useComposerAttachments } from "@/v4/composer/useComposerAttachments.js";
+import { useComposerInputPrediction } from "@/v4/composer/useComposerInputPrediction.js";
+import { useMobileWebViewport } from "@/hooks/useMobileWebViewport.js";
+import { useOptionalServices } from "@/hooks/useServices.js";
 import type { ConversationDropTargetController } from "@/v4/composer/conversationDropTarget.js";
 import { CodeCommentAttachmentChip } from "@/v4/composer/CodeCommentAttachmentChip.js";
 import { removeCodeCommentPreview } from "@/v4/composer/codeCommentPreviewSync.js";
@@ -153,6 +156,10 @@ import { PptxElementReferenceChip } from "@/v4/composer/PptxElementReferenceChip
 import { useOpenPptxElementReference } from "@/v4/composer/useOpenPptxElementReference.js";
 import type { CodeViewerSource } from "@/lib/codeViewer.js";
 import { useConversationSelectionReferences } from "@/v4/composer/useConversationSelectionReferences.js";
+import {
+  isConversationSelectionReference,
+  type ConversationSelectionText,
+} from "@/lib/conversationSelectionReference.js";
 import { ConversationBackgroundWorkTrigger } from "@/v4/composer/ConversationBackgroundWorkTrigger.js";
 import { V4ComposerCuaEntry } from "@/v4/composer/V4ComposerCuaEntry.js";
 import {
@@ -189,6 +196,12 @@ export interface ConversationComposerSendOptions {
   /** 本次 busy input 的一次性投递覆盖，不改 session 偏好。 */
   requestedDelivery?: "startNow" | "queue" | "guide";
   sharedContextRefs?: Array<{ kind: "shared_context_import"; context_id: string }>;
+  /**
+   * 会话选区引用：随 turn metadata 发送，不再拼进可见正文。
+   * Composer 只交出带锚点的引用（sourceSessionId/sourceRowId），由宿主在发送前
+   * 用当前投影做 stale/跨会话准入，再转成线格式 quotes。
+   */
+  conversationSelections?: import("@/lib/conversationSelectionReference.js").ConversationSelectionDisplayReference[];
   /** 插件 UI 代发：随 sendText 持久化，用户消息卡片显示"来自插件 X"。 */
   source?: import("@zcode/shared/zcode-protocol-v4").ConversationInputSource;
 }
@@ -302,6 +315,11 @@ export interface ComposerRestoreRequest {
   inputKind: "sendText" | "sendGoalCommand";
   text: string;
   attachments: readonly AttachmentRef[];
+  /**
+   * 队列项原有的选区引用（含批注）：撤回编辑把它交回**同一个草稿 owner**，
+   * 否则用户再发送时会静默丢掉批注（正文里没有引用材料）。
+   */
+  conversationSelections?: readonly ConversationSelectionText[];
   config?: Pick<V4ComposerDraft, "mode" | "planEnabled" | "modelSelection">;
 }
 
@@ -544,9 +562,9 @@ function ConversationComposerImpl({
   onDropTargetControllerChange,
 }: ConversationComposerProps) {
   const { intl, locale } = useZCodeIntl();
-  const services = useOptionalServices();
-
   const draftScopeId = sessionId ?? V4_DRAFT_SCOPE_ROOT;
+  const services = useOptionalServices();
+  const isMobileViewport = useMobileWebViewport();
   const workspaceKey = workspaceIdentity?.trim() || workspacePath;
   const configPickerScopeKey = `${workspaceKey}\0${draftScopeId}`;
   const [text, setText] = useState("");
@@ -605,6 +623,17 @@ function ConversationComposerImpl({
   const pendingShareContext = activeShareContext?.status === "pending" ? activeShareContext : null;
   const inputApiRef = useRef<LexicalChatInputHandle | null>(null);
 
+  const prediction = useComposerInputPrediction({
+    // 发送 ACK 前草稿尚未清空，但它已交给提交路径，不能继续预测或交付旧提示。
+    disabled: disabled || pending,
+    draft: text,
+    remoteSessionId,
+    revisionFallback: contentRevisionRef.current,
+    sessionId,
+    snapshot,
+    workspaceIdentity,
+    workspacePath,
+  });
   const primaryModifierPressed = usePrimaryFollowupModifier();
   const appleKeyboardPlatform = isAppleKeyboardPlatform();
   const enterSubmits = true;
@@ -752,6 +781,7 @@ function ConversationComposerImpl({
   const {
     references: conversationSelectionReferences,
     limitReason: conversationSelectionLimitReason,
+    setReferences: setConversationSelectionReferences,
     removeReference: removeConversationSelectionReference,
     clearReferences: clearConversationSelectionReferences,
   } = useConversationSelectionReferences({ sessionId, workspaceKey });
@@ -828,15 +858,16 @@ function ConversationComposerImpl({
   const appliedExternalTextInsertRequestRef = useRef<number | null>(null);
   // 决策入参经 ref 读取，避免把 autoFocusEnabled/disabled/viewport 灌进 scope effect 依赖，
   // 触发多余的草稿重恢复（disabled 变化本不应重放草稿）。
+  // Bug 原因：这里曾硬编码 false，已有手机“不要抢焦点”策略从未生效，切任务会自动弹软键盘。
   const focusOptsRef = useRef<ComposerAutoFocusOptions>({
     autoFocusEnabled,
     disabled,
-    isMobileViewport: false,
+    isMobileViewport,
   });
   focusOptsRef.current = {
     autoFocusEnabled,
     disabled,
-    isMobileViewport: false,
+    isMobileViewport,
   };
   const flushPendingFocus = useCallback(() => {
     if (!pendingFocusRef.current) return;
@@ -846,7 +877,11 @@ function ConversationComposerImpl({
 
     // Lexical root 可能晚一帧就绪，聚焦排到下一帧（与草稿回填同款时序）。
     if (typeof requestAnimationFrame === "function") {
-      requestAnimationFrame(() => inputApiRef.current?.focus());
+      requestAnimationFrame(() => {
+        // viewport/disabled 可能在排帧后变化；兑现时仍需尊重同一焦点门禁。
+        if (resolveComposerAutoFocus(focusOptsRef.current) === "focus-now")
+          inputApiRef.current?.focus();
+      });
     } else {
       inputApiRef.current.focus();
     }
@@ -911,6 +946,12 @@ function ConversationComposerImpl({
       const appliedNow =
         nextAppliedRequestId === composerRestoreRequest.requestId &&
         appliedComposerRestoreRequestRef.current !== composerRestoreRequest.requestId;
+      if (appliedNow && composerRestoreRequest.conversationSelections?.length) {
+        // 队列撤回把引用交回同一草稿 owner：再发送时仍带同一批注，不另存副本。
+        setConversationSelectionReferences(
+          composerRestoreRequest.conversationSelections.map((quote) => ({ ...quote })),
+        );
+      }
       appliedComposerRestoreRequestRef.current = nextAppliedRequestId;
       if (appliedNow) onComposerRestoreApplied?.(composerRestoreRequest.requestId);
       return nextAppliedRequestId === composerRestoreRequest.requestId;
@@ -925,6 +966,7 @@ function ConversationComposerImpl({
     codeCommentContexts.length,
     composerRestoreRequest,
     conversationSelectionReferences.length,
+    setConversationSelectionReferences,
     onComposerRestoreApplied,
     replaceComposerDraft,
     requestComposerFocus,
@@ -1274,9 +1316,10 @@ function ConversationComposerImpl({
         // 里没有任何东西解析它），唯一作用是驱动一个已被产品裁掉的 chip，代价却是把一个
         // share URL 塞进发给模型的正文。模型侧内容由隐藏的 shared_context 消息经
         // inputIntent.sharedContextRefs 注入，与正文无关。
+        // 会话选区不再序列化成正文尾块：结构化引用走 onSendText 的 conversationQuotes，
+        // 正文只保留用户自己写的内容（历史行从 row.conversationQuotes 还原芯片）。
         const promptText = serializeComposerPromptContexts(trimmed, {
           codeComments: currentCodeCommentContexts,
-          conversationSelections: currentConversationSelections,
           webElements: currentWebElementContexts,
           pptxElements: currentPptxElementReferences,
           pluginUiContexts: currentPluginUiContexts,
@@ -1315,6 +1358,9 @@ function ConversationComposerImpl({
         const sendResult = await onSendText(promptText, {
           submission,
           localTtft,
+          ...(currentConversationSelections.length
+            ? { conversationSelections: [...currentConversationSelections] }
+            : {}),
           ...(requestedDelivery ? { requestedDelivery } : {}),
           ...(heldQueueDisposition ? { heldQueueDisposition } : {}),
           ...(expectedHeldQueueItemIds ? { expectedHeldQueueItemIds } : {}),
@@ -1372,8 +1418,10 @@ function ConversationComposerImpl({
         currentPptxElementReferences.forEach((reference) =>
           removePptxElementReference(reference.id),
         );
-        currentConversationSelections.forEach((reference) =>
-          removeConversationSelectionReference(reference.id),
+        currentConversationSelections.forEach(
+          (reference) =>
+            isConversationSelectionReference(reference) &&
+            removeConversationSelectionReference(reference.id),
         );
         // 发送成功：清本次提交捕获的 scope 草稿；prompt history 已在真实发送前同步写盘，
         // 避免首发 promote 丢失或误清 promotion 后的新 scope。
@@ -2121,6 +2169,7 @@ function ConversationComposerImpl({
       style={isBlockedByInteraction ? { display: "none" } : undefined}
       className={cn(
         "chat-composer-region z-20 w-full shrink-0 @container/composer",
+        isMobileViewport && "pb-[env(safe-area-inset-bottom)]",
         centered && "max-w-2xl",
       )}
     >
@@ -2163,6 +2212,23 @@ function ConversationComposerImpl({
               id: `chat.selections.limit.${conversationSelectionLimitReason}`,
             })}
           </div>
+        ) : null}
+        {prediction.hint ? (
+          <ComposerInputPrediction
+            draft={text}
+            text={prediction.hint.text}
+            onAccept={() => {
+              const suffix = prediction.hint?.text ?? "";
+              prediction.clear();
+              const inputApi = inputApiRef.current;
+              if (!inputApi) return;
+              inputApi.appendText(suffix, { exactSuffix: true, keepFocus: true });
+              // 修复依据：Lexical mention 节点可能自带尾随空格；草稿事实必须回读编辑器的 canonical markdown，
+              // 不能用普通文本拼接把结构节点/编辑器真实文本与 React 草稿分叉。
+              updateText(inputApi.getMarkdown());
+              persistDraftNow(draftScopeRef.current);
+            }}
+          />
         ) : null}
         <ChatPromptEditor
           workspacePath={workspacePath}

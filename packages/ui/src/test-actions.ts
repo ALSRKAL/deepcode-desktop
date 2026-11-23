@@ -2,6 +2,7 @@ import type { TaskChatMessage as ChatMessage } from "@/lib/taskChatMessageTypes.
 import { shouldExposeE2EStoreBridge } from "@/lib/e2eStoreBridge.js";
 import type { Locale } from "@zcode/shared";
 import type { IZCodeAgentService } from "@zcode/services";
+import type { Locale } from "@zcode/shared";
 import type { TaskListE2EActions } from "@/lib/taskListE2EActions.js";
 import { useEffect } from "react";
 

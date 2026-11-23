@@ -4,6 +4,7 @@ import { access, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, isAbsolute, join } from "node:path";
 import type { Readable, Writable } from "node:stream";
+import { setTimeout as delay } from "node:timers/promises";
 import { ZCODE_VERSION } from "@zcode/shared";
 import {
   controlRequestSchema,
@@ -28,7 +29,12 @@ import {
   removeRunContentsExceptLock,
 } from "./runtime/uninstallGuard.js";
 import { readPersistedStatus, readPersistedStatusDetailed } from "./runtime/statusSnapshot.js";
-import { waitForServerStopped } from "./runtime/shutdownWait.js";
+import {
+  isStoppedServerStatus,
+  readStatusForStopWithoutControl,
+  stopSupervisorAndWait,
+  waitForServerStopped,
+} from "./runtime/shutdownWait.js";
 export { readPersistedStatus } from "./runtime/statusSnapshot.js";
 import {
   hasLegacyServiceRegistration,
@@ -48,6 +54,8 @@ export interface ServerCliRuntimeOptions {
   bundledAgentWiring?: BundledAgentWiring | null;
   /** 测试注入的 stdin/stdout；生产环境使用 process streams。 */
   proxyStdioStreams?: { input: Readable; output: Writable };
+  /** 只取消本次 readiness 等待，不停止共享 Supervisor。 */
+  daemonReadiness?: { timeoutMs?: number; signal?: AbortSignal };
 }
 
 const stdout = (io: CliIO, value: unknown): void =>
@@ -98,8 +106,9 @@ export async function runServerCli(
     // 同一物理 data-root 的符号链接别名会派生不同 control endpoint 和 OS service
     // identity。生命周期命令统一在 IO 前收敛 root，避免第二个 Supervisor 绕过探测重复注册。
     const layout =
-      ["serve", "status", "stop", "restart", "update", "uninstall"].includes(command) ||
-      proxyStdioRequested
+      ["serve", "status", "running-tasks", "stop", "restart", "update", "uninstall"].includes(
+        command,
+      ) || proxyStdioRequested
         ? await resolveCanonicalServerLayout(parsed.layout.serverRoot)
         : parsed.layout;
     if (proxyStdioRequested) {
@@ -123,9 +132,15 @@ export async function runServerCli(
       case "serve":
         return await runServe(parsed.argv.slice(1), io, json, layout, runtimeOptions);
       case "status":
-      case "stop":
-      case "restart":
+      case "running-tasks":
         return await runControl(command, io, json, {}, layout);
+      case "stop":
+        // Bug 原因：runControl 不接收 argv，`stop --wait` 曾被当成 ack 型 stop 立即返回，
+        // 桌面端会在远端仍持锁时报告“已停止”。--wait 必须走统一的停止等待。
+        if (parsed.argv.includes("--wait")) return await runStopAndWait(io, json, layout);
+        return await runControl("stop", io, json, {}, layout);
+      case "restart":
+        return await runRestart(io, json, layout, runtimeOptions);
       case "update":
         if (parsed.argv.includes("--from-archive")) {
           return await runLocalArchiveUpdateCommand(parsed.argv, io, json, layout, () =>
@@ -185,18 +200,29 @@ async function runServe(
   const daemonRequested = args.includes("--daemon");
   const supervisorProcess = args.includes("--supervisor");
   if (shouldRegisterService(daemonRequested, supervisorProcess)) {
+    runtimeOptions.daemonReadiness?.signal?.throwIfAborted();
     const startupMode = daemonStartupMode();
     const legacyIdentityMigration =
       startupMode === "service" && (await hasLegacyServiceRegistration(layout));
-    const existing = await readControlStatus(layout, 500);
+    const existing = await readControlStatus(layout, 500, runtimeOptions.daemonReadiness?.signal);
     if (existing && (existing.state === "ready" || existing.state === "starting")) {
       if ((existing.serviceRegistered && !legacyIdentityMigration) || startupMode === "fallback") {
-        if (json) stdout(io, existing);
-        else
-          stdout(
-            io,
-            `ZCode Server ${existing.state} at ${existing.host ?? ""}:${existing.port ?? ""}`,
-          );
+        // starting 只是 Supervisor 已接管，并非 Core ingress 可用；复用同一 readiness
+        // barrier 读取 control owner，不能把 port:null 当成功返回给 transport adapter。
+        const ready =
+          existing.state === "ready"
+            ? requireReadyIngress(existing)
+            : await waitForPersistedStatus(
+                layout,
+                "ready",
+                0,
+                undefined,
+                existing.serviceRegistered,
+                { ...runtimeOptions.daemonReadiness, readControl: true },
+              );
+        runtimeOptions.daemonReadiness?.signal?.throwIfAborted();
+        if (json) stdout(io, ready);
+        else stdout(io, `ZCode Server ${ready.state} at ${ready.host ?? ""}:${ready.port ?? ""}`);
         return 0;
       }
       if (existing.runningTaskCount > 0) {
@@ -271,6 +297,7 @@ async function runServe(
         }
       },
       serviceStarted,
+      runtimeOptions.daemonReadiness,
     );
     if (json) stdout(io, started);
     else stdout(io, `ZCode Server ${started.state} at ${started.host ?? ""}:${started.port ?? ""}`);
@@ -372,21 +399,11 @@ async function runControl(
     if (command === "status") {
       const persisted = await readPersistedStatusDetailed(layout);
       result = persisted.status ?? createStoppedServerStatus(ZCODE_VERSION);
-    } else if (command === "stop" && isControlEndpointUnavailable(error)) {
-      const persisted = await readPersistedStatusDetailed(layout);
-      if (persisted.state === "invalid" || persisted.state === "unreadable") {
-        throw error;
-      }
-      if (
-        persisted.status &&
-        persisted.status.state !== "stopped" &&
-        persisted.status.state !== "uninstalled"
-      ) {
-        throw error;
-      }
-      // Supervisor 停止时会先关闭 control socket，再由 CLI 落盘 stopped 状态。
-      // 重复 stop 发生在这个窗口后不应因为 socket 不存在而变成失败。
-      result = persisted.status ?? createStoppedServerStatus(ZCODE_VERSION);
+    } else if (command === "stop") {
+      // 快照缺失表示 daemon 从未写出过状态，按已停止输出。
+      result =
+        (await readStatusForStopWithoutControl(layout, error)) ??
+        createStoppedServerStatus(ZCODE_VERSION);
     } else {
       throw error;
     }
@@ -396,9 +413,45 @@ async function runControl(
   return 0;
 }
 
-function isControlEndpointUnavailable(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("code" in error)) return false;
-  return error.code === "ENOENT" || error.code === "ECONNREFUSED" || error.code === "EINVAL";
+/**
+ * `stop --wait`：data-root 锁释放且 status 为比基线新的 stopped 后才输出最终 ServerStatus（R2 §8.1）。
+ * daemon 未运行（锁缺失或 stale）时立即成功；stop-failed 与 control 超时以公开错误码失败。
+ */
+async function runStopAndWait(
+  io: CliIO,
+  json: boolean,
+  layout: ReturnType<typeof resolveServerLayout>,
+): Promise<number> {
+  await stopSupervisorAndWait(layout, "stop");
+  const persisted = await readPersistedStatusDetailed(layout);
+  const status = persisted.status;
+  // Supervisor 已死时快照可能仍停在死前的 ready；输出只表达“已停止”这一最终事实。
+  const finalStatus = isStoppedServerStatus(status)
+    ? status
+    : createStoppedServerStatus(ZCODE_VERSION, {
+        serviceRegistered: status?.serviceRegistered ?? false,
+      });
+  if (json) stdout(io, finalStatus);
+  else stdout(io, finalStatus);
+  return 0;
+}
+
+/**
+ * 整棵进程树重启（R2 §8.1），由发起命令的 CLI 协调，不在持锁的 Supervisor 内自举。
+ *
+ * Bug 原因：旧 `restart` 只经 control 让 Supervisor 在进程内换 Core，Supervisor 与崩溃预算不变；
+ * daemon 未运行或 Supervisor 已死但残留 socket 时直接报错，`crash-loop-stopped` 也无法自救。
+ * 现在先用统一停止等待收口现有 Supervisor（锁缺失或 stale 即视为未运行，跳过停止；新的
+ * `stop-failed` 以公开码失败且不启动新实例），再按 `serve --daemon` 启动并等 ready。
+ */
+async function runRestart(
+  io: CliIO,
+  json: boolean,
+  layout: ReturnType<typeof resolveServerLayout>,
+  runtimeOptions: ServerCliRuntimeOptions,
+): Promise<number> {
+  await stopSupervisorAndWait(layout, "restart");
+  return await runServe(["--daemon"], io, json, layout, runtimeOptions);
 }
 
 async function runUninstall(
@@ -500,21 +553,51 @@ async function waitForPersistedStatus(
   minUpdatedAt = 0,
   assertStillWaiting?: () => void,
   expectedServiceRegistered?: boolean,
+  options: NonNullable<ServerCliRuntimeOptions["daemonReadiness"]> & {
+    readControl?: boolean;
+  } = {},
 ): Promise<ServerStatus> {
-  const deadline = Date.now() + 10_000;
+  const deadline = Date.now() + (options.timeoutMs ?? 10_000);
   while (Date.now() < deadline) {
-    const status = await readPersistedStatus(layout);
-    if (
-      status?.state === expectedState &&
-      status.updatedAt > minUpdatedAt &&
-      (expectedServiceRegistered === undefined ||
-        status.serviceRegistered === expectedServiceRegistered)
-    )
-      return status;
+    options.signal?.throwIfAborted();
+    // 复用中的事实只来自同一个 control owner；磁盘旧 ready 不能跨 Supervisor 冒充成功。
+    const status = options.readControl
+      ? serverStatusSchema.parse(
+          await requestControl(
+            layout.controlEndpoint,
+            { command: "status" },
+            deadline - Date.now(),
+            options.signal,
+          ),
+        )
+      : await readPersistedStatus(layout);
+    if (status && status.updatedAt > minUpdatedAt) {
+      if (
+        status.state === expectedState &&
+        (expectedServiceRegistered === undefined ||
+          status.serviceRegistered === expectedServiceRegistered)
+      ) {
+        options.signal?.throwIfAborted();
+        return expectedState === "ready" ? requireReadyIngress(status) : status;
+      }
+      if (expectedState === "ready" && status.state !== "starting" && status.state !== "ready") {
+        throw new Error(
+          `Server ${status.state} before ready: ${status.lastExitReason ?? "no exit reason"}`,
+        );
+      }
+    }
     assertStillWaiting?.();
-    await new Promise<void>((resolve) => setTimeout(resolve, 100));
+    const remaining = deadline - Date.now();
+    if (remaining > 0) await delay(Math.min(100, remaining), undefined, { signal: options.signal });
   }
   throw new Error(`Timed out waiting for Server ${expectedState}`);
+}
+
+function requireReadyIngress(status: ServerStatus): ServerStatus {
+  if (!status.host?.trim() || !status.port || status.port > 65535) {
+    throw new Error("Server ready status has no valid ingress host/port");
+  }
+  return status;
 }
 
 async function waitForSupervisorReady(supervisor: {
@@ -534,11 +617,19 @@ async function waitForSupervisorReady(supervisor: {
 async function readControlStatus(
   layout: ReturnType<typeof resolveServerLayout>,
   timeoutMs: number,
+  signal?: AbortSignal,
 ): Promise<ServerStatus | null> {
   try {
-    const result = await requestControl(layout.controlEndpoint, { command: "status" }, timeoutMs);
+    const result = await requestControl(
+      layout.controlEndpoint,
+      { command: "status" },
+      timeoutMs,
+      signal,
+    );
     return serverStatusSchema.parse(result);
   } catch {
+    // 取消不是 daemon 不存在；不能吞掉后继续注册服务或 fork 新进程。
+    signal?.throwIfAborted();
     return null;
   }
 }

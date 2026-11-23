@@ -1,7 +1,11 @@
-use super::Engine;
+use super::{
+    Engine,
+    protocol::{PROTOCOL_NAME, PROTOCOL_VERSION},
+};
 use crate::contract::{Method, RuntimeError};
 use anyhow::{Context, Result, bail};
 use serde_json::{Value, json};
+
 impl Engine {
     fn execution_capabilities(&self) -> Value {
         json!({"permissionModes":["build","edit","yolo","auto"],"independentPlanState":true})
@@ -57,8 +61,13 @@ impl Engine {
                 });
                 Ok(json!({"operationId":operation,"cancelled":cancelled}))
             }
+            // 握手身份是静态事实：不读 workspace/model/网络，响应只含能力与协议身份。
+            // `worktreeCwd: false`：Rust 没有 forkAssistant.targetCwd 与
+            // session/releaseUnderDirectory 的 native 实现。Host 按 `=== true` 判定，
+            // 所以这里即使显式 false 也不会收到 targetCwd；解析层另有一道显式拒绝
+            // （见 protocol::command_schema 的 refinements），两者不得单方面松动。
             Method::RuntimeCapabilities => Ok(
-                json!({"workspaceExecutionCapabilities":true,"independentPlanState":true,"accountProviderConfig":self.registry.is_some()}),
+                json!({"protocol":{"name":PROTOCOL_NAME,"version":PROTOCOL_VERSION},"workspaceExecutionCapabilities":true,"independentPlanState":true,"accountProviderConfig":self.registry.is_some(),"worktreeCwd":false}),
             ),
             Method::ProcessChildProcesses => Ok(json!({"processes": self.tools.child_processes()})),
             Method::WorkspaceReadPresentation => {
@@ -113,6 +122,149 @@ impl Engine {
             }
             // 路由保证只把查询类方法交到这里；其余方法到达此处说明分派表缺项。
             method => Err(RuntimeError::MethodNotFound(method.as_str().into()).into()),
+        }
+    }
+}
+
+/// `runtime/capabilities` 的握手身份必须是静态事实：不读 workspace、模型或网络，
+/// 响应里只有能力与协议身份。测试用最小端口，不写任何存储；workspace 用临时目录路径，
+/// 既贴近真实调用，也验证路径不会被回显。
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::contract::{ContextPort, RuntimeClock, RuntimePorts, SessionStore, ToolPort};
+    use async_trait::async_trait;
+    use std::{collections::BTreeMap, sync::Arc};
+    use tokio_util::sync::CancellationToken;
+
+    #[derive(Default)]
+    struct NoStore;
+
+    #[async_trait]
+    impl SessionStore for NoStore {
+        async fn load_index(&self, _: &str) -> Result<BTreeMap<String, Value>> {
+            Ok(BTreeMap::new())
+        }
+        async fn lookup_ack(&self, _: &str, _: &str) -> Result<Option<Value>> {
+            Ok(None)
+        }
+        async fn load(
+            &self,
+            _: &str,
+        ) -> Result<(
+            Vec<crate::domain::session::Session>,
+            BTreeMap<String, Value>,
+        )> {
+            Ok((vec![], BTreeMap::new()))
+        }
+        async fn commit(
+            &self,
+            _: &str,
+            _: Option<&mut crate::domain::session::Session>,
+            _: Option<(String, Value)>,
+        ) -> Result<()> {
+            Ok(())
+        }
+    }
+
+    struct NoTools;
+
+    #[async_trait]
+    impl ToolPort for NoTools {
+        fn definitions(&self) -> Vec<Value> {
+            vec![]
+        }
+        async fn execute(&self, _: &str, _: &Value, _: &CancellationToken) -> Result<String> {
+            bail!("tool execution must be unused")
+        }
+        async fn cancel_session(&self, _: &str, _: Option<&str>) -> Result<()> {
+            Ok(())
+        }
+    }
+
+    struct FixedClock;
+
+    impl RuntimeClock for FixedClock {
+        fn now(&self) -> u64 {
+            123
+        }
+        fn id(&self) -> String {
+            "fixed-epoch".into()
+        }
+    }
+
+    struct UnusedContext;
+
+    #[async_trait]
+    impl ContextPort for UnusedContext {
+        fn desktop(&self) -> bool {
+            false
+        }
+        async fn snapshot(
+            &self,
+            _: &CancellationToken,
+        ) -> Result<crate::domain::prompt::PromptSnapshot> {
+            bail!("ContextPort must be unused")
+        }
+        async fn instructions(
+            &self,
+            _: &CancellationToken,
+        ) -> Result<crate::domain::prompt::InstructionRead> {
+            bail!("ContextPort must be unused")
+        }
+    }
+
+    #[tokio::test]
+    async fn runtime_capabilities_announce_the_legacy_protocol_identity() {
+        // 应用层不做进程/文件系统 IO：这里只需要一个不会出现在响应里的不透明 workspace 标识，
+        // 不读取真实 pid 也不落盘（Engine 的 NoStore/NoTools 不会触碰该路径）。
+        let workspace = "/tmp/zcode-runtime-caps-workspace-probe".to_owned();
+        let mut engine = Engine::new(
+            workspace.clone(),
+            None,
+            RuntimePorts {
+                context: Arc::new(UnusedContext),
+                store: Arc::new(NoStore),
+                model: None,
+                tools: Arc::new(NoTools),
+                clock: Arc::new(FixedClock),
+            },
+        )
+        .await
+        .unwrap();
+
+        let capabilities = engine
+            .query(Method::RuntimeCapabilities, &json!({}))
+            .unwrap();
+
+        // 与 legacy session 快照同名的协议身份；V4 physical wire 版本不在此响应里。
+        // worktreeCwd 显式 false：未实现受管 worktree 的 cwd 语义时不得声明支持。
+        assert_eq!(
+            capabilities,
+            json!({
+                "protocol": {"name": "ZCode Protocol", "version": 1},
+                "workspaceExecutionCapabilities": true,
+                "independentPlanState": true,
+                "accountProviderConfig": false,
+                "worktreeCwd": false,
+            })
+        );
+        assert_ne!(capabilities["worktreeCwd"], json!(true));
+        // 不泄露 workspace 路径，也不附加模型/账号/会话事实。
+        let text = capabilities.to_string();
+        assert!(!text.contains(&workspace), "{text}");
+        for key in [
+            "model",
+            "provider",
+            "session",
+            "workspace",
+            "user",
+            "account",
+        ] {
+            assert!(
+                !capabilities.as_object().unwrap().contains_key(key),
+                "unexpected {key} in {text}"
+            );
         }
     }
 }

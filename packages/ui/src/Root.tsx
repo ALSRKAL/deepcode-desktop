@@ -18,6 +18,7 @@ import {
   APP_RUNTIME_PREFERENCES_CHANGED_BROADCAST_CHANNEL,
   DesktopCommandIds,
   appRuntimePreferencesChangedBroadcastPayloadSchema,
+  toZhOrEnLocale,
   type RemoteTarget,
 } from "@zcode/shared";
 import { TooltipProvider } from "@/components/ui/tooltip.js";
@@ -33,6 +34,7 @@ import { useWorkspaceServices } from "@/hooks/useWorkspaceServices.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { SSHDialog } from "@/SSHDialog.js";
 import { SettingsPage } from "@/SettingsPage.js";
+import { DataSyncDialogHost } from "@/data-sync/index.js";
 import { setDefaultFileDisplayBasePath } from "@/lib/fileDisplay.js";
 
 import {
@@ -56,6 +58,7 @@ import { useModelSelectionServiceView } from "@/hooks/useModelSelectionView.js";
 import { useRootProviderSettingsSnapshot } from "@/root/useRootProviderSettingsSnapshot.js";
 import { useDesktopNativeThemeSync } from "@/root/useDesktopNativeThemeSync.js";
 import { useRootPlatformEffects } from "@/root/useRootPlatformEffects.js";
+import { useAppControlNavigation } from "@/root/useAppControlNavigation.js";
 import { useRootWorkspaceActions } from "@/root/useRootWorkspaceActions.js";
 import { registerBaseWorkspaceServices } from "@/store/remoteWorkspaceSessionStore.js";
 import type { RootProps } from "@/root/types.js";
@@ -105,6 +108,7 @@ export function Root(props: RootProps) {
           <PlatformProvider platform={props.platform}>
             <StoreProvider broadcastService={props.services.broadcastService}>
               <TabStoreProvider>
+                <DataSyncDialogHost />
                 <DiffsWorkerPoolProvider>
                   <AssistantCodeCommentFeatureProvider
                     enabled={props.assistantCodeCommentCardsEnabled}
@@ -483,7 +487,7 @@ function RootInner({
   const conversationImport = useConversationArchiveImport({
     platform,
     intl,
-    locale,
+    locale: toZhOrEnLocale(locale),
     tabs,
     activeWorkspacePath,
     activeWorkspaceIdentity,
@@ -521,6 +525,15 @@ function RootInner({
     remoteWorkspaceErrorByWorkspaceKey,
     hasCompletedFullTabRestore: hasCompletedFullRestore,
     intl,
+  });
+
+  // 桌面 App 控制导航：历史 tab 恢复完成后才登记，避免 restore 覆盖刚提交的导航。
+  useAppControlNavigation({
+    platform,
+    isDesktop,
+    enabled: hasCompletedFullRestore,
+    activateTabByPath,
+    addTab,
   });
 
   useEffect(() => {
