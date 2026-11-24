@@ -30,6 +30,8 @@ export const DEEPCODE_MODELS: readonly DeepCodeModelInfo[] = [
   // Free / trial (OpenCode Go).
   { id: "hy4-flash-free", name: "Hy4 Flash Free", detail: "Free · no credits", plan: "free" },
   { id: "deepseek-v4.1-flash", name: "DeepSeek Flash", detail: "DeepSeek V4.1 Flash", plan: "free" },
+  // New Go model added by the admin catalog sync (available from Starter/trial).
+  { id: "hungerg-free", name: "HungerG Free", detail: "Stealth reasoning model", plan: "starter" },
   // Starter (Go economy).
   { id: "glm-5.3-flash", name: "GLM-5.3-Flash", detail: "Zhipu GLM 5.3 Flash", plan: "starter" },
   { id: "glm-5.2", name: "GLM-5.2", detail: "Zhipu GLM 5.2", plan: "starter" },

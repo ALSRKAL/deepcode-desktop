@@ -50,6 +50,7 @@ const DEEPCODE_MODELS = [
   // 少一个，该模型在 Agent Registry 里就不存在；多一个也无妨，网关仍会按计划拒绝。
   "hy4-flash-free",
   "deepseek-v4.1-flash",
+  "hungerg-free",
   "glm-5.3-flash",
   "glm-5.2",
   "longcat-2.0",
