@@ -564,8 +564,7 @@
               "deepseek-v4.1-flash",
               "hungerg-free",
               "glm-5.3-flash",
-              "glm-5.2",
-              "longcat-2.0",
+              "longcat-2.5",
               "mimo-v2.6-flash",
               "minimax-m3",
               "qwen3.7-plus",
@@ -620,8 +619,7 @@
               "deepseek-v4.1-flash",
               "hungerg-free",
               "glm-5.3-flash",
-              "glm-5.2",
-              "longcat-2.0",
+              "longcat-2.5",
               "mimo-v2.6-flash",
               "minimax-m3",
               "qwen3.7-plus",
@@ -676,8 +674,7 @@
               "deepseek-v4.1-flash",
               "hungerg-free",
               "glm-5.3-flash",
-              "glm-5.2",
-              "longcat-2.0",
+              "longcat-2.5",
               "mimo-v2.6-flash",
               "minimax-m3",
               "qwen3.7-plus",
@@ -732,8 +729,7 @@
               "deepseek-v4.1-flash",
               "hungerg-free",
               "glm-5.3-flash",
-              "glm-5.2",
-              "longcat-2.0",
+              "longcat-2.5",
               "mimo-v2.6-flash",
               "minimax-m3",
               "qwen3.7-plus",
@@ -2584,7 +2580,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-architect$",
+          "modelMatch": "^deepcode-architect$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2617,7 +2613,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-coder\\-pro$",
+          "modelMatch": "^deepcode-coder-pro$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2650,7 +2646,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-default$",
+          "modelMatch": "^deepcode-default$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2685,7 +2681,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-fast\\-agent$",
+          "modelMatch": "^deepcode-fast-agent$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2718,7 +2714,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-mid$",
+          "modelMatch": "^deepcode-mid$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2751,7 +2747,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-lite$",
+          "modelMatch": "^deepcode-lite$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2785,7 +2781,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-general$",
+          "modelMatch": "^deepcode-general$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2819,7 +2815,7 @@
           }
         },
         {
-          "modelMatch": "^deepcode\\-background$",
+          "modelMatch": "^deepcode-background$",
           "config": {
             "enabled": true,
             "properties": {
@@ -2845,6 +2841,894 @@
                   "high",
                   "xhigh",
                   "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^hy4-flash-free$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^deepseek-v4\\.1-flash$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "high",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^hungerg-free$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^glm-5\\.3-flash$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "high",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^longcat-2\\.5$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^mimo-v2\\.6-flash$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": true,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^minimax-m3$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^qwen3\\.7-plus$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^hy4$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^hy3$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 256000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": false,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "low",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^kimi-k2\\.7-code$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 262144,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^qwen3\\.8-flash$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "xhigh"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^hy4-preview$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1024000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": false,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 64000
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^gemini-4-argon$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": true,
+                "supportsPdf": true
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^minimax-m3\\.1-flash$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^glm-5\\.3$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": false,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "high",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^kimi-k3\\.1-pro$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "high",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^kimi-k3$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^step-5-preview$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^mimo-v2\\.6-pro$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1048576,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": true,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "disabled",
+                  "enabled"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^deepseek-v4-pro$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": false,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "high",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^gpt-6-luna$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1050000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": true
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^gpt-5\\.6-luna$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1050000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": true
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "none",
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^claude-haiku-5-5$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": true
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh",
+                  "max"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^grok-4\\.7$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 500000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsAudio": false,
+                "supportsPdf": true
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^qwen4-max$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "high",
+                  "xhigh"
+                ]
+              },
+              "maxOutputTokens": {
+                "max": 65536
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "^qwen3\\.8-max$",
+          "config": {
+            "enabled": true,
+            "properties": {
+              "contextWindow": 1000000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": true,
+                "supportsAudio": false,
+                "supportsPdf": false
+              },
+              "outputFormat": {
+                "supportsText": true
+              },
+              "supportsToolCall": true,
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "reasoningLevel": {
+                "values": [
+                  "low",
+                  "medium",
+                  "xhigh"
                 ]
               },
               "maxOutputTokens": {

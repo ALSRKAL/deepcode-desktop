@@ -34,8 +34,7 @@ export const DEEPCODE_MODELS: readonly DeepCodeModelInfo[] = [
   { id: "hungerg-free", name: "HungerG Free", detail: "Stealth reasoning model", plan: "starter" },
   // Starter (Go economy).
   { id: "glm-5.3-flash", name: "GLM-5.3-Flash", detail: "Zhipu GLM 5.3 Flash", plan: "starter" },
-  { id: "glm-5.2", name: "GLM-5.2", detail: "Zhipu GLM 5.2", plan: "starter" },
-  { id: "longcat-2.0", name: "LongCat-2.0", detail: "LongCat 2.0", plan: "starter" },
+  { id: "longcat-2.5", name: "LongCat-2.5", detail: "LongCat 2.5", plan: "starter" },
   { id: "mimo-v2.6-flash", name: "MiMo-V2.6-Flash", detail: "Xiaomi MiMo V2.6 Flash", plan: "starter" },
   { id: "minimax-m3", name: "MiniMax-M3", detail: "MiniMax M3", plan: "starter" },
   { id: "qwen3.7-plus", name: "Qwen3.7 Plus", detail: "Qwen 3.7 Plus", plan: "starter" },

@@ -52,8 +52,7 @@ const DEEPCODE_MODELS = [
   "deepseek-v4.1-flash",
   "hungerg-free",
   "glm-5.3-flash",
-  "glm-5.2",
-  "longcat-2.0",
+  "longcat-2.5",
   "mimo-v2.6-flash",
   "minimax-m3",
   "qwen3.7-plus",
@@ -79,12 +78,22 @@ const DEEPCODE_MODELS = [
 ];
 
 /**
- * DeepCode 模型的精确能力（Synthetic GET /openai/v1/models，2026-11-16 读取）：
- * context_length、max_output_length、input_modalities、reasoning_parameters.efforts。
- * 修复原因：此前全部落到通配规则（200K 窗口、仅 开/关 思考、无图片），导致
- * gpt-oss（128K）在自动压缩前就超窗，DeepSeek/Kimi 的 512K 被浪费，且思考强度无法选择。
+ * DeepCode 模型的精确能力：
+ * - Synthetic：GET /openai/v1/models（2026-11-16 读取）。
+ * - OpenCode Go：GET https://opencode.ai/inference/go/v1/models（2026-11-24 读取）。
+ *   字段为 limit.context / limit.output / modalities.input / capabilities.reasoning.effort。
+ *
+ * 修复原因：此前只有 Synthetic 有精确事实，所有 Go 模型落到上游通配规则
+ * （200K 窗口、32K 输出、无图片），于是网关声明 1M 的 HungerG Free 在应用里
+ * 只显示 200K，Hy4/GLM/Kimi 等 1M 模型也被低估。这里覆盖全部在售 Go 模型；
+ * 网关仍是权限与计费边界，客户端只按真实能力管理上下文。
+ *
+ * maxOutput 默认 65536：与套餐的输出上限（starter 32K / pro,team 64K）一致，
+ * 避免为 1M 模型预留过大的输出预算而压缩掉可用上下文。hy4-preview 原生长度
+ * 只有 64000，单独保留。
  */
 const DEEPCODE_MODEL_FACTS = {
+  // Synthetic (owner-only).
   "deepcode-architect": { contextWindow: 524288, image: true, efforts: ["low", "high", "max"] },
   "deepcode-coder-pro": { contextWindow: 524288, image: false, efforts: ["low", "high", "max"] },
   "deepcode-default": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
@@ -93,24 +102,60 @@ const DEEPCODE_MODEL_FACTS = {
   "deepcode-lite": { contextWindow: 196608, image: false, efforts: ["none", "low", "medium", "high"] },
   "deepcode-general": { contextWindow: 131072, image: false, efforts: ["none", "low", "medium", "high"] },
   "deepcode-background": { contextWindow: 524288, image: true, efforts: ["none", "low", "high", "xhigh", "max"] },
+  // OpenCode Go (public + trial). 27 active models on 2026-11-24.
+  "hy4-flash-free": { contextWindow: 1048576, image: true, efforts: ["none", "high"] },
+  "deepseek-v4.1-flash": { contextWindow: 1000000, image: true, efforts: ["low", "high", "max"], structuredOutput: true },
+  "hungerg-free": { contextWindow: 1000000, image: true, video: true, efforts: ["disabled", "enabled"] },
+  "glm-5.3-flash": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "high", "max"], structuredOutput: true },
+  "longcat-2.5": { contextWindow: 1000000, image: true, efforts: ["disabled", "enabled"] },
+  "mimo-v2.6-flash": { contextWindow: 1048576, image: true, video: true, audio: true, efforts: ["disabled", "enabled"] },
+  "minimax-m3": { contextWindow: 1000000, image: true, video: true, efforts: ["disabled", "enabled"] },
+  "qwen3.7-plus": { contextWindow: 1000000, image: true, video: true, efforts: ["disabled", "enabled"] },
+  "hy4": { contextWindow: 1048576, image: true, efforts: ["none", "high"] },
+  "hy3": { contextWindow: 256000, image: false, efforts: ["none", "low", "high"] },
+  "kimi-k2.7-code": { contextWindow: 262144, image: true, video: true, efforts: ["enabled"], structuredOutput: true },
+  "qwen3.8-flash": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "medium", "xhigh"], structuredOutput: true },
+  "hy4-preview": { contextWindow: 1024000, maxOutput: 64000, image: false, efforts: ["none", "high"] },
+  "gemini-4-argon": { contextWindow: 1048576, image: true, video: true, audio: true, pdf: true, efforts: ["low", "medium", "high"], structuredOutput: true },
+  "minimax-m3.1-flash": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "medium", "high", "xhigh", "max"] },
+  "glm-5.3": { contextWindow: 1000000, image: false, efforts: ["low", "high", "max"], structuredOutput: true },
+  "kimi-k3.1-pro": { contextWindow: 1048576, image: true, video: true, efforts: ["low", "high", "max"], structuredOutput: true },
+  "kimi-k3": { contextWindow: 1048576, image: true, video: true, efforts: ["max"], structuredOutput: true },
+  "step-5-preview": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "medium", "high"], structuredOutput: true },
+  "mimo-v2.6-pro": { contextWindow: 1048576, image: true, video: true, audio: true, efforts: ["disabled", "enabled"] },
+  "deepseek-v4-pro": { contextWindow: 1000000, image: false, efforts: ["high", "max"], structuredOutput: true },
+  "gpt-6-luna": { contextWindow: 1050000, image: true, pdf: true, efforts: ["none", "low", "medium", "high", "xhigh", "max"], structuredOutput: true },
+  "gpt-5.6-luna": { contextWindow: 1050000, image: true, pdf: true, efforts: ["none", "low", "medium", "high", "xhigh", "max"], structuredOutput: true },
+  "claude-haiku-5-5": { contextWindow: 1000000, image: true, pdf: true, efforts: ["low", "medium", "high", "xhigh", "max"], structuredOutput: true },
+  "grok-4.7": { contextWindow: 500000, image: true, pdf: true, efforts: ["low", "medium", "high", "xhigh"], structuredOutput: true },
+  "qwen4-max": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "high", "xhigh"], structuredOutput: true },
+  "qwen3.8-max": { contextWindow: 1000000, image: true, video: true, efforts: ["low", "medium", "xhigh"], structuredOutput: true },
 };
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** 追加在上游规则之后（后者覆盖前者）：DeepCode 模型的属性与思考强度。 */
 function deepcodeModelRules() {
   return Object.entries(DEEPCODE_MODEL_FACTS).map(([id, f]) => ({
-    modelMatch: `^${id.replace(/[-]/g, "\\-")}$`,
+    modelMatch: `^${escapeRegExp(id)}$`,
     config: {
       enabled: true,
       properties: {
         contextWindow: f.contextWindow,
-        inputFormat: { supportsText: true, supportsImage: f.image, supportsVideo: false, supportsAudio: false, supportsPdf: false },
+        inputFormat: {
+          supportsText: true,
+          supportsImage: f.image ?? false,
+          supportsVideo: f.video ?? false,
+          supportsAudio: f.audio ?? false,
+          supportsPdf: f.pdf ?? false,
+        },
         outputFormat: { supportsText: true },
         supportsToolCall: true,
-        supportsJsonSchemaOutput: true,
+        supportsJsonSchemaOutput: f.structuredOutput ?? true,
       },
       optionSpecs: {
         reasoningLevel: { values: f.efforts },
-        maxOutputTokens: { max: 65536 },
+        maxOutputTokens: { max: f.maxOutput ?? 65536 },
       },
     },
   }));
