@@ -33,7 +33,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip.js";
-import { AlertCircle, CheckIcon, ChevronDownIcon, LoaderIcon, PackageIcon } from "lucide-react";
+import { AlertCircle, CheckIcon, ChevronDownIcon, LoaderIcon, PackageIcon, SearchIcon } from "lucide-react";
 import {
   TID_CHAT_MODEL_SELECT_GROUP,
   TID_CHAT_MODEL_SELECT_ITEM,
@@ -45,7 +45,15 @@ import {
   shouldRestoreChatInputFocusAfterPickerClose,
 } from "@/lib/pickerFocus.js";
 import { RollingToolbarLabel } from "@/chat-input-toolbar/RollingToolbarLabel.js";
+import { thoughtLevelLabelId } from "@/chat-input-toolbar/thoughtLevelOptions.js";
 import { ModelInputCapabilityBadge } from "@/components/ModelInputCapabilityBadge.js";
+import { useZCodeIntl } from "@/i18n/IntlProvider.js";
+import {
+  filterModelSelectGroups,
+  filterModelSelectItems,
+  reasoningLevelIndex,
+  reasoningLevelValue,
+} from "@/lib/modelSelectFilters.js";
 
 export interface ModelSelectGroupItem {
   key: string;
@@ -55,6 +63,11 @@ export interface ModelSelectGroupItem {
   detail?: string;
   badgeLabel?: string;
   supportsVisionInput?: boolean;
+  supportsVideoInput?: boolean;
+  supportsPdfInput?: boolean;
+  supportsAudioInput?: boolean;
+  /** Ordered low → high. Empty/undefined hides the effort control for this model. */
+  reasoningLevels?: readonly string[];
   /** Shown but not selectable; the badge names what unlocks it (e.g. a plan). */
   lockedBadge?: string;
   /** Tooltip for a locked item; defaults to the select's lock reason. */
@@ -189,6 +202,10 @@ interface ModelConfigSelectProps {
   leadingItems?: readonly ModelSelectGroupItem[];
   /** 触发器里标签之后的小徽标（如「会话模型」「不可用」）；缺省即无。 */
   triggerBadge?: ReactNode;
+  /** Current reasoning level and its setter; the model picker renders the effort slider. */
+  reasoningValue?: string;
+  reasoningShortcutLabel?: string;
+  onReasoningValueChange?: (value: string) => void;
 }
 
 export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
@@ -233,11 +250,49 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
   contentAlign = "start",
   leadingItems,
   triggerBadge,
+  reasoningValue,
+  reasoningShortcutLabel,
+  onReasoningValueChange,
 }: ModelConfigSelectProps) {
+  const { intl } = useZCodeIntl();
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const open = controlledOpen ?? uncontrolledOpen;
   const lastOpenRequestKeyRef = useRef(openRequestKey);
   const hasSelectableModel = modelGroups.length > 0;
+  const hasAnyModels = modelGroups.length > 0 || (leadingItems?.length ?? 0) > 0;
+  const visibleGroups = useMemo(
+    () => filterModelSelectGroups(modelGroups, query),
+    [modelGroups, query],
+  );
+  const visibleLeadingItems = useMemo(
+    () => (leadingItems === undefined ? undefined : filterModelSelectItems(leadingItems, query)),
+    [leadingItems, query],
+  );
+  const hasVisibleModels =
+    visibleGroups.length > 0 || (visibleLeadingItems?.length ?? 0) > 0;
+  const selectedItem = useMemo(() => {
+    for (const group of modelGroups) {
+      const item = group.items.find((candidate) => candidate.value === normalizedValue);
+      if (item) return item;
+    }
+    return leadingItems?.find((candidate) => candidate.value === normalizedValue) ?? null;
+  }, [leadingItems, modelGroups, normalizedValue]);
+  const reasoningLevels = selectedItem?.reasoningLevels ?? [];
+  const showReasoningControl =
+    reasoningLevels.length > 0 && Boolean(onReasoningValueChange);
+  const currentReasoningIndex = reasoningLevelIndex(reasoningLevels, reasoningValue);
+  const currentReasoningValue =
+    reasoningLevelValue(reasoningLevels, currentReasoningIndex) ?? reasoningValue ?? "";
+  const currentReasoningLabelId = thoughtLevelLabelId(currentReasoningValue);
+  const currentReasoningLabel = currentReasoningLabelId
+    ? intl.formatMessage({ id: currentReasoningLabelId })
+    : currentReasoningValue;
+  const effortLabel = intl.formatMessage({ id: "chat.toolbar.model.effort" });
+
+  useEffect(() => {
+    if (!open) setQuery("");
+  }, [open]);
   // 闲时任务白名单只有一层模型值；只要存在 group 就强制展示 provider 层的话，
   // 下方已有的扁平模型分支永远不可达，也无法复用 New Task 模型选择器。
   const shouldShowProviderLevel = showProviderLevel ?? shouldShowModelProviderLevel(modelGroups);
@@ -315,7 +370,10 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
             {item.badgeLabel ? (
               <span className={MODEL_CONFIG_SELECT_BADGE_CLASS_NAME}>{item.badgeLabel}</span>
             ) : null}
-            {item.supportsVisionInput ? <ModelInputCapabilityBadge /> : null}
+            {item.supportsVisionInput ? <ModelInputCapabilityBadge kind="vision" /> : null}
+            {item.supportsVideoInput ? <ModelInputCapabilityBadge kind="video" /> : null}
+            {item.supportsPdfInput ? <ModelInputCapabilityBadge kind="pdf" /> : null}
+            {item.supportsAudioInput ? <ModelInputCapabilityBadge kind="audio" /> : null}
           </span>
           {itemLocked ? (
             <TooltipProvider>
@@ -587,16 +645,38 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
             input?.focus();
           }}
         >
-          {leadingItems !== undefined && leadingItems.length > 0 ? (
+          {hasAnyModels ? (
+            <div className="sticky top-0 z-10 -mx-1 -mt-1 mb-0.5 bg-menu px-1 pb-1 pt-1">
+              <div className="flex items-center gap-1.5 rounded-md border border-border bg-surface px-2">
+                <SearchIcon className="size-3.5 shrink-0 text-foreground-subtle" aria-hidden="true" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.currentTarget.value)}
+                  onKeyDown={(event) => {
+                    // 菜单的 typeahead 会吞掉输入字符；只拦可打印键，Escape/方向键仍交给菜单。
+                    if (event.key.length === 1 || event.key === "Backspace") {
+                      event.stopPropagation();
+                    }
+                  }}
+                  placeholder={intl.formatMessage({ id: "chat.toolbar.model.searchPlaceholder" })}
+                  aria-label={intl.formatMessage({ id: "chat.toolbar.model.searchPlaceholder" })}
+                  data-testid="chat-model-search"
+                  className="h-7 min-w-0 flex-1 bg-transparent text-ui-sm text-foreground outline-none placeholder:text-foreground-subtlest"
+                />
+              </div>
+            </div>
+          ) : null}
+          {visibleLeadingItems !== undefined && visibleLeadingItems.length > 0 ? (
             <>
-              {renderModelItems(leadingItems)}
-              {hasSelectableModel ? <DropdownMenuSeparator /> : null}
+              {renderModelItems(visibleLeadingItems)}
+              {hasVisibleModels ? <DropdownMenuSeparator /> : null}
             </>
           ) : null}
           {hasSelectableModel && shouldShowProviderLevel
-            ? modelGroups.map((group, index) => {
+            ? visibleGroups.map((group, index) => {
                 const groupSeparator = shouldRenderModelGroupSeparator(
-                  modelGroups[index - 1],
+                  visibleGroups[index - 1],
                   group,
                 ) ? (
                   <DropdownMenuSeparator />
@@ -653,26 +733,90 @@ export const ModelConfigSelect = memo(function ModelConfigSelectComponent({
                 );
               })
             : hasSelectableModel
-              ? renderModelItems(modelGroups[0]?.items ?? [])
+              ? renderModelItems(visibleGroups[0]?.items ?? [])
               : null}
-          {renderedFooterActions.length > 0 ? (
+          {query.trim() && !hasVisibleModels ? (
+            <div className="px-2 py-3 text-center text-ui-sm text-foreground-subtle">
+              {intl.formatMessage({ id: "chat.toolbar.model.empty" })}
+            </div>
+          ) : null}
+          {showReasoningControl || renderedFooterActions.length > 0 ? (
             <div className="sticky bottom-0 z-10 bg-menu after:absolute after:left-0 after:top-full after:h-1 after:w-full after:bg-menu after:content-['']">
-              {hasSelectableModel ? <DropdownMenuSeparator /> : null}
-              {renderedFooterActions.map((action) => (
-                <DropdownMenuItem
-                  key={action.key}
-                  className="min-h-8 gap-2 px-2"
-                  data-model-footer-action={action.key}
-                  data-model-footer-action-selected={action.selected ? "true" : undefined}
-                  onSelect={() => {
-                    handlePopoverOpenChange(false);
-                    action.onSelect?.();
-                  }}
+              <DropdownMenuSeparator />
+              {showReasoningControl ? (
+                <div
+                  className="px-2 pb-1 pt-1.5"
+                  data-model-effort="true"
+                  data-model-effort-levels={reasoningLevels.join(",")}
+                  data-model-effort-value={currentReasoningValue}
                 >
-                  <span className="min-w-0 flex-1 truncate">{action.label}</span>
-                  {action.selected ? <CheckIcon className="size-4 text-foreground-subtle" /> : null}
-                </DropdownMenuItem>
-              ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-ui-sm text-foreground-subtle">{effortLabel}</span>
+                    <span className="ms-auto text-ui-sm font-medium text-foreground">
+                      {currentReasoningLabel}
+                    </span>
+                    {reasoningShortcutLabel ? (
+                      <kbd className="rounded border border-border bg-surface px-1 py-px font-sans text-ui-xs text-foreground-subtle">
+                        {reasoningShortcutLabel}
+                      </kbd>
+                    ) : null}
+                  </div>
+                  <div className="relative mt-1.5 h-5">
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-1 top-0 h-1.5 bg-[radial-gradient(circle,rgba(255,255,255,0.7)_1px,transparent_1px)] bg-[length:14px_6px] opacity-70"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-[linear-gradient(90deg,#34d399_0%,#22d3ee_48%,#3b82f6_100%)] shadow-[0_0_10px_rgba(34,211,238,0.28)]"
+                    />
+                    <input
+                      type="range"
+                      min={0}
+                      max={Math.max(0, reasoningLevels.length - 1)}
+                      step={1}
+                      value={currentReasoningIndex}
+                      disabled={reasoningLevels.length < 2}
+                      dir="ltr"
+                      aria-label={effortLabel}
+                      aria-valuetext={currentReasoningLabel}
+                      data-testid="chat-model-effort-slider"
+                      onChange={(event) => {
+                        const next = reasoningLevelValue(
+                          reasoningLevels,
+                          Number(event.currentTarget.value),
+                        );
+                        if (next) onReasoningValueChange?.(next);
+                      }}
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={(event) => event.stopPropagation()}
+                      className="relative z-10 h-5 w-full cursor-pointer appearance-none bg-transparent disabled:cursor-default [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow [&::-moz-range-track]:bg-transparent [&::-webkit-slider-runnable-track]:bg-transparent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow"
+                    />
+                  </div>
+                </div>
+              ) : null}
+              {renderedFooterActions.length > 0 ? (
+                <>
+                  {showReasoningControl ? <DropdownMenuSeparator /> : null}
+                  {renderedFooterActions.map((action) => (
+                    <DropdownMenuItem
+                      key={action.key}
+                      className="min-h-8 gap-2 px-2"
+                      data-model-footer-action={action.key}
+                      data-model-footer-action-selected={action.selected ? "true" : undefined}
+                      onSelect={() => {
+                        handlePopoverOpenChange(false);
+                        action.onSelect?.();
+                      }}
+                    >
+                      <span className="min-w-0 flex-1 truncate">{action.label}</span>
+                      {action.selected ? (
+                        <CheckIcon className="size-4 text-foreground-subtle" />
+                      ) : null}
+                    </DropdownMenuItem>
+                  ))}
+                </>
+              ) : null}
             </div>
           ) : null}
         </DropdownMenuContent>

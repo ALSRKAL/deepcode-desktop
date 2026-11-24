@@ -536,6 +536,13 @@ function V4ComposerModelControlsImpl({
           isItemLocked={isModelOptionLocked}
           onLockedItemSelect={handleLockedModelSelect}
           onValueChange={handleModelValueChange}
+          reasoningValue={
+            thoughtOption?.type === "select"
+              ? String(thoughtOption.currentValue ?? "")
+              : undefined
+          }
+          reasoningShortcutLabel={thoughtShortcutLabel}
+          onReasoningValueChange={handleThoughtValueChange}
           disabled={disabled || recoveryPending || modelSelectionState.status !== "ready"}
           tooltipTitle={modelTriggerDisplay.fullLabel}
           shortcutLabel={modelShortcutLabel}

@@ -77,22 +77,34 @@ function buildRawRegistryModelSelectGroups(
         label: accountPresentation?.label || provider.providerName?.trim() || provider.providerId,
         ...(accountPresentation?.labelBadge ? { labelBadge: accountPresentation.labelBadge } : {}),
         ...(accountPresentation ? { directItems: true } : {}),
-        items: provider.models.map(({ modelId, config }) => ({
-          key: `registry-provider:${provider.providerId}:${modelId}`,
-          value: encodeCustomModelValue(provider.providerId, modelId),
-          // DeepCode 品牌名 + 实际上游模型，用户看得到自己在用哪个模型。
-          name: (isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)?.name) || modelId,
-          ...(isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)
-            ? { detail: deepCodeModelInfo(modelId)!.detail }
-            : {}),
-          ...(shouldShowModelVisionBadge(
-            modelId,
-            config.properties?.inputFormat?.supportsImage,
-            provider.config.access,
-          )
-            ? { supportsVisionInput: true }
-            : {}),
-        })),
+        items: provider.models.map(({ modelId, config }) => {
+          const inputFormat = config.properties?.inputFormat;
+          const reasoningLevels = Array.isArray(config.optionSpecs?.reasoningLevel?.values)
+            ? config.optionSpecs.reasoningLevel.values.filter(
+                (value): value is string => typeof value === "string" && value.trim().length > 0,
+              )
+            : [];
+          return {
+            key: `registry-provider:${provider.providerId}:${modelId}`,
+            value: encodeCustomModelValue(provider.providerId, modelId),
+            // DeepCode 品牌名 + 实际上游模型，用户看得到自己在用哪个模型。
+            name: (isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)?.name) || modelId,
+            ...(isDeepCodeProviderId(provider.providerId) && deepCodeModelInfo(modelId)
+              ? { detail: deepCodeModelInfo(modelId)!.detail }
+              : {}),
+            ...(shouldShowModelVisionBadge(
+              modelId,
+              inputFormat?.supportsImage,
+              provider.config.access,
+            )
+              ? { supportsVisionInput: true }
+              : {}),
+            ...(inputFormat?.supportsVideo === true ? { supportsVideoInput: true } : {}),
+            ...(inputFormat?.supportsPdf === true ? { supportsPdfInput: true } : {}),
+            ...(inputFormat?.supportsAudio === true ? { supportsAudioInput: true } : {}),
+            ...(reasoningLevels.length > 0 ? { reasoningLevels } : {}),
+          };
+        }),
       },
     ];
   });

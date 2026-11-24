@@ -50,6 +50,49 @@ describe("DeepCode model menu", () => {
     expect(locked.every((i) => isDeepCodeLockedValue(i.value))).toBe(true);
   });
 
+  it("exposes per-model input capabilities and reasoning levels", () => {
+    const [group] = buildRegistryModelSelectGroups(
+      ZCODE_AGENT_PROVIDER,
+      {
+        providers: [
+          {
+            providerId: "account:deepcode",
+            providerName: "DeepCode Studio",
+            config: {
+              api: { type: "openai-chat-completions", baseUrl: "https://x/v1" },
+              access: { type: "deepcode-account" },
+            },
+            models: [
+              {
+                modelId: "hungerg-free",
+                config: {
+                  properties: {
+                    inputFormat: {
+                      supportsImage: true,
+                      supportsVideo: true,
+                      supportsPdf: false,
+                      supportsAudio: false,
+                    },
+                  },
+                  optionSpecs: {
+                    reasoningLevel: { values: ["disabled", "enabled"] },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      } as unknown as ModelSelectionView,
+      labels,
+    );
+    const item = group!.items.find((candidate) => candidate.name === "HungerG Free")!;
+    expect(item.supportsVisionInput).toBe(true);
+    expect(item.supportsVideoInput).toBe(true);
+    expect(item.supportsPdfInput).toBeUndefined();
+    expect(item.supportsAudioInput).toBeUndefined();
+    expect(item.reasoningLevels).toEqual(["disabled", "enabled"]);
+  });
+
   it("adds the premium on-request group with names only, all locked", () => {
     const groups = buildRegistryModelSelectGroups(ZCODE_AGENT_PROVIDER, view(["deepcode-default"]), labels);
     const premium = groups.find((g) => g.key === "deepcode-premium-on-request")!;
